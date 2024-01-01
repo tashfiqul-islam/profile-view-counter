@@ -1,0 +1,8 @@
+
+    <svg xmlns="http://www.w3.org/2000/svg" width="200" height="32">
+      <rect width="100%" height="100%" fill="#555" rx="0"/>
+      <rect width="50%" height="100%" fill="#4CAF50"/>
+      <text x="25%" y="50%" font-family="Roboto Light" font-size="14" text-anchor="middle" fill="#fff">Profile Views</text>
+      <text x="75%" y="50%" font-family="Roboto Regular" font-size="14" text-anchor="middle" fill="#000">35</text>
+    </svg>
+  
