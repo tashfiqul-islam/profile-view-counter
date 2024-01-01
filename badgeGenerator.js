@@ -30,7 +30,7 @@ exports.generateBadge = (label, count) => {
         <svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${badgeHeight}">
             <rect width="${ashSectionWidth}" height="${badgeHeight}" fill="#555555" />
             <rect x="${ashSectionWidth}" width="${blueSectionWidth}" height="${badgeHeight}" fill="#007ec6"/>
-            <image href="https://raw.githubusercontent.com/tashfiqul-islam/profile-view-counter/master/assets/github.png" x="${padding}" y="${(badgeHeight - logoSize) / 2}" height="${logoSize}" width="${logoSize}"/>
+            <image href="https://raw.githubusercontent.com/tashfiqul-islam/profile-view-counter/master/assets/github.PNG" x="${padding}" y="${(badgeHeight - logoSize) / 2}" height="${logoSize}" width="${logoSize}"/>
             <text x="${labelXPosition}" y="${verticalCenter}" alignment-baseline="middle" text-anchor="middle" font-family="Roboto-regular, sans-serif" font-size="${textFontSize}" fill="#fff">${label}</text>
             <text x="${countXPosition}" y="${verticalCenter}" alignment-baseline="middle" text-anchor="middle" font-family="Roboto-medium, sans-serif" font-size="${textFontSize}" font-weight="bold" fill="#fff">${formattedCount}</text>
         </svg>`;
