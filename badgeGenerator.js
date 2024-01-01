@@ -6,8 +6,8 @@ exports.generateBadge = (label, count) => {
     const logoSize = 22;
     const padding = 8;
     const spacing = 8;
-    const textFontSize = 12.5;
-    const fontWeightAdjustment = 1.2;
+    const textFontSize = 13;
+    const fontWeightAdjustment = 1.5;
 
     // Function to estimate text width
     const estimatedTextWidth = (text, fontSize, fontWeight) => 
