@@ -2,7 +2,7 @@
   "name": "profile-view-counter",
   "version": "1.0.0",
   "description": "A Node.js application to track and display the number of views on GitHub profiles.",
-  "main": "index.js",
+  "main": "api/view-counter.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/tashfiqul-islam/profile-view-counter"
@@ -19,7 +19,7 @@
     "mongodb": "^6.3.0"
   },
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node api/view-counter.js",
+    "dev": "nodemon api/view-counter.js"
   }
 }
