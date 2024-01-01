@@ -1,16 +1,15 @@
-const express = require('express');
 const { MongoClient } = require('mongodb');
 const rateLimit = require('express-rate-limit');
-const config = require('./config');
-const { generateBadge } = require('./badgeGenerator');
+const config = require('../config');
+const { generateBadge } = require('../badgeGenerator');
 
-const app = express();
 const client = new MongoClient(config.mongodb.uri);
 
-app.use(rateLimit(config.rateLimit));
+const rateLimiter = rateLimit(config.rateLimit).bind(null, {}, {});
 
-// Route for handling view counts
-app.get('/view-counter', async (req, res) => {
+module.exports = async (req, res) => {
+    await rateLimiter(req, res, () => {});
+
     const { username } = req.query;
 
     if (!username) {
@@ -45,9 +44,4 @@ app.get('/view-counter', async (req, res) => {
     } finally {
         await client.close();
     }
-});
-
-// Server Initialization
-app.listen(config.server.port, () => {
-    console.log(`Server running on http://localhost:${config.server.port}`);
-});
+};
