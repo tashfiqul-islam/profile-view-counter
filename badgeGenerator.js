@@ -2,16 +2,16 @@ exports.generateBadge = (label, count) => {
     const formattedCount = count >= 100000 ? formatLargeNumber(count) : formatNumberWithCommas(count);
 
     // Badge dimension and font size
-    const badgeHeight = 32;
+    const badgeHeight = 34;
     const logoSize = 22;
-    const padding = 8;
+    const padding = 10;
     const spacing = 8;
-    const textFontSize = 13;
+    const textFontSize = 14;
     const fontWeightAdjustment = 1.5;
 
     // Function to estimate text width
     const estimatedTextWidth = (text, fontSize, fontWeight) => 
-        text.length * (fontSize / 2) * (fontWeight === 'bold' ? fontWeightAdjustment : 1);
+        text.length * (fontSize / 2) * (fontWeight === 'bold' ? fontWeightAdjustment : 1.05);
 
     const labelWidth = estimatedTextWidth(label, textFontSize, 'normal');
     const countWidth = estimatedTextWidth(formattedCount, textFontSize, 'bold');
