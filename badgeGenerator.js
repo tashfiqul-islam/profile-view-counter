@@ -23,7 +23,7 @@ exports.generateBadge = (label, count) => {
     // Position calculations
     const labelXPosition = padding + logoSize + spacing + (labelWidth / 2);
     const countXPosition = ashSectionWidth + (blueSectionWidth / 2);
-    const verticalCenter = (badgeHeight / 2) + 1;
+    const verticalCenter = (badgeHeight / 2) + 1.5;
 
     // SVG markup
     return `
