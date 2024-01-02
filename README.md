@@ -5,7 +5,7 @@
         <strong>Track your GitHub profile views and showcase your popularity!</strong><br>
         Real-time tracking, customizable designs, and easy GitHub integration.
     </p>
-    <h3>Badge Design</h3>
+    <h3>Demo Badge Design</h3>
     <a>
         <img src="https://git-pvc-b6c98dcecb5c.herokuapp.com/api/view-counter?username=testuser" alt="Profile Views" alt="Design">
     </a>
@@ -60,10 +60,10 @@
     <h3>Repo Inspiration</h3>
     <p>
         <a href="https://github.com/DenverCoder1/Simple-View-Counter" target="_blank">
-            <img src="https://custom-icon-badges.demolab.com/static/v1?label=Tracking+Tool&message=Simple+View+Counter&color=blue&style=for-the-badge&logo=github" alt="Simple View Counter Badge">
+            <img src="https://custom-icon-badges.demolab.com/static/v1?label=Tracking+Tool&message=Simple+View+Counter&color=blue&style=for-the-badge&logo=graph" alt="Simple View Counter Badge">
         </a>
         <a href="https://github.com/DenverCoder1/custom-icon-badges" target="_blank">
-            <img src="https://custom-icon-badges.demolab.com/static/v1?label=Badge+Tool&message=Custom+Icon+Badges&color=purple&style=for-the-badge&logo=github" alt="Custom Icon Badges Badge">
+            <img src="https://custom-icon-badges.demolab.com/static/v1?label=Badge+Tool&message=Custom+Icon+Badges&color=purple&style=for-the-badge&logo=file-badge" alt="Custom Icon Badges Badge">
         </a>
     </p>
 </div>
