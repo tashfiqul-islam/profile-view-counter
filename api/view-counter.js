@@ -41,10 +41,11 @@ app.get('/api/view-counter', async (req, res) => {
     // Redirect to generated badge URL
     if (result && 'views' in result) {
       const badgeUrl = generateBadge(result.views);
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
-         .setHeader('Pragma', 'no-cache')
-         .setHeader('Expires', '0')
-         .redirect(badgeUrl);
+      res
+        .setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+        .setHeader('Pragma', 'no-cache')
+        .setHeader('Expires', '0')
+        .redirect(badgeUrl);
     } else {
       res.status(404).send('User not found or view count not updated');
     }
