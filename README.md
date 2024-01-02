@@ -5,7 +5,7 @@
         <strong>Track your GitHub profile views and showcase your popularity!</strong><br>
         Real-time tracking, customizable designs, and easy GitHub integration.
     </p>
-    <h3>Design</h3>
+    <h3>Badge Design</h3>
     <a>
         <img src="https://git-pvc-b6c98dcecb5c.herokuapp.com/api/view-counter?username=testuser" alt="Profile Views" alt="Design">
     </a>
