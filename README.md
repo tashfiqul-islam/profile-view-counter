@@ -77,6 +77,9 @@
         <a href="https://github.com/DenverCoder1" target="_blank">
             <img src="https://custom-icon-badges.demolab.com/static/v1?label=Developer&message=DenverCoder1&color=D90368&style=for-the-badge&logo=github" alt="DenverCoder1 Profile Badge">
         </a>
+        <a href="https://www.youtube.com/@DevProTips" target="_blank">
+            <img src="https://custom-icon-badges.demolab.com/static/v1?label=YouTube&message=Jonah+Lawrence+%C2%B7+Dev+Pro+Tips&color=CD201F&style=for-the-badge&logo=youtube&logoSource=feather" alt="DenverCoder1 Profile Badge">
+        </a>
     </p>
 </div>
 
