@@ -4,6 +4,9 @@ node_modules/
 # Environment variables
 .env
 
+# Codecov report
+/coverage
+
 # Build output
 /dist
 

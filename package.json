@@ -24,7 +24,7 @@
     "dev": "nodemon api/view-counter.js",
     "format": "prettier --write .",
     "test": "jest --coverage"
-  },  
+  },
   "devDependencies": {
     "jest": "^29.7.0",
     "mongodb-memory-server": "^9.1.3",
