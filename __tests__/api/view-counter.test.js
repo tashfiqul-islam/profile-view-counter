@@ -13,7 +13,6 @@ describe('API /view-counter Tests', () => {
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
-    console.log('Test MongoDB URI:', uri);
     client = new MongoClient(uri);
     await client.connect();
 
@@ -45,7 +44,6 @@ describe('API /view-counter Tests', () => {
 
     // Additional logging for debugging purposes
     const allDocuments = await db.collection('viewCounts').find({}).toArray();
-    console.log('All documents in viewCounts collection:', allDocuments);
   });
 
   // Test for handling missing username parameter

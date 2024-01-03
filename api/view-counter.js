@@ -18,8 +18,6 @@ function makeApp(dbClient) {
     if (!db) {
       await client.connect();
       db = client.db('githubViews');
-      console.log('Connected to MongoDB');
-      console.log('Connected to MongoDB at:', client.s.url);
     }
   }
 
@@ -32,8 +30,6 @@ function makeApp(dbClient) {
       { upsert: true, returnDocument: 'after' },
     );
 
-    console.log('Database operation result:', result);
-    console.log(`Updated view count for ${username}:`, result);
     return result;
   }
 
@@ -47,7 +43,6 @@ function makeApp(dbClient) {
 
       await connectToDatabase();
       const updatedDocument = await incrementViewCount(username);
-      console.log('Updated document:', updatedDocument); // Debug log
 
       if (updatedDocument && 'views' in updatedDocument) {
         const badgeUrl = generateBadge(updatedDocument.views);
