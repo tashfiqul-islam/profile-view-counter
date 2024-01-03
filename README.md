@@ -27,10 +27,10 @@
   </p>
 
   <h3>Markdown:</h3>
-    <pre><code>![Profile Views](https://git-pvc.herokuapp.com/api/view-counter?username=your-username)</code></pre>
+    <pre><code>![Profile Views](https://git-pvc-b6c98dcecb5c.com/api/view-counter?username=your-username)</code></pre>
 
   <h3>HTML:</h3>
-    <pre><code>&lt;img src="https://git-pvc.herokuapp.com/api/view-counter?username=your-username" alt="Profile Views"&gt;</code></pre>
+    <pre><code>&lt;img src="https://git-pvc-b6c98dcecb5c.com/api/view-counter?username=your-username" alt="Profile Views"&gt;</code></pre>
 </div>
 
 <br>
