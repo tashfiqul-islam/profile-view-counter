@@ -18,12 +18,12 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['20.10.0'] 
+        node-version: ['16, 18, 20'] 
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
