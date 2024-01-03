@@ -5,9 +5,13 @@
         <strong>Track your GitHub profile views and showcase your popularity!</strong><br>
         Real-time tracking, customizable designs, and easy GitHub integration.
     </p>
+    <a>
+        <img alt="Node CI" src="https://img.shields.io/github/actions/workflow/status/tashfiqul-islam/profile-view-counter/nodejs.yml?style=flat-square&logo=node.js&logoColor=white&labelColor=%23555555&color=339933">
+    </a> 
+    <br>
     <h3>Demo Badge Design</h3>
     <a>
-        <img src="https://git-pvc-b6c98dcecb5c.herokuapp.com/api/view-counter?username=testuser" alt="Profile Views" alt="Design">
+        <img src="https://git-pvc-b6c98dcecb5c.herokuapp.com/api/view-counter?username=testuser&bustcache=1" alt="Profile Views" alt="Design">
     </a>
 </div>
 
@@ -31,7 +35,7 @@
 <h2 align="center">💻 Tech Stack</h2>
 <p align="center">
     <img src="https://img.shields.io/badge/Express-4.18.2-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express">
-    <img src="https://img.shields.io/badge/Node.js-18.17.1-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
+    <img src="https://img.shields.io/badge/Node.js-20.10.0-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
     <img src="https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
     <img src="https://img.shields.io/badge/MongoDB-6.3.0-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB">
     <img src="https://img.shields.io/badge/Dotenv-16.3.1-00C7B7?style=for-the-badge&logo=dotenv&logoColor=white" alt="Dotenv">
