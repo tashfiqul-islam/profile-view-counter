@@ -3,60 +3,80 @@ const { MongoClient } = require('mongodb');
 const { generateBadge } = require('../badgeGenerator');
 const config = require('../config');
 
-// Initialize Express application
-const app = express();
+function makeApp(dbClient) {
+  const app = express();
 
-// MongoDB client and database variables
-let client;
-let db;
+  let client = dbClient || new MongoClient(config.mongodb.uri);
+  let db;
 
-// Connect to MongoDB database
-async function connectToDatabase() {
-  if (!client) {
-    client = new MongoClient(config.mongodb.uri);
-    await client.connect();
-    db = client.db('githubViews');
-  }
-}
-
-// Increment view count for a given username
-async function incrementViewCount(username) {
-  const collection = db.collection('viewCounts');
-  return await collection.findOneAndUpdate(
-    { username },
-    { $inc: { views: 1 } },
-    { upsert: true, returnDocument: 'after' },
-  );
-}
-
-// Route to handle view count requests
-app.get('/api/view-counter', async (req, res) => {
-  try {
-    const { username } = req.query;
-    if (!username) return res.status(400).send('Username is required');
-
-    await connectToDatabase();
-    const result = await incrementViewCount(username);
-
-    // Redirect to generated badge URL
-    if (result && 'views' in result) {
-      const badgeUrl = generateBadge(result.views);
-      res
-        .setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
-        .setHeader('Pragma', 'no-cache')
-        .setHeader('Expires', '0')
-        .redirect(badgeUrl);
-    } else {
-      res.status(404).send('User not found or view count not updated');
+  async function connectToDatabase() {
+    if (!client) {
+      client = new MongoClient(config.mongodb.uri);
     }
-  } catch (error) {
-    console.error('Server error:', error);
-    res.status(500).send('Internal Server Error');
+
+    // Connect if not already connected
+    if (!db) {
+      await client.connect();
+      db = client.db('githubViews');
+      console.log('Connected to MongoDB');
+      console.log('Connected to MongoDB at:', client.s.url);
+    }
   }
-});
 
-// Start server on configured port
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  // Increment view count for a given username
+  async function incrementViewCount(username) {
+    const collection = db.collection('viewCounts');
+    const result = await collection.findOneAndUpdate(
+      { username },
+      { $inc: { views: 1 } },
+      { upsert: true, returnDocument: 'after' },
+    );
 
-module.exports = app;
+    console.log('Database operation result:', result);
+    console.log(`Updated view count for ${username}:`, result);
+    return result;
+  }
+
+  // Route to handle view count requests
+  app.get('/api/view-counter', async (req, res) => {
+    try {
+      const { username } = req.query;
+      if (!username) {
+        return res.status(400).send('Username is required');
+      }
+
+      await connectToDatabase();
+      const updatedDocument = await incrementViewCount(username);
+      console.log('Updated document:', updatedDocument); // Debug log
+
+      if (updatedDocument && 'views' in updatedDocument) {
+        const badgeUrl = generateBadge(updatedDocument.views);
+        res
+          .setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+          .setHeader('Pragma', 'no-cache')
+          .setHeader('Expires', '0')
+          .redirect(badgeUrl);
+      } else {
+        res.status(404).send('User not found or view count not updated');
+      }
+    } catch (error) {
+      console.error('Server error:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+
+  // Export the app for testing purposes
+  return app;
+}
+
+// Start the server only if this module is not required by another module (i.e., during testing).
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  const app = makeApp();
+
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+module.exports = makeApp;
