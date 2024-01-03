@@ -5,9 +5,9 @@
         <strong>Track your GitHub profile views and showcase your popularity!</strong><br>
         Real-time tracking, customizable designs, and easy GitHub integration.
     </p>
-    <a>
+    <a href="https://github.com/tashfiqul-islam/profile-view-counter/actions/workflows/nodejs.yml">
         <img alt="Node CI" src="https://img.shields.io/github/actions/workflow/status/tashfiqul-islam/profile-view-counter/nodejs.yml?style=flat-square&logo=node.js&logoColor=white&labelColor=%23555555&color=339933">
-    </a> 
+    </a>
     <br>
     <h3>Demo Badge Design</h3>
     <a>
