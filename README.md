@@ -7,7 +7,7 @@
     </p>
     <a href="https://github.com/tashfiqul-islam/profile-view-counter/actions/workflows/nodejs.yml">
         <img alt="Node CI" src="https://img.shields.io/github/actions/workflow/status/tashfiqul-islam/profile-view-counter/nodejs.yml?style=flat-square&logo=node.js&logoColor=white&labelColor=%23555555&color=339933">
-    </a> &nbsp;
+    </a>
     <a href="https://codecov.io/github/tashfiqul-islam/profile-view-counter" > 
          <img src="https://img.shields.io/codecov/c/github/tashfiqul-islam/profile-view-counter?style=flat-square&logo=Codecov&logoColor=white&labelColor=555555&color=FF0077"/> 
     </a>
