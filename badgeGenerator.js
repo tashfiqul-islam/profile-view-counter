@@ -11,18 +11,24 @@ function formatLargeNumber(number) {
   if (number < 0) {
     // Return formatted negative numbers
     return formatNumberWithCommas(number);
-  } else if (number < 1000) {
-    // Numbers less than 1000 are returned as-is
+  } else if (number < 100000) {
+    // Numbers less than 100,000 are returned as-is
     return number.toString();
   } else if (number < 1000000) {
     // Format thousands with 'k' suffix
-    return (number / 1000).toFixed(0) + 'k';
+    const formatted = (number / 1000).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    return formatted.endsWith('.00')
+      ? formatted.slice(0, -3) + 'k'
+      : formatted + 'k';
   } else if (number < 1000000000) {
-    // Format millions with 'M' suffix, removing trailing zeros
-    return (number / 1000000).toFixed(2).replace(/\.0+$/, '') + 'M';
+    // Format millions with 'M' suffix
+    return (number / 1000000).toFixed(0) + 'M';
   } else {
-    // Format billions with 'B' suffix, removing trailing zeros
-    return (number / 1000000000).toFixed(2).replace(/\.0+$/, '') + 'B';
+    // Format billions with 'B' suffix
+    return (number / 1000000000).toFixed(0) + 'B';
   }
 }
 
