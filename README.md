@@ -14,7 +14,7 @@
     <br>
     <h3>Demo Badge Design</h3>
     <a>
-        <img src="https://git-pvc-b6c98dcecb5c.herokuapp.com/api/view-counter?username=tashfiqul-islam" alt="Profile Views" alt="Design">
+        <img src="https://git-pvc-b6c98dcecb5c.herokuapp.com/api/view-counter?username=testuser&cacheBuster=1" alt="Profile Views" alt="Design">
     </a>
 </div>
 
