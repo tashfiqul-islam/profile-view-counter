@@ -29,11 +29,14 @@ describe('API /view-counter Tests', () => {
   // Test for successful view count increment and badge URL generation
   test('increments view count and returns badge URL for valid username', async () => {
     const username = 'testuser';
-    const response = await request(app).get('/api/view-counter').query({ username });
+    const response = await request(app)
+      .get('/api/view-counter')
+      .query({ username });
     expect(response.status).toBe(302);
 
     // Check if the response redirects to the correct badge URL
-    const badgeUrlRegex = /^https:\/\/custom-icon-badges\.demolab\.com\/static\/v1\?.*/;
+    const badgeUrlRegex =
+      /^https:\/\/custom-icon-badges\.demolab\.com\/static\/v1\?.*/;
     expect(response.headers.location).toMatch(badgeUrlRegex);
 
     // Verify the view count in the database

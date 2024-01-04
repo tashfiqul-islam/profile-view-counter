@@ -27,9 +27,15 @@ function formatLargeNumber(number) {
 }
 
 // Function to generate a custom badge URL based on view count
-const generateBadge = (count, style = 'for-the-badge', color = '007ec6') => {
-  // Determine the correct format for the count
-  const formattedCount = count >= 100000 ? formatLargeNumber(count) : formatNumberWithCommas(count);
+const generateBadge = (
+  count,
+  style = 'for-the-badge',
+  color = '007ec6',
+  timestamp = new Date().getTime(),
+) => {
+  // Format the count for display
+  const formattedCount =
+    count >= 100000 ? formatLargeNumber(count) : formatNumberWithCommas(count);
 
   // Define parameters for the badge URL
   const params = new URLSearchParams({
@@ -40,11 +46,11 @@ const generateBadge = (count, style = 'for-the-badge', color = '007ec6') => {
     logo: 'github',
     logoColor: 'white',
     logoSource: 'feather',
+    cacheBuster: timestamp,
   });
 
   // Construct and return the complete badge URL
   return `https://custom-icon-badges.demolab.com/static/v1?${params.toString()}`;
 };
 
-// Export the functions for external use
 module.exports = { formatNumberWithCommas, formatLargeNumber, generateBadge };

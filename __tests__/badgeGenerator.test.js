@@ -1,4 +1,8 @@
-const { formatNumberWithCommas, formatLargeNumber, generateBadge } = require('../badgeGenerator');
+const {
+  formatNumberWithCommas,
+  formatLargeNumber,
+  generateBadge,
+} = require('../badgeGenerator');
 
 describe('Badge Generator Tests', () => {
   // Tests for formatNumberWithCommas
@@ -62,37 +66,48 @@ describe('Badge Generator Tests', () => {
     });
   });
 
+  // Fixed timestamp for testing
+  const testTimestamp = 'timestamp';
+
   // Tests for generateBadge
   describe('generateBadge function', () => {
     // Test for correct badge URL generation for small numbers
     test('generates correct badge URL for small numbers', () => {
       const count = 150;
       const expectedUrl =
-        'https://custom-icon-badges.demolab.com/static/v1?label=Profile+Visitors&message=150&color=007ec6&style=for-the-badge&logo=github&logoColor=white&logoSource=feather';
-      expect(generateBadge(count)).toBe(expectedUrl);
+        'https://custom-icon-badges.demolab.com/static/v1?label=Profile+Visitors&message=150&color=007ec6&style=for-the-badge&logo=github&logoColor=white&logoSource=feather&cacheBuster=timestamp';
+      expect(
+        generateBadge(count, 'for-the-badge', '007ec6', testTimestamp),
+      ).toBe(expectedUrl);
     });
 
     test('generates correct badge URL for large numbers', () => {
       const count = 150000;
       const expectedUrl =
-        'https://custom-icon-badges.demolab.com/static/v1?label=Profile+Visitors&message=150k&color=007ec6&style=for-the-badge&logo=github&logoColor=white&logoSource=feather';
-      expect(generateBadge(count)).toBe(expectedUrl);
+        'https://custom-icon-badges.demolab.com/static/v1?label=Profile+Visitors&message=150k&color=007ec6&style=for-the-badge&logo=github&logoColor=white&logoSource=feather&cacheBuster=timestamp';
+      expect(
+        generateBadge(count, 'for-the-badge', '007ec6', testTimestamp),
+      ).toBe(expectedUrl);
     });
 
     // Handling zero views
     test('handles zero views correctly', () => {
       const count = 0;
       const expectedUrl =
-        'https://custom-icon-badges.demolab.com/static/v1?label=Profile+Visitors&message=0&color=007ec6&style=for-the-badge&logo=github&logoColor=white&logoSource=feather';
-      expect(generateBadge(count)).toBe(expectedUrl);
+        'https://custom-icon-badges.demolab.com/static/v1?label=Profile+Visitors&message=0&color=007ec6&style=for-the-badge&logo=github&logoColor=white&logoSource=feather&cacheBuster=timestamp';
+      expect(
+        generateBadge(count, 'for-the-badge', '007ec6', testTimestamp),
+      ).toBe(expectedUrl);
     });
 
     // Handling very large numbers
     test('handles very large numbers correctly', () => {
       const count = 1000000000; // 1 billion
       const expectedUrl =
-        'https://custom-icon-badges.demolab.com/static/v1?label=Profile+Visitors&message=1B&color=007ec6&style=for-the-badge&logo=github&logoColor=white&logoSource=feather';
-      expect(generateBadge(count)).toBe(expectedUrl);
+        'https://custom-icon-badges.demolab.com/static/v1?label=Profile+Visitors&message=1B&color=007ec6&style=for-the-badge&logo=github&logoColor=white&logoSource=feather&cacheBuster=timestamp';
+      expect(
+        generateBadge(count, 'for-the-badge', '007ec6', testTimestamp),
+      ).toBe(expectedUrl);
     });
 
     // Additional scenario tests for different styles, colors
@@ -101,8 +116,10 @@ describe('Badge Generator Tests', () => {
       const style = 'for-the-badge';
       const color = '007ec6';
       const expectedUrl =
-        'https://custom-icon-badges.demolab.com/static/v1?label=Profile+Visitors&message=500&color=007ec6&style=for-the-badge&logo=github&logoColor=white&logoSource=feather';
-      expect(generateBadge(count, style, color)).toBe(expectedUrl);
+        'https://custom-icon-badges.demolab.com/static/v1?label=Profile+Visitors&message=500&color=007ec6&style=for-the-badge&logo=github&logoColor=white&logoSource=feather&cacheBuster=timestamp';
+      expect(
+        generateBadge(count, 'for-the-badge', '007ec6', testTimestamp),
+      ).toBe(expectedUrl);
     });
   });
 });
