@@ -14,7 +14,7 @@
     <br>
     <h3>Demo Badge Design</h3>
     <a>
-        <img src="https://git-pvc-b6c98dcecb5c.herokuapp.com/api/view-counter?username=testuser&cacheBust=1" alt="Profile Views" alt="Design">
+        <img src="https://profile-view-counter-jcp1.onrender.com/api/view-counter?username=testuser&cacheBust=1" alt="Profile Views" alt="Design">
     </a>
 </div>
 
@@ -27,10 +27,10 @@
   </p>
 
   <h3>Markdown:</h3>
-    <pre><code>![Profile Views](https://git-pvc-b6c98dcecb5c.com/api/view-counter?username=your-username)</code></pre>
+    <pre><code>![Profile Views](https://profile-view-counter-jcp1.onrender.com/api/view-counter?username=your_username)</code></pre>
 
   <h3>HTML:</h3>
-    <pre><code>&lt;img src="https://git-pvc-b6c98dcecb5c.com/api/view-counter?username=your-username" alt="Profile Views"&gt;</code></pre>
+    <pre><code>&lt;img src="https://profile-view-counter-jcp1.onrender.com/api/view-counter?username=your_username" alt="Profilewae Views"&gt;</code></pre>
 </div>
 
 <br>
@@ -45,7 +45,7 @@
     <br>
     <br>
     <a href="https://heroku.com" target="_blank">
-        <img src="https://img.shields.io/badge/Hosted%20on-Heroku-430098?style=for-the-badge&logo=heroku" alt="Heroku">
+        <img src="https://custom-icon-badges.demolab.com/badge/Hosted%20on-Render-000?style=for-the-badge&logo=render-community-large-icon" alt="Render">
     </a>
 </p>
 
