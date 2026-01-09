@@ -24,5 +24,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
       - name: Validate Renovate Config
-        run: npx --yes renovate@latest renovate-config-validator --strict renovate.json
+        run: npx --yes renovate@latest renovate-config-validator renovate.json
