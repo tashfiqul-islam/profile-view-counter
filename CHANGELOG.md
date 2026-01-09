@@ -2,6 +2,10 @@
 
 All notable changes to **Profile View Counter** are documented in this file. See our [Contribution Guidelines](https://github.com/tashfiqul-islam/profile-view-counter#-contributing) for commit guidelines.
 
+## <small>2.0.4 (2026-01-09)</small>
+
+* fix: node lts for renovate validator ([9a23d04](https://github.com/tashfiqul-islam/profile-view-counter/commit/9a23d04))
+
 ## <small>2.0.3 (2026-01-09)</small>
 
 * Merge branch 'master' of https://github.com/tashfiqul-islam/profile-view-counter ([3674a13](https://github.com/tashfiqul-islam/profile-view-counter/commit/3674a13))
