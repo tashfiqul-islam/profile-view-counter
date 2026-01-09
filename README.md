@@ -1,126 +1,173 @@
 <div align="center">
-    <img src="https://raw.githubusercontent.com/tashfiqul-islam/profile-view-counter/master/assets/pvc_banner1.png" alt="Profile View Counter Logo">
-    <h1>📊 Profile View Counter</h1>
-    <p>
-        <strong>Track your GitHub profile views and showcase your popularity!</strong><br>
-        Real-time tracking, customizable designs, and easy GitHub integration.
-    </p>
-    <a href="https://github.com/tashfiqul-islam/profile-view-counter/actions/workflows/nodejs.yml">
-        <img alt="Node CI" src="https://img.shields.io/github/actions/workflow/status/tashfiqul-islam/profile-view-counter/nodejs.yml?style=flat-square&logo=node.js&logoColor=white&labelColor=%23555555&color=339933">
-    </a>
-    <a href="https://codecov.io/github/tashfiqul-islam/profile-view-counter" > 
-         <img src="https://img.shields.io/codecov/c/github/tashfiqul-islam/profile-view-counter?style=flat-square&logo=Codecov&logoColor=white&labelColor=555555&color=FF0077"/> 
-    </a>
-    <br>
-    <h3>Demo Badge Design</h3>
-    <a>
-        <img src="https://profile-view-counter-jcp1.onrender.com/api/view-counter?username=testuser&cacheBust=1" alt="Profile Views" alt="Design">
-    </a>
+
+![Profile View Counter Banner](assets/readme-cover.png)
+
+<div style="margin-top: 20px;">
+
+![Version](https://img.shields.io/badge/version-2.0.0-blue?style=for-the-badge&logo=github&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-passing-success?style=for-the-badge&logo=vitest&logoColor=white)
+![Coverage](https://img.shields.io/badge/coverage-100%25-success?style=for-the-badge&logo=vitest&logoColor=white)
+
 </div>
 
-<br>
-
-<div align="center">
-  <h2>🚀 Quick Start</h2>
-  <p align="center">
-    Add the view counter to your README in seconds! Replace <code>your-username</code> with your GitHub username.
-  </p>
-
-  <h3>Markdown:</h3>
-    <pre><code>![Profile Views](https://profile-view-counter-jcp1.onrender.com/api/view-counter?username=your_username)</code></pre>
-
-  <h3>HTML:</h3>
-    <pre><code>&lt;img src="https://profile-view-counter-jcp1.onrender.com/api/view-counter?username=your_username" alt="Profilewae Views"&gt;</code></pre>
-</div>
-
-<br>
-
-<h2 align="center">💻 Tech Stack</h2>
 <p align="center">
-    <img src="https://img.shields.io/badge/Express-4.18.2-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express">
-    <img src="https://img.shields.io/badge/Node.js-20.10.0-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
-    <img src="https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
-    <img src="https://img.shields.io/badge/MongoDB-6.3.0-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB">
-    <img src="https://img.shields.io/badge/Dotenv-16.3.1-00C7B7?style=for-the-badge&logo=dotenv&logoColor=white" alt="Dotenv">
-    <br>
-    <br>
-    <a href="https://heroku.com" target="_blank">
-        <img src="https://custom-icon-badges.demolab.com/badge/Hosted%20on-Render-000?style=for-the-badge&logo=render-community-large-icon" alt="Render">
-    </a>
+  A <b>blazing-fast, edge-deployed</b> profile view counter for GitHub.<br>
+  Built with <b>Bun</b>, <b>Hono</b>, <b>Cloudflare D1 & KV</b>, and <b>TypeScript</b>.
 </p>
 
-<br>
+[![](https://img.shields.io/badge/Live_Demo-Visit-success?style=for-the-badge&logo=google-chrome&logoColor=white)](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam)
 
-<h2 align="center">🌟 Features</h2>
-<ul>
-    <li>⏱️ Real-time Visitor Tracking</li>
-    <li>🎨 Customizable Badge Design</li>
-    <li>🔗 Easy GitHub Integration</li>
-</ul>
-
-<br>
-
-<h2 align="center">🌟 Inspiration</h2>
-<p align="center">This project was inspired by innovative works in the open-source community. Special thanks to the following:</p>
-
-<div align="center">
-    <h3>Repo Inspiration</h3>
-    <p>
-        <a href="https://github.com/DenverCoder1/Simple-View-Counter" target="_blank">
-            <img src="https://custom-icon-badges.demolab.com/static/v1?label=Tracking+Tool&message=Simple+View+Counter&color=blue&style=for-the-badge&logo=graph" alt="Simple View Counter Badge">
-        </a>
-        <a href="https://github.com/DenverCoder1/custom-icon-badges" target="_blank">
-            <img src="https://custom-icon-badges.demolab.com/static/v1?label=Badge+Tool&message=Custom+Icon+Badges&color=purple&style=for-the-badge&logo=file-badge" alt="Custom Icon Badges Badge">
-        </a>
-    </p>
 </div>
 
+---
+
+## 📖 Table of Contents
+
+- [Quick Setup](#-quick-setup)
+- [Features](#-features)
+- [Documentation](#-documentation)
+- [For Developers](#-for-developers)
+  - [Tech Stack](#tech-stack)
+  - [Development Setup](#development-setup)
+- [Contributing](#-contributing)
+
+---
+
+## 🚀 Quick Setup
+
+Add this to your GitHub profile `README.md` to instantly track views:
+
+### Markdown
+```markdown
+[![Profile View Counter](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=YOUR_USERNAME)](https://github.com/tashfiqul-islam/profile-view-counter)
+```
+
+### HTML
+```html
+<a href="https://github.com/tashfiqul-islam/profile-view-counter">
+  <img src="https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=YOUR_USERNAME" alt="Profile View Counter" />
+</a>
+```
+
+> 💡 **Tip:** Replace `YOUR_USERNAME` with your actual GitHub username to start tracking!
+
+---
+
+## ✨ Features
+
+| Feature | Description |
+| :--- | :--- |
+| **🎨 Modern Aesthetics** | Glassmorphism 3D badges with dynamic gradients and shadows. |
+| **⚡ Zero Latency** | Edge caching via Cloudflare KV for sub-10ms global response times. |
+| **🛡️ Atomic Accuracy** | D1 (SQLite) database ensures precise, atomic view increments. |
+| **✅ Strict Type Safety** | End-to-end type safety with TypeScript and Valibot validation. |
+| **🧪 100% Reliability** | Comprehensive test suite with 100% code coverage. |
+| **🚀 State-of-the-Art** | Built with Bun, Biome, and the latest Cloudflare primitives. |
+
+---
+
+## � Documentation
+
+| Document | Description |
+|----------|-------------|
+| [API Reference](src/docs/API.md) | Endpoints, parameters, responses, error handling |
+| [Architecture](src/docs/ARCHITECTURE.md) | System design, flow diagrams, component breakdown |
+| [Deployment](src/docs/DEPLOYMENT.md) | Step-by-step Cloudflare Workers deployment guide |
+
+---
+
+## �🛠️ For Developers
+
+If you want to host your own instance or contribute:
+
+### Tech Stack
+
+| Component | Technology | Why? |
+|-----------|------------|------|
+| **Runtime** | [![Bun](https://img.shields.io/badge/Bun-%23000000.svg?style=for-the-badge&logo=bun&logoColor=white)](https://bun.sh) | 30x faster installs & script execution |
+| **Edge** | [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare_Workers-%23F38020.svg?style=for-the-badge&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com) | Global low-latency deployment |
+| **Framework** | [![Hono](https://img.shields.io/badge/Hono-%23E36002.svg?style=for-the-badge&logo=hono&logoColor=white)](https://hono.dev) | Ultra-lightweight, edge-optimized standard |
+| **Database** | [![Cloudflare D1](https://img.shields.io/badge/Cloudflare_D1-%23F38020.svg?style=for-the-badge&logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/d1/) | Serverless, atomic SQLite at the edge |
+| **Cache** | [![Cloudflare KV](https://img.shields.io/badge/Cloudflare_KV-%23F38020.svg?style=for-the-badge&logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/kv/) | High-performance, distributed key-value store |
+| **Validation** | [![Valibot](https://img.shields.io/badge/Valibot-%23326CE5.svg?style=for-the-badge&logo=valibot&logoColor=white)](https://valibot.dev) | Tree-shakeable, tiny schema validation |
+| **Testing** | [![Vitest](https://img.shields.io/badge/Vitest-%2344a833.svg?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev) | Native worker testing pool & Istanbul coverage |
+| **Tooling** | [![Biome](https://img.shields.io/badge/Biome-%2360a5fa.svg?style=for-the-badge&logo=biome&logoColor=white)](https://biomejs.dev) | Rust-based instant linting & formatting |
+
+### Development Setup
+
+1. **Install Dependencies**
+   ```bash
+   bun install
+   ```
+
+2. **Start Dev Server**
+   ```bash
+   bun run dev
+   ```
+
+3. **Run Tests** (100% Coverage)
+   ```bash
+   bun run test --coverage
+   ```
+
+4. **Deploy**
+   ```bash
+   bunx wrangler login
+   bun run deploy
+   ```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Here's how to get started:
+
+1. **Fork & Clone**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/profile-view-counter.git
+   cd profile-view-counter
+   bun install
+   ```
+
+2. **Create a Branch**
+   ```bash
+   git checkout -b feat/your-feature
+   ```
+
+3. **Make Changes & Test**
+   ```bash
+   bun run test --coverage   # Must maintain 100% coverage
+   bun run lint:fix          # Must pass linting
+   bun run typecheck         # Must pass type checks
+   ```
+
+4. **Update Documentation** (if adding features)
+   - Update `src/docs/API.md` for new endpoints
+   - Update `src/docs/ARCHITECTURE.md` for design changes
+
+5. **Commit with Conventional Commits**
+   ```bash
+   bun run commit            # Interactive commit wizard
+   ```
+
+6. **Push & Open PR**
+   ```bash
+   git push origin feat/your-feature
+   ```
+
+---
+
 <div align="center">
-    <h3>Shoutout to the Developer</h3>
-    <p>
-        A big shoutout to <a href="https://github.com/DenverCoder1" target="_blank">DenverCoder1</a> for his helpful repositories and YouTube videos.
-        <br>
-        <br>
-        <a href="https://github.com/DenverCoder1" target="_blank">
-            <img src="https://custom-icon-badges.demolab.com/static/v1?label=Developer&message=DenverCoder1&color=D90368&style=for-the-badge&logo=github" alt="DenverCoder1 Profile Badge">
-        </a>
-        <a href="https://www.youtube.com/@DevProTips" target="_blank">
-            <img src="https://custom-icon-badges.demolab.com/static/v1?label=YouTube&message=Jonah+Lawrence+%C2%B7+Dev+Pro+Tips&color=CD201F&style=for-the-badge&logo=youtube&logoSource=feather" alt="DenverCoder1 Profile Badge">
-        </a>
-    </p>
-</div>
 
-<br>
+  <a href="https://github.com/tashfiqul-islam">
+    <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/>
+  </a>
+  <a href="https://x.com/_tashfiqulislam">
+    <img src="https://img.shields.io/badge/Twitter-000000?style=for-the-badge&logo=x&logoColor=white" alt="X"/>
+  </a>
 
-<h2 align="center">🤝 Contributing</h2>
-<p align="center">
-    Want to contribute? Great! Here's how you can help:
-</p>
-<ol>
-    <li>Fork the repository.</li>
-    <li>Create a new branch (<code>git checkout -b feature-name</code>).</li>
-    <li>Commit your changes (<code>git commit -m "Add some feature"</code>).</li>
-    <li>Push to the branch (<code>git push origin feature-name</code>).</li>
-    <li>Open a Pull Request.</li>
-</ol>
+  <h3>Built with ❤️ by Tashfiqul Islam</h3>
+  <p>Licensed under MIT • © 2026 Profile View Counter</p>
 
-<br>
-
-<h2 align="center">📜 License</h2>
-<p align="center">
-    Licensed under the <a href="LICENSE">MIT License</a>.<br>
-    <em>Feel free to use and modify as you like.</em>
-</p>
-
-<br>
-
-<div align="center">
-    <p>
-        <strong>This project was a learning journey, crafted with ❤️ by Tashfiq.</strong><br>
-        <em>A stepping stone in my ongoing quest to become a Programming Ninja!</em>
-    </p>
-    <p>
-        <a href="https://github.com/your-github-username" target="_blank">🌟 Follow me on GitHub</a> —
-        I promise, my future projects will only have <em>slightly</em> fewer bugs! 🐛
-    </p>
 </div>

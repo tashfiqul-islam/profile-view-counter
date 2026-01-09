@@ -1,0 +1,42 @@
+{
+  "branches": ["master", "main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "conventionalcommits",
+        "presetConfig": {
+          "types": [
+            { "type": "feat", "section": "🚀 Features" },
+            { "type": "fix", "section": "🩹 Fixes" },
+            { "type": "docs", "section": "📖 Documentation" },
+            { "type": "style", "section": "🎨 Styles" },
+            { "type": "refactor", "section": "💅 Refactor" },
+            { "type": "perf", "section": "🔥 Performance" },
+            { "type": "test", "section": "✅ Tests" },
+            { "type": "build", "section": "📦 Build" },
+            { "type": "ci", "section": "🤖 CI" },
+            { "type": "chore", "section": "🏡 Chore" },
+            { "type": "revert", "section": "⏪ Reverts" },
+            { "type": "types", "section": "🌊 Types" }
+          ]
+        }
+      }
+    ],
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogTitle": "# Changelog\n\nAll notable changes to **Profile View Counter** are documented in this file. See our [Contribution Guidelines](https://github.com/tashfiqul-islam/profile-view-counter#-contributing) for commit guidelines."
+      }
+    ],
+    "@semantic-release/github",
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["package.json", "CHANGELOG.md"],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ]
+  ]
+}
