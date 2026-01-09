@@ -1,6 +1,6 @@
 {
   "name": "profile-view-counter",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "description": "A blazing-fast profile view counter for GitHub READMEs, powered by Cloudflare Workers",
   "author": "Tashfiqul Islam",
