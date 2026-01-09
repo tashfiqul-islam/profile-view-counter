@@ -2,6 +2,10 @@
 
 All notable changes to **Profile View Counter** are documented in this file. See our [Contribution Guidelines](https://github.com/tashfiqul-islam/profile-view-counter#-contributing) for commit guidelines.
 
+## <small>1.0.1 (2026-01-09)</small>
+
+* fix: update demo link in README.md ([294f84b](https://github.com/tashfiqul-islam/profile-view-counter/commit/294f84b))
+
 ## 1.0.0 (2026-01-09)
 
 * ci: added node lts release workflow ([6011a9b](https://github.com/tashfiqul-islam/profile-view-counter/commit/6011a9b))
