@@ -16,7 +16,7 @@
   Built with <b>Bun</b>, <b>Hono</b>, <b>Cloudflare D1 & KV</b>, and <b>TypeScript</b>.
 </p>
 
-[![](https://img.shields.io/badge/Live_Demo-Visit-success?style=for-the-badge&logo=google-chrome&logoColor=white)](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam)
+[![Profile View Counter](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=demo-user-123)](https://github.com/tashfiqul-islam/profile-view-counter)
 
 </div>
 
