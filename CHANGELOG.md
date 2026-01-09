@@ -2,6 +2,12 @@
 
 All notable changes to **Profile View Counter** are documented in this file. See our [Contribution Guidelines](https://github.com/tashfiqul-islam/profile-view-counter#-contributing) for commit guidelines.
 
+## <small>2.0.1 (2026-01-09)</small>
+
+* fix: removed npm cache for release workflow ([ebdfd50](https://github.com/tashfiqul-islam/profile-view-counter/commit/ebdfd50))
+* ci: added dependency caching ([f81c43c](https://github.com/tashfiqul-islam/profile-view-counter/commit/f81c43c))
+* chore: align version to v2.0.1 ([a3bda7b](https://github.com/tashfiqul-islam/profile-view-counter/commit/a3bda7b))
+
 ## <small>1.0.1 (2026-01-09)</small>
 
 * fix: update demo link in README.md ([294f84b](https://github.com/tashfiqul-islam/profile-view-counter/commit/294f84b))
