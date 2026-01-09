@@ -1,6 +1,7 @@
 name: Renovate Config Validator
 
 on:
+  workflow_dispatch: # Manual trigger
   push:
     paths:
       - 'renovate.json'
