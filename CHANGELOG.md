@@ -2,6 +2,17 @@
 
 All notable changes to **Profile View Counter** are documented in this file. See our [Contribution Guidelines](https://github.com/tashfiqul-islam/profile-view-counter#-contributing) for commit guidelines.
 
+## <small>2.0.2 (2026-01-09)</small>
+
+* fix: reverted renovate config to use fileMatch ([fbba6f4](https://github.com/tashfiqul-islam/profile-view-counter/commit/fbba6f4))
+* Merge pull request #4 from tashfiqul-islam/renovate/pin-dependencies ([6424191](https://github.com/tashfiqul-islam/profile-view-counter/commit/6424191)), closes [#4](https://github.com/tashfiqul-islam/profile-view-counter/issues/4)
+* Merge pull request #5 from tashfiqul-islam/renovate/biome ([48746af](https://github.com/tashfiqul-islam/profile-view-counter/commit/48746af)), closes [#5](https://github.com/tashfiqul-islam/profile-view-counter/issues/5)
+* Merge pull request #6 from tashfiqul-islam/renovate/migrate-config ([a0913de](https://github.com/tashfiqul-islam/profile-view-counter/commit/a0913de)), closes [#6](https://github.com/tashfiqul-islam/profile-view-counter/issues/6)
+* chore(config): migrate config renovate.json ([8ca3f8e](https://github.com/tashfiqul-islam/profile-view-counter/commit/8ca3f8e))
+* chore(deps): pin dependencies ([900a475](https://github.com/tashfiqul-islam/profile-view-counter/commit/900a475))
+* chore(deps): pin dependency @biomejs/biome to 2.3.11 ([c5ee4cf](https://github.com/tashfiqul-islam/profile-view-counter/commit/c5ee4cf))
+* ci: added manual trigger for renovate check ([0083d4b](https://github.com/tashfiqul-islam/profile-view-counter/commit/0083d4b))
+
 ## <small>2.0.1 (2026-01-09)</small>
 
 * fix: removed npm cache for release workflow ([ebdfd50](https://github.com/tashfiqul-islam/profile-view-counter/commit/ebdfd50))
