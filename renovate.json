@@ -1,34 +1,21 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:best-practices"
-  ],
-  "enabledManagers": [
-    "npm",
-    "custom.regex"
-  ],
-  "labels": [
-    "dependencies"
-  ],
+  "extends": ["config:best-practices"],
+  "enabledManagers": ["npm", "custom.regex"],
+  "labels": ["dependencies"],
   "customManagers": [
     {
       "customType": "regex",
       "description": "Update packageManager field in package.json",
-      "managerFilePatterns": [
-        "/^package\\.json$/"
-      ],
-      "matchStrings": [
-        "\"packageManager\":\\s*\"(?<depName>.*?)@(?<currentValue>.*?)\""
-      ],
+      "fileMatch": ["^package\\.json$"],
+      "matchStrings": ["\"packageManager\":\\s*\"(?<depName>.*?)@(?<currentValue>.*?)\""],
       "datasourceTemplate": "npm",
       "versioningTemplate": "semver"
     },
     {
       "customType": "regex",
       "description": "Update Biome schema version in biome.jsonc",
-      "managerFilePatterns": [
-        "/^biome\\.jsonc?$/"
-      ],
+      "fileMatch": ["^biome\\.jsonc?$"],
       "matchStrings": [
         "\"\\$schema\":\\s*\"https://biomejs\\.dev/schemas/(?<currentValue>.*?)/schema\\.json\""
       ],
@@ -39,15 +26,11 @@
   ],
   "packageRules": [
     {
-      "matchDepTypes": [
-        "packageManager"
-      ],
+      "matchDepTypes": ["packageManager"],
       "groupName": "Package Manager"
     },
     {
-      "matchPackageNames": [
-        "@biomejs/biome"
-      ],
+      "matchPackageNames": ["@biomejs/biome"],
       "groupName": "Biome"
     }
   ]
