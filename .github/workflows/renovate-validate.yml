@@ -25,4 +25,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate Renovate Config
-        run: npx --yes --package renovate renovate-config-validator --strict renovate.json
+        run: npx --yes renovate@latest renovate-config-validator --strict renovate.json
