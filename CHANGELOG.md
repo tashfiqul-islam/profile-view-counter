@@ -2,6 +2,16 @@
 
 All notable changes to **Profile View Counter** are documented in this file. See our [Contribution Guidelines](https://github.com/tashfiqul-islam/profile-view-counter#-contributing) for commit guidelines.
 
+## [2.1.1](https://github.com/tashfiqul-islam/profile-view-counter/compare/v2.1.0...v2.1.1) (2026-03-01)
+
+### 🩹 Fixes
+
+* **ci:** pass Cloudflare credentials as env vars for preCommands ([defaa1e](https://github.com/tashfiqul-islam/profile-view-counter/commit/defaa1e8211cde76b8c8a97b24022372534a453a))
+
+### 🤖 CI
+
+* **deploy:** add Cloudflare Workers deploy workflow with manual trigger ([3693631](https://github.com/tashfiqul-islam/profile-view-counter/commit/3693631ba213eeb315a20bdae9938481d0ef89d5))
+
 ## [2.1.0](https://github.com/tashfiqul-islam/profile-view-counter/compare/v2.0.5...v2.1.0) (2026-03-01)
 
 ### 🚀 Features
