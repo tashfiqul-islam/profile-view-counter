@@ -7,6 +7,11 @@ import { incrementViewCount } from '../services/counter'
 
 const CACHE_TTL_SECONDS = 60
 
+const SVG_HEADERS = {
+  'Content-Type': 'image/svg+xml',
+  'X-Content-Type-Options': 'nosniff',
+} as const
+
 export const viewCounterRoute = new Hono<{ Bindings: Env }>()
 
 viewCounterRoute.get('/view-counter', vValidator('query', querySchema), async (c) => {
@@ -16,7 +21,7 @@ viewCounterRoute.get('/view-counter', vValidator('query', querySchema), async (c
   const cached = await getCachedBadge(c.env.CACHE, cacheKey)
   if (cached !== null) {
     return c.body(cached, 200, {
-      'Content-Type': 'image/svg+xml',
+      ...SVG_HEADERS,
       'Cache-Control': 'public, max-age=60',
       'X-Cache': 'HIT',
     })
@@ -25,10 +30,10 @@ viewCounterRoute.get('/view-counter', vValidator('query', querySchema), async (c
   const count = await incrementViewCount(c.env.DB, username)
   const svg = generateModernBadge(count)
 
-  await setCachedBadge(c.env.CACHE, cacheKey, svg, CACHE_TTL_SECONDS)
+  c.executionCtx.waitUntil(setCachedBadge(c.env.CACHE, cacheKey, svg, CACHE_TTL_SECONDS))
 
   return c.body(svg, 200, {
-    'Content-Type': 'image/svg+xml',
+    ...SVG_HEADERS,
     'Cache-Control': 'no-cache, no-store, must-revalidate',
     'X-Cache': 'MISS',
   })
