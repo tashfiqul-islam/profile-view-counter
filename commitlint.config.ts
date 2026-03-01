@@ -18,6 +18,7 @@ const Configuration: UserConfig = {
         'ci',
         'chore',
         'revert',
+        'types',
       ],
     ],
   },

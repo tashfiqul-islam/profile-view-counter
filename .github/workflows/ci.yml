@@ -10,7 +10,7 @@ on:
 permissions:
   contents: read
 
-# Performance: Cancel in-progress runs for the same PR
+# Performance: Cancel in-progress runs for the same PR/branch
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -23,18 +23,18 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version-file: package.json
 
       - name: Cache Bun Dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-
 
@@ -44,11 +44,14 @@ jobs:
       - name: Generate CF Types
         run: bun run cf-typegen
 
-      - name: Lint (Biome)
-        run: bun run lint
+      - name: Lint & Format (Ultracite)
+        run: bun run check
 
       - name: Type Check
         run: bun run typecheck
 
-      - name: Test (Vitest)
-        run: bun run test
+      - name: Unit Tests (Bun)
+        run: bun run test:unit
+
+      - name: Integration Tests (Vitest + Workerd)
+        run: bun run test:integration

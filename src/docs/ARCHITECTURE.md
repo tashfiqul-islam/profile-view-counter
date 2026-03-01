@@ -13,7 +13,7 @@ flowchart LR
     C -->|HIT| D[Return Cached SVG]
     C -->|MISS| E[D1 Database]
     E -->|Atomic Increment| F[Generate SVG]
-    F --> G[Store in KV]
+    F -->|waitUntil| G[Store in KV]
     G --> D
     D --> A
 ```
@@ -38,7 +38,7 @@ sequenceDiagram
         D1-->>H: Updated view count
         H->>G: Generate SVG
         G-->>H: SVG string
-        H->>KV: Store with 60s TTL
+        H--)KV: waitUntil(Store with 60s TTL)
     end
     H-->>U: SVG Response
 ```
@@ -89,8 +89,8 @@ Implements the cache-first pattern:
 
 1. Validate query params with Valibot
 2. Check KV cache for existing badge
-3. If cache miss: increment D1 count, generate SVG, cache result
-4. Return SVG with appropriate headers
+3. If cache miss: increment D1 count, generate SVG, non-blocking cache write via `waitUntil()`
+4. Return SVG with security headers (`X-Content-Type-Options: nosniff`)
 
 ### 3. Counter Service (`services/counter.ts`)
 
@@ -107,11 +107,12 @@ RETURNING views
 
 ### 4. Badge Generator (`badge/generator.ts`)
 
-Creates a modern SVG badge with:
+Creates a responsive SVG badge with:
 - 3D capsule design with rounded corners
 - GitHub logo in a circular frame
 - Dynamic view count formatting (K, M, B)
-- Accessibility attributes (`role`, `aria-label`, `<title>`)
+- Responsive sizing via `viewBox` + `preserveAspectRatio="xMinYMid meet"`
+- Accessibility attributes (`role`, `aria-labelledby`, `<title>`, `<desc>`)
 
 ---
 
@@ -124,8 +125,8 @@ Creates a modern SVG badge with:
 | 3 | Cache Service | Check KV for cached badge |
 | 4 | Counter Service | Atomic increment in D1 (if cache miss) |
 | 5 | Badge Generator | Create SVG string |
-| 6 | Cache Service | Store badge in KV with 60s TTL |
-| 7 | Response | Return SVG with appropriate headers |
+| 6 | Cache Service | Non-blocking KV store via `waitUntil()` with 60s TTL |
+| 7 | Response | Return SVG with security + cache headers |
 
 ---
 
@@ -147,3 +148,36 @@ Creates a modern SVG badge with:
 **Key Format**: `badge:{username}`
 **Value**: SVG string
 **TTL**: 60 seconds
+
+---
+
+## Tooling
+
+| Tool | Purpose |
+|------|---------|
+| **Bun 1.3.10** | Package manager, script runner, unit test runner (`bun:test`) |
+| **Ultracite 7.2.4** | Opinionated Biome preset layer for linting & formatting |
+| **Biome 2.4.4** | Underlying engine for Ultracite (lint + format) |
+| **Vitest 3.2** | Integration test runner with `@cloudflare/vitest-pool-workers` |
+| **TypeScript 5.9** | Strict type checking with `verbatimModuleSyntax` |
+| **Wrangler 4.69** | Cloudflare Workers CLI, type generation, local dev |
+| **Lefthook** | Git hooks (pre-commit: ultracite fix, commit-msg: commitlint) |
+| **Semantic Release** | Automated versioning & changelog from conventional commits |
+
+## Testing Architecture
+
+Tests are split across two runners to maximize performance:
+
+| Runner | Files | Scope |
+|--------|-------|-------|
+| `bun test` | `test/badge-generator.test.ts` | Unit tests for pure SVG generation (no Workers runtime) |
+| `bunx vitest run` | `test/integration.test.ts` | Integration tests via `@cloudflare/vitest-pool-workers` (workerd runtime) |
+
+Both runners contribute to 100% code coverage across all `src/` files.
+
+## Performance Optimizations
+
+- **Smart Placement**: `placement.mode: "smart"` in `wrangler.jsonc` runs the Worker closer to the D1 primary, reducing query latency
+- **Non-blocking cache writes**: `waitUntil()` sends the response immediately while KV write completes in the background
+- **Edge caching**: KV serves cached badges for 60s, avoiding D1 queries on repeat views
+- **Observability**: Built-in Cloudflare observability enabled for structured error logging

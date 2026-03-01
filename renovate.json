@@ -8,7 +8,9 @@
       "customType": "regex",
       "description": "Update packageManager field in package.json",
       "fileMatch": ["^package\\.json$"],
-      "matchStrings": ["\"packageManager\":\\s*\"(?<depName>.*?)@(?<currentValue>.*?)\""],
+      "matchStrings": [
+        "\"packageManager\":\\s*\"(?<depName>.*?)@(?<currentValue>.*?)\""
+      ],
       "datasourceTemplate": "npm",
       "versioningTemplate": "semver"
     },

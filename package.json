@@ -9,7 +9,7 @@
     "type": "git",
     "url": "https://github.com/tashfiqul-islam/profile-view-counter"
   },
-  "packageManager": "bun@1.3.5",
+  "packageManager": "bun@1.3.10",
   "keywords": [
     "cloudflare-workers",
     "profile-views",
@@ -22,11 +22,12 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
-    "format": "biome format --write .",
+    "test": "bun test test/badge-generator.test.ts && bunx vitest run",
+    "test:unit": "bun test test/badge-generator.test.ts",
+    "test:integration": "bunx vitest run",
+    "test:watch": "bunx vitest",
+    "check": "ultracite check",
+    "fix": "ultracite fix",
     "typecheck": "tsc --noEmit",
     "db:migrate": "wrangler d1 migrations apply DB --local",
     "db:migrate:prod": "wrangler d1 migrations apply DB --remote",
@@ -39,28 +40,28 @@
     }
   },
   "dependencies": {
-    "@hono/valibot-validator": "^0.6.1",
-    "hono": "^4.11.3",
-    "valibot": "^1.2.0"
+    "@hono/valibot-validator": "0.6.1",
+    "hono": "4.12.3",
+    "valibot": "1.2.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.11",
-    "@cloudflare/vitest-pool-workers": "0.12.1",
-    "@cloudflare/workers-types": "4.20260109.0",
-    "@commitlint/cli": "20.3.1",
-    "@commitlint/config-conventional": "20.3.1",
-    "@commitlint/types": "20.3.1",
+    "@biomejs/biome": "2.4.4",
+    "@cloudflare/vitest-pool-workers": "0.12.18",
+    "@commitlint/cli": "20.4.2",
+    "@commitlint/config-conventional": "20.4.2",
+    "@commitlint/types": "20.4.0",
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
-    "@semantic-release/github": "12.0.2",
+    "@semantic-release/github": "12.0.6",
+    "@types/bun": "1.3.9",
     "@vitest/coverage-istanbul": "3.2.4",
-    "@vitest/coverage-v8": "3.2.4",
     "commitizen": "4.3.1",
     "cz-git": "1.12.0",
-    "lefthook": "2.0.13",
-    "semantic-release": "25.0.2",
+    "lefthook": "2.1.1",
+    "semantic-release": "25.0.3",
     "typescript": "5.9.3",
+    "ultracite": "7.2.4",
     "vitest": "3.2.4",
-    "wrangler": "4.58.0"
+    "wrangler": "4.69.0"
   }
 }

@@ -1,4 +1,4 @@
-export async function getCachedBadge(kv: KVNamespace, key: string): Promise<string | null> {
+export function getCachedBadge(kv: KVNamespace, key: string): Promise<string | null> {
   return kv.get(key, 'text')
 }
 
