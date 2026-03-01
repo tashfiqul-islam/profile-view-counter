@@ -63,6 +63,7 @@ describe('Integration Tests (Hono + D1 + KV)', () => {
 
     expect(res1.status).toBe(200)
     expect(res1.headers.get('X-Cache')).toBe('MISS')
+    expect(res1.headers.get('X-Content-Type-Options')).toBe('nosniff')
     expect(await res1.text()).toContain('PROFILE VISITORS')
 
     // Verify DB increment
@@ -78,7 +79,8 @@ describe('Integration Tests (Hono + D1 + KV)', () => {
     await waitOnExecutionContext(ctx2)
 
     expect(res2.status).toBe(200)
-    expect(res2.headers.get('X-Cache')).toBe('HIT') // Should be cached in KV
+    expect(res2.headers.get('X-Cache')).toBe('HIT')
+    expect(res2.headers.get('X-Content-Type-Options')).toBe('nosniff')
   })
 
   it('GET /api/view-counter validates query params', async () => {
