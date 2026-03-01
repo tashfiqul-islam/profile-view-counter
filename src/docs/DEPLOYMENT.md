@@ -6,7 +6,7 @@
 
 ## Prerequisites
 
-- **Bun** v1.2+ installed
+- **Bun** v1.3.10+ installed
 - **Cloudflare Account** (free tier works)
 - **Wrangler CLI** (included in devDependencies)
 
@@ -115,7 +115,17 @@ This runs a local Cloudflare Workers environment with:
 ### Run Tests
 
 ```bash
-bun run test --coverage
+bun run test           # Run all tests (unit + integration)
+bun run test:unit      # Badge generator tests (bun:test)
+bun run test:integration  # Worker integration tests (vitest + workerd)
+```
+
+### Lint & Format
+
+```bash
+bun run check         # Lint + format check (ultracite)
+bun run fix           # Auto-fix lint & format (ultracite)
+bun run typecheck     # TypeScript type checking
 ```
 
 ---
@@ -124,9 +134,10 @@ bun run test --coverage
 
 The project includes GitHub Actions workflows for:
 
-- **CI**: Runs on every push/PR (lint, typecheck, test)
-- **Renovate**: Automated dependency updates
-- **Semantic Release**: Automated versioning and changelog
+- **CI** (`ci.yml`): Runs on every push/PR — `bun run check`, `typecheck`, `test:unit`, `test:integration`
+- **Release** (`release.yml`): Automated semantic versioning & changelog on push to `master`/`main`
+- **Renovate Validate** (`renovate-validate.yml`): Validates `renovate.json` on changes
+- **Renovate**: Automated dependency updates via Mend Renovate
 
 ---
 

@@ -22,7 +22,6 @@ Returns API information and available endpoints.
 ```json
 {
   "message": "Profile View Counter API is running 🚀",
-  "version": "2.0.0",
   "endpoints": {
     "health": "/health",
     "view_counter": "/api/view-counter?username=:username"
@@ -62,7 +61,8 @@ Generates an SVG badge and increments the view count for the specified user.
 - **Content-Type**: `image/svg+xml`
 - **Headers**:
   - `X-Cache`: `HIT` (served from cache) or `MISS` (freshly generated)
-  - `Cache-Control`: `public, max-age=60` (cache hit) or `no-cache` (cache miss)
+  - `X-Content-Type-Options`: `nosniff` (MIME sniffing prevention)
+  - `Cache-Control`: `public, max-age=60` (cache hit) or `no-cache, no-store, must-revalidate` (cache miss)
 
 **Error Responses**
 
