@@ -2,6 +2,12 @@
 
 All notable changes to **Profile View Counter** are documented in this file. See our [Contribution Guidelines](https://github.com/tashfiqul-islam/profile-view-counter#-contributing) for commit guidelines.
 
+## [2.1.2](https://github.com/tashfiqul-islam/profile-view-counter/compare/v2.1.1...v2.1.2) (2026-03-01)
+
+### 🩹 Fixes
+
+* **ci:** use vars context for CLOUDFLARE_ACCOUNT_ID ([6d24cad](https://github.com/tashfiqul-islam/profile-view-counter/commit/6d24cad8a0f22cd53fa75cac8e03263ea67c52ca))
+
 ## [2.1.1](https://github.com/tashfiqul-islam/profile-view-counter/compare/v2.1.0...v2.1.1) (2026-03-01)
 
 ### 🩹 Fixes
