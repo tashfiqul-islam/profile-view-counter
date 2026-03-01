@@ -17,7 +17,6 @@ app.get('/health', (c) => c.json({ status: 'ok', timestamp: Date.now() }))
 app.get('/', (c) =>
   c.json({
     message: 'Profile View Counter API is running 🚀',
-    version: '2.0.0',
     endpoints: {
       health: '/health',
       view_counter: '/api/view-counter?username=:username',
@@ -31,7 +30,7 @@ app.route('/api', viewCounterRoute)
 app.notFound((c) => c.json({ error: 'Not Found' }, 404))
 
 app.onError((err, c) => {
-  console.error('Error:', err.message)
+  console.error(JSON.stringify({ error: err.name, message: err.message, stack: err.stack }))
   return c.json({ error: 'Internal Server Error' }, 500)
 })
 
