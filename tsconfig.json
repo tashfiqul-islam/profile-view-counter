@@ -1,19 +1,11 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "ESNext",
-    "module": "ESNext",
+    "module": "Preserve",
+    "moduleDetection": "force",
     "moduleResolution": "bundler",
     "lib": ["ESNext"],
     "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "noImplicitThis": true,
-    "useUnknownInCatchVariables": true,
-    "alwaysStrict": true,
     "exactOptionalPropertyTypes": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
@@ -24,12 +16,16 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
     "verbatimModuleSyntax": true,
-    "isolatedModules": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "noEmit": true,
-    "types": ["@cloudflare/workers-types", "@cloudflare/vitest-pool-workers", "valibot"]
+    "types": ["@types/bun", "@cloudflare/vitest-pool-workers", "valibot"]
   },
-  "include": ["src/**/*", "test/**/*", "*.config.ts", "worker-configuration.d.ts"],
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "*.config.ts",
+    "worker-configuration.d.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

@@ -1,0 +1,19 @@
+[install]
+# Use exact versions for reproducible builds
+exact = true
+
+# Run lifecycle scripts concurrently
+concurrentScripts = 16
+
+[test]
+# Unit tests run via bun:test (badge-generator)
+root = "test"
+
+# Use reduced memory mode for CI environments
+smol = true
+
+# Built-in V8 coverage (no extra package needed)
+coverage = true
+coverageReporter = ["text", "lcov"]
+coverageThreshold = { lines = 1, functions = 1, statements = 1 }
+coverageSkipTestFiles = true
