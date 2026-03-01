@@ -2,6 +2,48 @@
 
 All notable changes to **Profile View Counter** are documented in this file. See our [Contribution Guidelines](https://github.com/tashfiqul-islam/profile-view-counter#-contributing) for commit guidelines.
 
+## [2.1.0](https://github.com/tashfiqul-islam/profile-view-counter/compare/v2.0.5...v2.1.0) (2026-03-01)
+
+### 🚀 Features
+
+* **badge:** responsive SVG with viewBox, a11y desc, typed constants ([1019084](https://github.com/tashfiqul-islam/profile-view-counter/commit/1019084c4036183209ed51d62617fcd9ca9be71c))
+* modernization — deps, tooling, performance, and AI config ([4b158e2](https://github.com/tashfiqul-islam/profile-view-counter/commit/4b158e22e32f980fbe7e5b8fdac8caa7dfd75b35))
+
+### 🩹 Fixes
+
+* **core:** remove stale version field, add structured error logging ([4ef7cdf](https://github.com/tashfiqul-islam/profile-view-counter/commit/4ef7cdf1148de7fca88f94f59030e68bdadce1dd))
+
+### 📖 Documentation
+
+* **ai:** add CLAUDE.md and AGENTS.md for AI-optimized repo context ([af96b90](https://github.com/tashfiqul-islam/profile-view-counter/commit/af96b907d9495e20250fd1f1a96db81523270753))
+* **copilot:** add GitHub Copilot repo configuration ([93e49ac](https://github.com/tashfiqul-islam/profile-view-counter/commit/93e49ac2d520cac820043b37e687685c39cea268))
+* rewrite README, update API/architecture/deployment docs ([0c905bb](https://github.com/tashfiqul-islam/profile-view-counter/commit/0c905bb09eb26f013ce3535bb6107ef119cb0ca3))
+
+### 💅 Refactor
+
+* **scripts:** replace biome CLI with ultracite, split test runners ([ee2b1d7](https://github.com/tashfiqul-islam/profile-view-counter/commit/ee2b1d7b1ad1de12095c1e5eadf7b73460bcf29e))
+
+### 🔥 Performance
+
+* **worker:** add waitUntil, security headers, smart placement ([3301e94](https://github.com/tashfiqul-islam/profile-view-counter/commit/3301e9400bc0913c25de228d5e335ab775c880c0))
+
+### ✅ Tests
+
+* **split:** migrate badge tests to bun:test, add responsive assertions ([b2e249c](https://github.com/tashfiqul-islam/profile-view-counter/commit/b2e249c82ee38d14a3c863e13eb835182b139630))
+
+### 📦 Build
+
+* **config:** add ultracite, bunfig.toml, and bun-native tsconfig ([009fa12](https://github.com/tashfiqul-islam/profile-view-counter/commit/009fa12a417f281843fa932633a7f63be7e59fdb))
+* **deps:** upgrade all dependencies to latest 2026 versions ([5988c85](https://github.com/tashfiqul-islam/profile-view-counter/commit/5988c85203dd43730712a9f32e64dc9830eab4a0))
+
+### 🤖 CI
+
+* **actions:** upgrade to 2026 action versions, add concurrency guards ([54f7046](https://github.com/tashfiqul-islam/profile-view-counter/commit/54f7046c6f1f29ce1d8e889f686b735d67283b86))
+
+### 🏡 Chore
+
+* **lint:** apply ultracite formatting, add types commit type ([379ae2c](https://github.com/tashfiqul-islam/profile-view-counter/commit/379ae2c8141652527b87a1de3356571fed83b36a))
+
 ## <small>2.0.5 (2026-01-09)</small>
 
 * Merge branch 'master' of https://github.com/tashfiqul-islam/profile-view-counter ([93cbcab](https://github.com/tashfiqul-islam/profile-view-counter/commit/93cbcab))
