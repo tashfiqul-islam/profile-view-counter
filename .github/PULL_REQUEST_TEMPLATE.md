@@ -9,7 +9,7 @@
 
 # Checklist
 - [ ] 🧪 100% Coverage (`bun run test --coverage`)
-- [ ] ✅ Linting Passed (`bun run lint`)
+- [ ] ✅ Linting Passed (`bun run check`)
 - [ ] 📘 Types Verified (`bun run typecheck`)
 - [ ] 📏 Conventional Commits (`feat:`, `fix:`, etc.)
 - [ ] 📚 Docs Updated (if adding features, update `src/docs/`)

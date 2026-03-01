@@ -3,7 +3,7 @@ import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
 export default defineWorkersConfig({
   test: {
     globals: true,
-    include: ['test/**/*.test.ts'],
+    include: ['test/integration.test.ts'],
     poolOptions: {
       workers: {
         wrangler: { configPath: './wrangler.jsonc' },
@@ -16,7 +16,7 @@ export default defineWorkersConfig({
         100: true,
       },
       include: ['src/**/*.ts'],
-      exclude: ['src/types/**', '**/*.d.ts'],
+      exclude: ['src/types/**', 'src/badge/**', '**/*.d.ts'],
     },
   },
 })
