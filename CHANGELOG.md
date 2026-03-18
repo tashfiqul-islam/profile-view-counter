@@ -2,6 +2,26 @@
 
 All notable changes to **Profile View Counter** are documented in this file. See our [Contribution Guidelines](https://github.com/tashfiqul-islam/profile-view-counter#-contributing) for commit guidelines.
 
+## [2.1.3](https://github.com/tashfiqul-islam/profile-view-counter/compare/v2.1.2...v2.1.3) (2026-03-18)
+
+### 🩹 Fixes
+
+* **deps:** update dependency hono to v4.12.8 ([20319e9](https://github.com/tashfiqul-islam/profile-view-counter/commit/20319e957e29b499996f020894618d9d2eb9abc7))
+
+### 🤖 CI
+
+* harden workflows with SHA pinning, fix frozen lockfile, and gate deploys on CI ([2080006](https://github.com/tashfiqul-islam/profile-view-counter/commit/2080006fa0998157fadb7677db7eec60d4f599f6))
+
+### 🏡 Chore
+
+* **deps:** update commitlint monorepo to v20.4.4 ([7eb5ced](https://github.com/tashfiqul-islam/profile-view-counter/commit/7eb5cedd68e9f9e6d101927b70fb6041036ffc78))
+* **deps:** update dependency @biomejs/biome to v2.4.7 ([1e43117](https://github.com/tashfiqul-islam/profile-view-counter/commit/1e43117097ed056fd9a3cb455ac8d0ee55c440a9))
+* **deps:** update dependency @types/bun to v1.3.10 ([47f3ab4](https://github.com/tashfiqul-islam/profile-view-counter/commit/47f3ab410c130e5e87b7805685ee2012c09ec210))
+* **deps:** update dependency lefthook to v2.1.4 ([cc6b5eb](https://github.com/tashfiqul-islam/profile-view-counter/commit/cc6b5eba2ac0ff5714e739df4108882b8283156e))
+* **deps:** update dependency ultracite to v7.3.1 ([b3b089f](https://github.com/tashfiqul-islam/profile-view-counter/commit/b3b089fabc80160f6b3290244e1392dfd85fa888))
+* **deps:** update dependency wrangler to v4.73.0 ([c6f9644](https://github.com/tashfiqul-islam/profile-view-counter/commit/c6f964472745289bee34bfdb9a9e907eefe4432e))
+* **deps:** upgrade all outdated packages and migrate to vitest 4 ([6466bf8](https://github.com/tashfiqul-islam/profile-view-counter/commit/6466bf8ecafd9c0636cac2d10c371cccf530f97f))
+
 ## [2.1.2](https://github.com/tashfiqul-islam/profile-view-counter/compare/v2.1.1...v2.1.2) (2026-03-01)
 
 ### 🩹 Fixes
