@@ -15,6 +15,6 @@ applyTo: "test/**/*.ts"
 
 - `badge-generator.test.ts` uses `bun:test` — never import `cloudflare:test` or vitest here
 - `integration.test.ts` uses Vitest with `@cloudflare/vitest-pool-workers` — never import `bun:test` here
-- Integration test env: `import { env } from 'cloudflare:test'` then cast `env as unknown as Env`
+- Integration test env: `import { env } from 'cloudflare:test'` then cast `env as Env`
 - Mock pattern: override method on env binding, restore in `finally` block
 - 100% line + function coverage required

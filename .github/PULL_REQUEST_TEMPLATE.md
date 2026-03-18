@@ -12,7 +12,7 @@
 - [ ] ✅ Linting Passed (`bun run check`)
 - [ ] 📘 Types Verified (`bun run typecheck`)
 - [ ] 📏 Conventional Commits (`feat:`, `fix:`, etc.)
-- [ ] 📚 Docs Updated (if adding features, update `src/docs/`)
+- [ ] 📚 Docs Updated (if applicable)
 
 # Related Issues
 Closes #
