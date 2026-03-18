@@ -8,6 +8,10 @@ node_modules/
 worker-configuration.d.ts
 dist/
 
+# AI
+.cursor/
+.claude/
+
 # Environment Variables
 .env
 .env.local
