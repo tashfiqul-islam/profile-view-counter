@@ -1,6 +1,14 @@
 # Changelog
 
-All notable changes to **Profile View Counter** are documented in this file. See our [Contribution Guidelines](https://github.com/tashfiqul-islam/profile-view-counter#-contributing) for commit guidelines.
+All notable changes to **Profile View Counter** are documented in this file.
+
+## [2.1.4](https://github.com/tashfiqul-islam/profile-view-counter/compare/v2.1.3...v2.1.4) (2026-04-10)
+
+### Refactoring
+
+* modernize to TypeScript 6 with latest toolchain and patterns ([23db668](https://github.com/tashfiqul-islam/profile-view-counter/commit/23db668a73ca6af975d4abc942adbba92263ac24))
+
+See our [Contribution Guidelines](https://github.com/tashfiqul-islam/profile-view-counter#-contributing) for commit guidelines.
 
 ## [2.1.3](https://github.com/tashfiqul-islam/profile-view-counter/compare/v2.1.2...v2.1.3) (2026-03-18)
 
