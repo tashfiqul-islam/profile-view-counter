@@ -2,6 +2,12 @@
 
 All notable changes to **Profile View Counter** are documented in this file.
 
+## [2.1.5](https://github.com/tashfiqul-islam/profile-view-counter/compare/v2.1.4...v2.1.5) (2026-04-10)
+
+### 📖 Documentation
+
+* contributing guidelines, security & release config workflows ([92b4b6f](https://github.com/tashfiqul-islam/profile-view-counter/commit/92b4b6f0576262b765394a5d54ba65a668396dde))
+
 ## [2.1.4](https://github.com/tashfiqul-islam/profile-view-counter/compare/v2.1.3...v2.1.4) (2026-04-10)
 
 ### 💅 Refactor
