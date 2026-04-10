@@ -14,19 +14,19 @@
         "preset": "conventionalcommits",
         "presetConfig": {
           "types": [
-            { "type": "feat", "section": "Features" },
-            { "type": "fix", "section": "Bug Fixes" },
-            { "type": "perf", "section": "Performance" },
-            { "type": "refactor", "section": "Refactoring" },
-            { "type": "docs", "section": "Documentation" },
-            { "type": "types", "section": "Types" },
-            { "type": "test", "section": "Tests" },
-            { "type": "build", "section": "Build System" },
-            { "type": "ci", "section": "CI/CD" },
-            { "type": "chore", "section": "Chore" },
-            { "type": "style", "section": "Styles" },
-            { "type": "security", "section": "Security" },
-            { "type": "revert", "section": "Reverts" }
+            { "type": "feat", "section": "\uD83D\uDE80 Features" },
+            { "type": "fix", "section": "\uD83E\uDE79 Fixes" },
+            { "type": "perf", "section": "\uD83D\uDD25 Performance" },
+            { "type": "refactor", "section": "\uD83D\uDC85 Refactor" },
+            { "type": "docs", "section": "\uD83D\uDCD6 Documentation" },
+            { "type": "types", "section": "\uD83C\uDF0A Types" },
+            { "type": "test", "section": "\u2705 Tests" },
+            { "type": "build", "section": "\uD83D\uDCE6 Build" },
+            { "type": "ci", "section": "\uD83E\uDD16 CI" },
+            { "type": "chore", "section": "\uD83C\uDFE1 Chore" },
+            { "type": "style", "section": "\uD83C\uDFA8 Styles" },
+            { "type": "security", "section": "\uD83D\uDD12 Security" },
+            { "type": "revert", "section": "\u23EA Reverts" }
           ]
         },
         "releaseRules": [
@@ -60,17 +60,17 @@
         "preset": "conventionalcommits",
         "presetConfig": {
           "types": [
-            { "type": "feat", "section": "Features" },
-            { "type": "fix", "section": "Bug Fixes" },
-            { "type": "perf", "section": "Performance" },
-            { "type": "refactor", "section": "Refactoring" },
-            { "type": "docs", "section": "Documentation" },
-            { "type": "types", "section": "Types" },
-            { "type": "test", "section": "Tests" },
-            { "type": "build", "section": "Build System" },
-            { "type": "ci", "section": "CI/CD" },
-            { "type": "security", "section": "Security" },
-            { "type": "revert", "section": "Reverts" },
+            { "type": "feat", "section": "\uD83D\uDE80 Features" },
+            { "type": "fix", "section": "\uD83E\uDE79 Fixes" },
+            { "type": "perf", "section": "\uD83D\uDD25 Performance" },
+            { "type": "refactor", "section": "\uD83D\uDC85 Refactor" },
+            { "type": "docs", "section": "\uD83D\uDCD6 Documentation" },
+            { "type": "types", "section": "\uD83C\uDF0A Types" },
+            { "type": "test", "section": "\u2705 Tests" },
+            { "type": "build", "section": "\uD83D\uDCE6 Build" },
+            { "type": "ci", "section": "\uD83E\uDD16 CI" },
+            { "type": "security", "section": "\uD83D\uDD12 Security" },
+            { "type": "revert", "section": "\u23EA Reverts" },
             { "type": "chore", "hidden": true },
             { "type": "style", "hidden": true }
           ]
