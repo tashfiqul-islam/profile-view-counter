@@ -1,39 +1,182 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:best-practices"],
-  "enabledManagers": ["npm", "custom.regex"],
-  "labels": ["dependencies"],
+  "description": "Automated dependency management for profile-view-counter",
+  "extends": [
+    "config:best-practices",
+    "group:monorepos",
+    "group:recommended",
+    "workarounds:all",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)",
+    ":semanticCommitScope(deps)"
+  ],
+  "timezone": "Asia/Dhaka",
+  "schedule": ["after 2am and before 4am on monday"],
+  "labels": ["dependencies", "renovate"],
+  "assignees": ["tashfiqul-islam"],
+  "reviewers": ["tashfiqul-islam"],
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "🔄 Dependency Dashboard",
+  "prConcurrentLimit": 10,
+  "branchConcurrentLimit": 5,
+  "prHourlyLimit": 0,
+  "separateMajorMinor": true,
+  "separateMultipleMajor": true,
+  "separateMinorPatch": false,
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "{{newVersion}}",
+  "commitMessageSuffix": "[skip actions]",
+  "commitBody": "[skip actions]",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 3am on the first day of the month"]
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security", "vulnerability"],
+    "automerge": true,
+    "schedule": ["at any time"]
+  },
+  "osvVulnerabilityAlerts": true,
+  "packageRules": [
+    {
+      "description": "Auto-merge minor/patch updates for production dependencies",
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "automergeType": "branch",
+      "minimumReleaseAge": "3 days",
+      "labels": ["dependencies", "{{updateType}}"]
+    },
+    {
+      "description": "Auto-merge minor/patch updates for dev dependencies",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "automergeType": "branch",
+      "minimumReleaseAge": "3 days",
+      "labels": ["dependencies", "dev", "{{updateType}}"]
+    },
+    {
+      "description": "Major updates require manual approval",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "dependencyDashboardApproval": true,
+      "labels": ["dependencies", "major", "breaking-change"]
+    },
+    {
+      "description": "Bun runtime updates - weekly check",
+      "matchPackageNames": ["bun", "bun-types", "@types/bun"],
+      "matchDepTypes": ["packageManager", "devDependencies"],
+      "schedule": ["after 2am and before 4am on monday"],
+      "automerge": true,
+      "automergeType": "pr",
+      "labels": ["dependencies", "bun", "runtime"],
+      "semanticCommitScope": "bun",
+      "commitMessageTopic": "{{depName}}"
+    },
+    {
+      "description": "Group Biome packages together",
+      "matchPackageNames": ["/^@biomejs/"],
+      "groupName": "Biome packages",
+      "automerge": true,
+      "schedule": ["after 2am and before 4am on monday"],
+      "labels": ["dependencies", "biome", "linting"]
+    },
+    {
+      "description": "Group TypeScript packages together",
+      "matchPackageNames": ["/^@types/", "typescript"],
+      "groupName": "TypeScript packages",
+      "automerge": true,
+      "schedule": ["after 2am and before 4am on monday"],
+      "labels": ["dependencies", "typescript", "types"]
+    },
+    {
+      "description": "Group Cloudflare packages together",
+      "matchPackageNames": ["/^@cloudflare/", "wrangler"],
+      "groupName": "Cloudflare packages",
+      "automerge": true,
+      "schedule": ["after 2am and before 4am on monday"],
+      "labels": ["dependencies", "cloudflare"]
+    },
+    {
+      "description": "Group Vitest packages together",
+      "matchPackageNames": ["/^@vitest/", "vitest"],
+      "groupName": "Vitest packages",
+      "automerge": true,
+      "schedule": ["after 2am and before 4am on monday"],
+      "labels": ["dependencies", "vitest", "testing"]
+    },
+    {
+      "description": "Group Hono packages together",
+      "matchPackageNames": ["/^@hono/", "hono"],
+      "groupName": "Hono packages",
+      "automerge": true,
+      "schedule": ["after 2am and before 4am on monday"],
+      "labels": ["dependencies", "hono"]
+    },
+    {
+      "description": "Group semantic-release packages together",
+      "matchPackageNames": ["/^@semantic-release/", "semantic-release"],
+      "groupName": "semantic-release packages",
+      "automerge": true,
+      "schedule": ["after 2am and before 4am on monday"],
+      "labels": ["dependencies", "release"]
+    },
+    {
+      "description": "Group commitlint packages together",
+      "matchPackageNames": ["/^@commitlint/"],
+      "groupName": "commitlint packages",
+      "automerge": true,
+      "schedule": ["after 2am and before 4am on monday"],
+      "labels": ["dependencies", "commitlint"]
+    },
+    {
+      "description": "GitHub Actions - weekly updates with auto-merge",
+      "matchManagers": ["github-actions"],
+      "schedule": ["after 2am and before 4am on monday"],
+      "automerge": true,
+      "automergeType": "pr",
+      "labels": ["dependencies", "github-actions"],
+      "semanticCommitScope": "actions",
+      "commitMessageTopic": "{{depName}}",
+      "groupName": "GitHub Actions"
+    },
+    {
+      "description": "Pin GitHub Action digests for security",
+      "matchManagers": ["github-actions"],
+      "rangeStrategy": "pin",
+      "pinDigests": true
+    }
+  ],
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Update packageManager field in package.json",
-      "fileMatch": ["^package\\.json$"],
+      "description": "Update Bun version in package.json packageManager field",
+      "managerFilePatterns": ["/^package\\.json$/"],
       "matchStrings": [
-        "\"packageManager\":\\s*\"(?<depName>.*?)@(?<currentValue>.*?)\""
+        "\"packageManager\":\\s*\"bun@(?<currentValue>[^\"]+)\""
       ],
+      "autoReplaceStringTemplate": "\"packageManager\": \"bun@{{newValue}}\"",
       "datasourceTemplate": "npm",
+      "depNameTemplate": "bun",
       "versioningTemplate": "semver"
     },
     {
       "customType": "regex",
-      "description": "Update Biome schema version in biome.jsonc",
-      "fileMatch": ["^biome\\.jsonc?$"],
-      "matchStrings": [
-        "\"\\$schema\":\\s*\"https://biomejs\\.dev/schemas/(?<currentValue>.*?)/schema\\.json\""
-      ],
-      "depNameTemplate": "@biomejs/biome",
+      "description": "Update Bun version in package.json engines field",
+      "managerFilePatterns": ["/^package\\.json$/"],
+      "matchStrings": ["\"bun\":\\s*\">=(?<currentValue>[^\"]+)\""],
+      "autoReplaceStringTemplate": "\"bun\": \">={{newValue}}\"",
       "datasourceTemplate": "npm",
+      "depNameTemplate": "bun",
       "versioningTemplate": "semver"
     }
   ],
-  "packageRules": [
-    {
-      "matchDepTypes": ["packageManager"],
-      "groupName": "Package Manager"
-    },
-    {
-      "matchPackageNames": ["@biomejs/biome"],
-      "groupName": "Biome"
-    }
-  ]
+  "ignorePaths": ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
+  "postUpgradeTasks": {
+    "commands": ["bun install --frozen-lockfile || bun install"],
+    "fileFilters": ["package.json", "bun.lock"],
+    "executionMode": "update"
+  }
 }

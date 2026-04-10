@@ -6,25 +6,21 @@
       "src/**/*.ts",
       "test/**/*.ts",
       "*.config.ts",
-      "**/*.json",
-      "**/*.jsonc"
+      "package.json",
+      "tsconfig.json",
+      "renovate.json",
+      "biome.jsonc",
+      "wrangler.jsonc",
+      ".releaserc.json",
+      "!!**/.claude-flow",
+      "!!**/.mcp.json"
     ]
-  },
-  "formatter": {
-    "lineWidth": 100
   },
   "linter": {
     "rules": {
       "performance": {
         "noBarrelFile": "off"
       }
-    }
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "single",
-      "semicolons": "asNeeded",
-      "trailingCommas": "all"
     }
   }
 }

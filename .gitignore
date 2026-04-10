@@ -8,9 +8,11 @@ node_modules/
 worker-configuration.d.ts
 dist/
 
-# AI
+# AI / MCP
 .cursor/
 .claude/
+.claude-flow/
+.mcp.json
 
 # Environment Variables
 .env
@@ -22,6 +24,7 @@ dist/
 # Testing & Coverage
 coverage/
 .nyc_output/
+test-results.xml
 
 # Logs
 logs

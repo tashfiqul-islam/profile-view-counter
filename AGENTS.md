@@ -27,44 +27,49 @@ For Claude Code-specific instructions, see [CLAUDE.md](CLAUDE.md).
 
 ## Stack
 
-| Layer | Technology | Version |
-|-------|-----------|---------|
-| Runtime | Cloudflare Workers (workerd) | compat 2026-01-01 |
-| Tooling | Bun | 1.3.10 |
-| Router | Hono | 4.12 |
-| Database | Cloudflare D1 (SQLite) | — |
-| Cache | Cloudflare KV | 60s TTL |
-| Validation | Valibot | 1.2 |
-| Lint/Format | Ultracite (Biome preset) | 7.2 |
-| Unit tests | bun:test | built-in |
-| Integration tests | Vitest + pool-workers | 3.2 |
-| CI/CD | GitHub Actions + Semantic Release | — |
+All versions managed in `package.json` — run `bun outdated` to check for updates.
+
+| Layer | Technology |
+|-------|-----------|
+| Runtime | Cloudflare Workers (workerd) — see `compatibility_date` in `wrangler.jsonc` |
+| Tooling | Bun — see `engines.bun` in `package.json` |
+| Language | TypeScript — `erasableSyntaxOnly`, `libReplacement`, strict |
+| Router | Hono |
+| Database | Cloudflare D1 (SQLite) |
+| Cache | Cloudflare KV (60s TTL) |
+| Validation | Valibot |
+| Lint/Format | Ultracite (Biome preset) |
+| Unit tests | bun:test (built-in) |
+| Integration tests | Vitest + `@cloudflare/vitest-pool-workers` |
+| Deployment | Wrangler |
+| CI/CD | GitHub Actions + Semantic Release |
 
 ## Source Map
 
 ```
 src/
-├── index.ts              # App entry: Hono, middleware, error handlers
-├── routes/view-counter.ts # GET /api/view-counter — cache-first badge endpoint
-├── badge/generator.ts    # SVG generation: responsive, accessible, themed
+├── index.ts              # App entry: Hono, middleware (requestId, secureHeaders, cors, logger, timing), error handlers
+├── routes/view-counter.ts # GET /api/view-counter — cache-first badge endpoint, error-safe waitUntil
+├── badge/generator.ts    # SVG generation: responsive, accessible, themed, readonly interfaces
 ├── services/counter.ts   # D1 atomic INSERT ON CONFLICT RETURNING
 ├── services/cache.ts     # KV get/set with TTL
-├── schemas/query.ts      # Valibot: username 1-39 chars, GitHub format
-└── types/env.ts          # { DB: D1Database, CACHE: KVNamespace }
+└── schemas/query.ts      # Valibot: username 1-39 chars, GitHub format, description metadata
 
 test/
 ├── badge-generator.test.ts  # bun:test — pure SVG unit tests
 └── integration.test.ts      # vitest — full Hono+D1+KV via workerd pool
 
 Config:
-├── wrangler.jsonc        # Workers config: D1, KV, smart placement
+├── wrangler.jsonc        # Workers config: D1, KV, smart placement, source maps, observability
 ├── biome.jsonc           # Extends ultracite/biome/core
-├── vitest.config.ts      # Integration tests only, istanbul coverage
-├── bunfig.toml           # Bun config: exact installs, test coverage
-├── tsconfig.json         # Strict, ESNext, Preserve modules
-├── lefthook.yml          # Pre-commit: ultracite, commit-msg: commitlint
-└── .releaserc.json       # Semantic release: changelog, git, github
+├── vitest.config.ts      # Integration tests only, istanbul coverage, 100% threshold
+├── bunfig.toml           # Bun 1.3+: isolated linker, text lockfile, test randomization
+├── tsconfig.json         # TS6: erasableSyntaxOnly, libReplacement, strict
+├── lefthook.yml          # Pre-commit: format+typecheck+test, pre-push: full gate, post-merge: auto-install
+└── .releaserc.js         # Semantic release: angular preset, release rules, bun.lock in assets
 ```
+
+Note: `Env` interface is auto-generated globally by `wrangler types` in `worker-configuration.d.ts`. No manual types directory.
 
 ## Request Flow
 
@@ -72,7 +77,7 @@ Config:
 Client GET /api/view-counter?username=X
   │
   ▼
-Hono middleware (cors → logger → timing)
+Hono middleware (requestId → secureHeaders → cors → logger → timing)
   │
   ▼
 Valibot validates username (1-39 chars, [a-zA-Z0-9-])
@@ -88,7 +93,7 @@ D1: INSERT ON CONFLICT RETURNING views
   ▼
 generateModernBadge(count) → SVG string
   │
-  ├──► waitUntil(KV.put("badge:X", svg, ttl=60))  [non-blocking]
+  ├──► waitUntil(KV.put("badge:X", svg, ttl=60).catch(...))  [non-blocking, error-safe]
   │
   ▼
 Return SVG (Cache-Control: no-cache, no-store, must-revalidate)
@@ -119,22 +124,23 @@ Migrations: `migrations/` directory, applied via `bun run db:migrate` (local) or
 
 ## Conventions
 
-- **Formatting**: Single quotes, no semicolons, trailing commas (Ultracite/Biome)
+- **Formatting**: Double quotes, semicolons (Ultracite 7.4 / Biome preset)
 - **Imports**: Named exports only; sole exception: `export default app` (Workers entry)
-- **Types**: `as const satisfies T` for config, strict TypeScript, Valibot at boundaries
+- **Types**: `readonly` interfaces, `as const satisfies T` for config, strict TypeScript 6, Valibot with `description()` metadata at boundaries
 - **Errors**: Always `{ error: string }` JSON, structured logging with stack traces
-- **Security**: `X-Content-Type-Options: nosniff` on SVG, CORS `*` for badge embedding
-- **Commits**: Conventional commits (`feat|fix|docs|refactor|test|ci|chore|perf|build|revert|types`)
-- **Coverage**: 100% lines + functions enforced in CI
+- **Security**: `secureHeaders()` middleware + `X-Content-Type-Options: nosniff` on SVG, CORS `*` for badge embedding
+- **Commits**: Conventional commits (`feat|fix|docs|refactor|test|ci|chore|perf|build|revert|types|security`)
+- **Coverage**: 100% lines, functions, statements, branches enforced in CI
 
 ## Testing Rules
 
 - Unit tests (`bun:test`): For pure functions with no Workers runtime dependency
-- Integration tests (Vitest): For anything touching D1, KV, or the Hono app
+- Integration tests (Vitest + pool-workers): For anything touching D1, KV, or the Hono app
 - Never import `cloudflare:test` in bun:test files — the module doesn't exist in Bun
 - Never import `bun:test` in vitest files — the module doesn't exist in workerd
-- Test env bindings: `env` from `cloudflare:test`, cast as `unknown as Env`
-- Mock pattern: Override method on `testEnv.DB`, restore in `finally` block
+- Test env bindings: `env` from `cloudflare:test`, cast as `unknown as Env` (global `Env` from worker-configuration.d.ts)
+- Mock pattern: Override method on `testEnv.DB` or `testEnv.CACHE`, restore in `finally` block
+- Test randomization: `seed=42` in bunfig.toml for reproducible order
 
 ## CI Pipeline
 
@@ -151,3 +157,5 @@ Semantic Release runs on push to `master`/`main` (separate workflow).
 - Add `biome-ignore` comments — override rules in `biome.jsonc` instead
 - Skip `bun run cf-typegen` after changing `wrangler.jsonc`
 - Hardcode version numbers — managed by semantic-release
+- Set `bun = true` in `bunfig.toml` `[run]` section — breaks workerd pool runner
+- Create manual `src/types/env.ts` — `Env` is auto-generated globally by wrangler

@@ -1,23 +1,98 @@
-# Lefthook configuration
-# https://github.com/evilmartians/lefthook
+# Lefthook Configuration - 2026 Modern Standards
+# https://lefthook.dev/configuration/
+
+min_version: 2.0.13
+
+# Clean output for better DX
+output:
+  - execution_out
+  - failure
+  - summary
+  - success
+
+# Skip LFS hooks if not using Git LFS
+skip_lfs: true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Pre-commit: Fast parallel checks on staged files
+# ═══════════════════════════════════════════════════════════════════════════════
 
 pre-commit:
   parallel: true
   jobs:
-    - name: ultracite
-      glob: "*.{js,ts,jsx,tsx,json,jsonc,css,scss,md,mdx}"
+    # Format and lint with Ultracite (Biome)
+    - name: format
+      glob: "*.{ts,tsx,js,jsx,json,jsonc,css,scss,md,mdx,toml,yml,yaml}"
       run: bunx ultracite fix {staged_files}
       stage_fixed: true
+      fail_text: "❌ Formatting failed. Run 'bun run fix' to fix."
+
+    # Type checking (only when TS files change)
+    - name: typecheck
+      glob: "*.{ts,tsx}"
+      run: bun run typecheck
+      fail_text: "❌ TypeScript errors found."
+
+    # Fast tests on staged files (skip during merge/rebase)
+    - name: test
+      glob: "*.{ts,tsx}"
+      run: bun test test/badge-generator.test.ts --bail
+      skip:
+        - merge
+        - rebase
+      fail_text: "❌ Tests failed."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Commit message validation
+# ═══════════════════════════════════════════════════════════════════════════════
 
 commit-msg:
   jobs:
     - name: commitlint
-      run: bunx commitlint --edit
+      run: bunx commitlint --edit {1}
+      fail_text: |
+        ❌ Invalid commit message format.
+
+        Expected: <type>(<scope>): <subject>
+        Example:  feat(badge): add retina scaling
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Interactive commit builder
+# ═══════════════════════════════════════════════════════════════════════════════
+
+prepare-commit-msg:
+  jobs:
+    - name: commitizen
+      interactive: true
+      run: bunx czg --hook || true
+      env:
+        LEFTHOOK: "0"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Pre-push: Full quality gate before pushing
+# ═══════════════════════════════════════════════════════════════════════════════
 
 pre-push:
   parallel: true
   jobs:
     - name: typecheck
       run: bun run typecheck
+      fail_text: "❌ TypeScript errors. Fix before pushing."
+
     - name: test
       run: bun run test
+      fail_text: "❌ Tests failed. Fix before pushing."
+
+    - name: lint
+      run: bunx ultracite check
+      fail_text: "❌ Lint errors found."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Post-merge: Auto-install deps when lockfile changes
+# ═══════════════════════════════════════════════════════════════════════════════
+
+post-merge:
+  jobs:
+    - name: install
+      glob: "{bun.lock,bun.lockb,package.json}"
+      run: bun install

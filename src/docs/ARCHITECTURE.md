@@ -58,14 +58,14 @@ src/
 │   ├── counter.ts        # D1 database operations
 │   └── cache.ts          # KV cache operations
 ├── schemas/
-│   └── query.ts          # Valibot validation schemas
-├── types/
-│   └── env.ts            # TypeScript type definitions
+│   └── query.ts          # Valibot validation schemas with description metadata
 └── docs/
     ├── API.md            # API reference
     ├── ARCHITECTURE.md   # This file
     └── DEPLOYMENT.md     # Deployment guide
 ```
+
+Note: `Env` interface (`DB: D1Database`, `CACHE: KVNamespace`) is auto-generated globally by `wrangler types` in `worker-configuration.d.ts`.
 
 ---
 
@@ -74,13 +74,13 @@ src/
 ### 1. Entry Point (`index.ts`)
 
 The Hono application configures:
-- **Middleware**: `logger()`, `timing()`, `cors()`
+- **Middleware**: `requestId()`, `secureHeaders()`, `cors()`, `logger()`, `timing()`
 - **Routes**: `/`, `/health`, `/favicon.ico`, `/api/*`
-- **Error Handlers**: 404 and 500
+- **Error Handlers**: 404 and 500 with structured JSON logging
 
 ```typescript
-const app = new Hono<{ Bindings: Env }>()
-export default app
+const app = new Hono<{ Bindings: Env }>();
+export default app;
 ```
 
 ### 2. Route Handler (`routes/view-counter.ts`)
@@ -89,7 +89,7 @@ Implements the cache-first pattern:
 
 1. Validate query params with Valibot
 2. Check KV cache for existing badge
-3. If cache miss: increment D1 count, generate SVG, non-blocking cache write via `waitUntil()`
+3. If cache miss: increment D1 count, generate SVG, error-safe non-blocking cache write via `waitUntil()` with `.catch()`
 4. Return SVG with security headers (`X-Content-Type-Options: nosniff`)
 
 ### 3. Counter Service (`services/counter.ts`)
@@ -113,6 +113,7 @@ Creates a responsive SVG badge with:
 - Dynamic view count formatting (K, M, B)
 - Responsive sizing via `viewBox` + `preserveAspectRatio="xMinYMid meet"`
 - Accessibility attributes (`role`, `aria-labelledby`, `<title>`, `<desc>`)
+- Readonly interfaces for immutable theme and dimension config
 
 ---
 
@@ -120,12 +121,12 @@ Creates a responsive SVG badge with:
 
 | Step | Component | Action |
 |------|-----------|--------|
-| 1 | Hono Middleware | Log request, add timing headers, set CORS |
+| 1 | Hono Middleware | Assign request ID, set security headers, log request, add timing headers, set CORS |
 | 2 | Valibot Validator | Validate `username` query parameter |
 | 3 | Cache Service | Check KV for cached badge |
 | 4 | Counter Service | Atomic increment in D1 (if cache miss) |
 | 5 | Badge Generator | Create SVG string |
-| 6 | Cache Service | Non-blocking KV store via `waitUntil()` with 60s TTL |
+| 6 | Cache Service | Error-safe non-blocking KV store via `waitUntil()` with 60s TTL |
 | 7 | Response | Return SVG with security + cache headers |
 
 ---
@@ -153,15 +154,16 @@ Creates a responsive SVG badge with:
 
 ## Tooling
 
+All versions managed in `package.json` — run `bun outdated` to check for updates.
+
 | Tool | Purpose |
 |------|---------|
-| **Bun 1.3.10** | Package manager, script runner, unit test runner (`bun:test`) |
-| **Ultracite 7.2.4** | Opinionated Biome preset layer for linting & formatting |
-| **Biome 2.4.4** | Underlying engine for Ultracite (lint + format) |
-| **Vitest 3.2** | Integration test runner with `@cloudflare/vitest-pool-workers` |
-| **TypeScript 5.9** | Strict type checking with `verbatimModuleSyntax` |
-| **Wrangler 4.69** | Cloudflare Workers CLI, type generation, local dev |
-| **Lefthook** | Git hooks (pre-commit: ultracite fix, commit-msg: commitlint) |
+| **Bun** | Package manager (isolated linker), script runner, unit test runner (`bun:test`) |
+| **TypeScript** | Strict type checking with `erasableSyntaxOnly`, `verbatimModuleSyntax`, `noUncheckedSideEffectImports` |
+| **Ultracite** | Opinionated Biome preset layer for linting & formatting (double quotes, semicolons) |
+| **Vitest** | Integration test runner with `@cloudflare/vitest-pool-workers` |
+| **Wrangler** | Cloudflare Workers CLI, type generation, local dev, source map uploads |
+| **Lefthook** | Git hooks (pre-commit: format+typecheck+test, pre-push: full gate, post-merge: auto-install) |
 | **Semantic Release** | Automated versioning & changelog from conventional commits |
 
 ## Testing Architecture
@@ -173,11 +175,11 @@ Tests are split across two runners to maximize performance:
 | `bun test` | `test/badge-generator.test.ts` | Unit tests for pure SVG generation (no Workers runtime) |
 | `bunx vitest run` | `test/integration.test.ts` | Integration tests via `@cloudflare/vitest-pool-workers` (workerd runtime) |
 
-Both runners contribute to 100% code coverage across all `src/` files.
+Both runners contribute to 100% code coverage across all `src/` files. Test randomization enabled with `seed=42` for flaky test detection.
 
 ## Performance Optimizations
 
 - **Smart Placement**: `placement.mode: "smart"` in `wrangler.jsonc` runs the Worker closer to the D1 primary, reducing query latency
-- **Non-blocking cache writes**: `waitUntil()` sends the response immediately while KV write completes in the background
+- **Non-blocking cache writes**: `waitUntil()` sends the response immediately while KV write completes in the background (error-safe with `.catch()`)
 - **Edge caching**: KV serves cached badges for 60s, avoiding D1 queries on repeat views
-- **Observability**: Built-in Cloudflare observability enabled for structured error logging
+- **Observability**: Built-in Cloudflare observability with full sampling rate, invocation logs, and source map uploads for production stack traces

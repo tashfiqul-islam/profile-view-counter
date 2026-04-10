@@ -1,41 +1,111 @@
 {
-  "branches": ["master", "main"],
+  "branches": [
+    "+([0-9])?(.{+([0-9]),x}).x",
+    "master",
+    "main",
+    { "name": "next", "prerelease": true },
+    { "name": "beta", "prerelease": true },
+    { "name": "alpha", "prerelease": true }
+  ],
   "plugins": [
-    "@semantic-release/commit-analyzer",
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "conventionalcommits",
+        "presetConfig": {
+          "types": [
+            { "type": "feat", "section": "Features" },
+            { "type": "fix", "section": "Bug Fixes" },
+            { "type": "perf", "section": "Performance" },
+            { "type": "refactor", "section": "Refactoring" },
+            { "type": "docs", "section": "Documentation" },
+            { "type": "types", "section": "Types" },
+            { "type": "test", "section": "Tests" },
+            { "type": "build", "section": "Build System" },
+            { "type": "ci", "section": "CI/CD" },
+            { "type": "chore", "section": "Chore" },
+            { "type": "style", "section": "Styles" },
+            { "type": "security", "section": "Security" },
+            { "type": "revert", "section": "Reverts" }
+          ]
+        },
+        "releaseRules": [
+          { "breaking": true, "release": "major" },
+          { "type": "feat", "release": "minor" },
+          { "type": "fix", "release": "patch" },
+          { "type": "docs", "release": "patch" },
+          { "type": "style", "release": "patch" },
+          { "type": "refactor", "release": "patch" },
+          { "type": "perf", "release": "patch" },
+          { "type": "build", "release": "patch" },
+          { "type": "ci", "release": "patch" },
+          { "type": "types", "release": "patch" },
+          { "type": "test", "release": "patch" },
+          { "type": "chore", "scope": "deps", "release": "patch" },
+          { "type": "chore", "scope": "actions", "release": "patch" },
+          { "type": "chore", "scope": "bun", "release": "patch" },
+          { "type": "chore", "scope": "dependencies", "release": "patch" },
+          { "type": "chore", "release": false },
+          { "type": "security", "release": "patch" },
+          { "type": "revert", "release": "patch" }
+        ],
+        "parserOpts": {
+          "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES", "BREAKING"]
+        }
+      }
+    ],
     [
       "@semantic-release/release-notes-generator",
       {
         "preset": "conventionalcommits",
         "presetConfig": {
           "types": [
-            { "type": "feat", "section": "🚀 Features" },
-            { "type": "fix", "section": "🩹 Fixes" },
-            { "type": "docs", "section": "📖 Documentation" },
-            { "type": "style", "section": "🎨 Styles" },
-            { "type": "refactor", "section": "💅 Refactor" },
-            { "type": "perf", "section": "🔥 Performance" },
-            { "type": "test", "section": "✅ Tests" },
-            { "type": "build", "section": "📦 Build" },
-            { "type": "ci", "section": "🤖 CI" },
-            { "type": "chore", "section": "🏡 Chore" },
-            { "type": "revert", "section": "⏪ Reverts" },
-            { "type": "types", "section": "🌊 Types" }
+            { "type": "feat", "section": "Features" },
+            { "type": "fix", "section": "Bug Fixes" },
+            { "type": "perf", "section": "Performance" },
+            { "type": "refactor", "section": "Refactoring" },
+            { "type": "docs", "section": "Documentation" },
+            { "type": "types", "section": "Types" },
+            { "type": "test", "section": "Tests" },
+            { "type": "build", "section": "Build System" },
+            { "type": "ci", "section": "CI/CD" },
+            { "type": "security", "section": "Security" },
+            { "type": "revert", "section": "Reverts" },
+            { "type": "chore", "hidden": true },
+            { "type": "style", "hidden": true }
           ]
+        },
+        "parserOpts": {
+          "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES", "BREAKING"]
+        },
+        "writerOpts": {
+          "commitGroupsSort": "title",
+          "commitsSort": ["scope", "subject"]
         }
       }
     ],
     [
       "@semantic-release/changelog",
       {
-        "changelogTitle": "# Changelog\n\nAll notable changes to **Profile View Counter** are documented in this file. See our [Contribution Guidelines](https://github.com/tashfiqul-islam/profile-view-counter#-contributing) for commit guidelines."
+        "changelogFile": "CHANGELOG.md",
+        "changelogTitle": "# Changelog\n\nAll notable changes to **Profile View Counter** are documented in this file."
       }
     ],
-    "@semantic-release/github",
     [
       "@semantic-release/git",
       {
-        "assets": ["package.json", "CHANGELOG.md"],
+        "assets": ["package.json", "CHANGELOG.md", "bun.lock"],
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [{ "path": "CHANGELOG.md", "label": "Changelog" }],
+        "successComment": "🚀 This PR is included in version ${nextRelease.version}",
+        "failComment": "❌ Release automation failed with error: ${error.message}",
+        "releasedLabels": ["released", "ready-for-production"],
+        "addReleases": "bottom"
       }
     ]
   ]

@@ -5,22 +5,47 @@ on:
     branches:
       - master
       - main
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: "Enable debug logging"
+        required: false
+        type: choice
+        options: ["true", "false"]
+      dry_run:
+        description: "Run in dry-run mode"
+        type: boolean
+        default: false
 
-permissions:
-  contents: write # required for creating releases and tags
-  issues: write # required for commenting on released issues
-  pull-requests: write # required for commenting on released PRs
-
-# Prevent concurrent releases
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+  attestations: write
+
+env:
+  NODE_ENV: production
+  DEBUG: ${{ (github.event.inputs.debug == 'true' && 'semantic-release:*') || '' }}
+  DRY_RUN: ${{ (github.event.inputs.dry_run == 'true' && 'true') || 'false' }}
+  GIT_AUTHOR_NAME: github-actions[bot]
+  GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+  GIT_COMMITTER_NAME: github-actions[bot]
+  GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+  LEFTHOOK: "0"
+
 jobs:
   release:
     name: Semantic Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
+    outputs:
+      version: ${{ steps.check-release.outputs.new_release_version }}
+      skip_ci: ${{ steps.skip-ci-check.outputs.skip_ci }}
 
     steps:
       - name: Checkout Code
@@ -38,12 +63,88 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version: 22
+          node-version: "lts/*"
 
       - name: Install Dependencies
-        run: bun install --frozen
+        run: bun install --frozen-lockfile
+
+      - name: Check for skip CI commits
+        id: skip-ci-check
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          if echo "$COMMIT_MSG" | grep -qE '\[skip ci\]|\[ci skip\]|\[no ci\]|\[skip actions\]'; then
+            echo "skip_ci=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip_ci=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate project
+        if: env.DRY_RUN != 'true' && steps.skip-ci-check.outputs.skip_ci != 'true'
+        run: bun run cf-typegen && bun run typecheck && bun run test
 
       - name: Run Semantic Release
+        id: semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bunx semantic-release
+        run: |
+          FLAGS=""
+          if [[ "${{ env.DRY_RUN }}" == "true" ]]; then
+            FLAGS="--dry-run"
+          fi
+          if [[ "${{ github.event.inputs.debug }}" == "true" ]]; then
+            FLAGS="${FLAGS} --debug"
+          fi
+          npx semantic-release $FLAGS
+
+      - name: Check for new release
+        id: check-release
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo 'none')
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo 'none')
+          if [ "$PREVIOUS_TAG" != "$LATEST_TAG" ] && [ "$LATEST_TAG" != "none" ]; then
+            echo "new_release_version=${LATEST_TAG#v}" >> $GITHUB_OUTPUT
+          else
+            echo "new_release_version=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Attest release provenance
+        if: steps.check-release.outputs.new_release_version != ''
+        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4.1.0
+        with:
+          subject-path: |
+            CHANGELOG.md
+            package.json
+            bun.lock
+
+  generate-summary:
+    name: Release Summary
+    needs: [release]
+    if: always()
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
+    steps:
+      - name: Generate summary
+        run: |
+          VERSION="${{ needs.release.outputs.version }}"
+          SKIP_CI="${{ needs.release.outputs.skip_ci }}"
+          {
+            echo "## Semantic Release Results"
+            echo ""
+            if [[ "$VERSION" != "" ]]; then
+              echo "✅ **Version $VERSION released successfully**"
+              echo "🔒 **SLSA provenance generated**"
+            elif [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
+              echo "✅ **Dry run completed successfully**"
+            elif [[ "${{ needs.release.result }}" != "success" ]]; then
+              echo "❌ **Release process failed**"
+            else
+              echo "ℹ️ **No new version released**"
+              if [[ "$SKIP_CI" == "true" ]]; then
+                echo "Expected for commits with [skip ci]."
+              else
+                echo "No semantic changes detected in commit messages."
+              fi
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

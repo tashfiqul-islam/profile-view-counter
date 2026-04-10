@@ -1,19 +1,16 @@
 name: Deploy
 
 on:
-  # Deploy only after CI passes on master/main
   workflow_run:
     workflows: [CI]
     types: [completed]
     branches: [master, main]
   workflow_dispatch:
 
-# Security: Restrict permissions to minimum required
 permissions:
   contents: read
   deployments: write
 
-# Serialize deploys — never cancel in-flight
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
@@ -21,14 +18,15 @@ concurrency:
 jobs:
   deploy:
     name: Deploy to Cloudflare Workers
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
-    # Only deploy if CI succeeded (skip on failure/cancelled); always run on manual dispatch
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
@@ -37,18 +35,16 @@ jobs:
           cache: true
 
       - name: Install Dependencies
-        run: bun install --frozen
+        run: bun install --frozen-lockfile
 
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3.14.1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: "4.75.0"
           packageManager: bun
           preCommands: |
             wrangler d1 migrations apply profile-views --remote
-        # preCommands run as shell commands and need credentials as env vars
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}

@@ -1,19 +1,66 @@
-[install]
-# Use exact versions for reproducible builds
-exact = true
+# Bun Configuration File
+# https://bun.sh/docs/runtime/bunfig
 
-# Run lifecycle scripts concurrently
-concurrentScripts = 16
+# ═══════════════════════════════════════════════════════════════════════════════
+# Runtime Configuration
+# ═══════════════════════════════════════════════════════════════════════════════
+
+logLevel = "warn"
+telemetry = false
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Test Configuration
+# ═══════════════════════════════════════════════════════════════════════════════
 
 [test]
-# Unit tests run via bun:test (badge-generator)
+# Unit tests run via bun:test (badge-generator only)
 root = "test"
 
-# Use reduced memory mode for CI environments
+# Reduced memory mode for CI environments
 smol = true
 
-# Built-in V8 coverage (no extra package needed)
+# Coverage settings (bun:test built-in V8 coverage)
 coverage = true
-coverageReporter = ["text", "lcov"]
-coverageThreshold = { lines = 1, functions = 1, statements = 1 }
 coverageSkipTestFiles = true
+coverageThreshold = { line = 100, function = 100, statement = 100 }
+coverageReporter = ["text", "lcov"]
+coverageDir = "coverage"
+
+# Test execution
+randomize = true
+seed = 42
+
+# Reporter configuration (Bun 1.3+)
+[test.reporter]
+junit = "test-results.xml"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Package Manager Configuration
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[install]
+# Lock exact versions for reproducible builds
+exact = true
+
+# Text-based lockfile (bun.lock) - easier to review in PRs
+saveTextLockfile = true
+
+# Stricter linker - phantom deps fail immediately
+linker = "isolated"
+
+# Auto-install behavior
+auto = "fallback"
+
+[install.cache]
+disableManifest = false
+
+[install.lockfile]
+save = true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Run Configuration
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[run]
+# Use Bun's shell for cross-platform consistency
+shell = "bun"

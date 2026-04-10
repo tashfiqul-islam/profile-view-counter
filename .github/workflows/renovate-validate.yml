@@ -1,38 +1,53 @@
-name: Renovate Config Validator
+name: Renovate Config Validation
 
 on:
-  workflow_dispatch: # Manual trigger
-  push:
-    paths:
-      - 'renovate.json'
-      - '.github/workflows/renovate-validate.yml'
   pull_request:
     paths:
-      - 'renovate.json'
-      - '.github/workflows/renovate-validate.yml'
+      - "renovate.json"
+      - ".github/workflows/renovate-validate.yml"
+  push:
+    branches: [master, main]
+    paths:
+      - "renovate.json"
+  workflow_dispatch:
 
-permissions:
-  contents: read
-
-# Cancel in-progress runs for the same ref
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   validate:
-    name: Validate Configuration
-    runs-on: ubuntu-latest
+    name: Validate Renovate Config
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 1
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          node-version: 22
+          node-version: "lts/*"
 
       - name: Validate Renovate Config
-        run: npx --yes --package renovate -- renovate-config-validator renovate.json
+        run: npx --yes --package renovate -- renovate-config-validator --strict
+
+      - name: Generate summary
+        if: always()
+        run: |
+          {
+            echo "## Renovate Config Validation"
+            echo ""
+            echo "| Property | Value |"
+            echo "|----------|-------|"
+            echo "| **Status** | ${{ job.status == 'success' && '✅ Passed' || '❌ Failed' }} |"
+            echo "| **Ref** | \`${{ github.ref_name }}\` |"
+            echo "| **SHA** | \`${{ github.sha }}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"

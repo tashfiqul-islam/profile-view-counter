@@ -1,37 +1,43 @@
-import { Hono } from 'hono'
-import { cors } from 'hono/cors'
-import { logger } from 'hono/logger'
-import { timing } from 'hono/timing'
-import { viewCounterRoute } from './routes/view-counter'
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { logger } from "hono/logger";
+import { requestId } from "hono/request-id";
+import { secureHeaders } from "hono/secure-headers";
+import { timing } from "hono/timing";
+import { viewCounterRoute } from "./routes/view-counter";
 
-const app = new Hono<{ Bindings: Env }>()
+const app = new Hono<{ Bindings: Env }>();
 
-app.use('*', logger())
-app.use('*', timing())
-app.use('*', cors())
+app.use("*", requestId());
+app.use("*", logger());
+app.use("*", timing());
+app.use("*", cors());
+app.use("*", secureHeaders());
 
-app.get('/favicon.ico', (c) => c.body(null, 204))
+app.get("/favicon.ico", (c) => c.body(null, 204));
 
-app.get('/health', (c) => c.json({ status: 'ok', timestamp: Date.now() }))
+app.get("/health", (c) => c.json({ status: "ok", timestamp: Date.now() }));
 
-app.get('/', (c) =>
+app.get("/", (c) =>
   c.json({
-    message: 'Profile View Counter API is running 🚀',
+    message: "Profile View Counter API is running 🚀",
     endpoints: {
-      health: '/health',
-      view_counter: '/api/view-counter?username=:username',
+      health: "/health",
+      view_counter: "/api/view-counter?username=:username",
     },
-    documentation: 'https://github.com/tashfiqul-islam/profile-view-counter',
-  }),
-)
+    documentation: "https://github.com/tashfiqul-islam/profile-view-counter",
+  })
+);
 
-app.route('/api', viewCounterRoute)
+app.route("/api", viewCounterRoute);
 
-app.notFound((c) => c.json({ error: 'Not Found' }, 404))
+app.notFound((c) => c.json({ error: "Not Found" }, 404));
 
 app.onError((err, c) => {
-  console.error(JSON.stringify({ error: err.name, message: err.message, stack: err.stack }))
-  return c.json({ error: 'Internal Server Error' }, 500)
-})
+  console.error(
+    JSON.stringify({ error: err.name, message: err.message, stack: err.stack })
+  );
+  return c.json({ error: "Internal Server Error" }, 500);
+});
 
-export default app
+export default app;

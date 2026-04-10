@@ -1,25 +1,39 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
+    // ── Emit & Module ────────────────────────────────────────────────────
+    "lib": ["ESNext"],
     "target": "ESNext",
     "module": "Preserve",
     "moduleDetection": "force",
     "moduleResolution": "bundler",
-    "lib": ["ESNext"],
+    "types": ["@types/bun", "@cloudflare/vitest-pool-workers/types"],
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+
+    // ── TypeScript 6.0 ──────────────────────────────────────────────────
+    "erasableSyntaxOnly": true,
+    "libReplacement": false,
+
+    // ── Strict Type-Checking ─────────────────────────────────────────────
     "strict": true,
-    "exactOptionalPropertyTypes": true,
     "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true,
-    "verbatimModuleSyntax": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitOverride": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noUncheckedSideEffectImports": true,
+
+    // ── Interop & Output ─────────────────────────────────────────────────
     "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "noEmit": true,
-    "types": ["@types/bun", "@cloudflare/vitest-pool-workers/types", "valibot"]
+    "forceConsistentCasingInFileNames": true,
+    "noErrorTruncation": true
   },
   "include": [
     "src/**/*",

@@ -12,6 +12,21 @@ https://profile-view-counter.tashfiq61.workers.dev
 
 ---
 
+## Common Headers
+
+All responses include these security and observability headers (via `secureHeaders()` middleware):
+
+| Header | Value | Description |
+|--------|-------|-------------|
+| `X-Request-Id` | UUID | Unique request identifier for tracing |
+| `X-Content-Type-Options` | `nosniff` | MIME sniffing prevention |
+| `Strict-Transport-Security` | `max-age=15552000; includeSubDomains` | HSTS |
+| `X-Frame-Options` | `SAMEORIGIN` | Clickjacking prevention |
+| `Referrer-Policy` | `no-referrer` | Referrer leakage prevention |
+| `Server-Timing` | varies | Request timing metrics |
+
+---
+
 ## Endpoints
 
 ### `GET /`
@@ -59,9 +74,8 @@ Generates an SVG badge and increments the view count for the specified user.
 **Success Response (200)**
 
 - **Content-Type**: `image/svg+xml`
-- **Headers**:
+- **Additional Headers**:
   - `X-Cache`: `HIT` (served from cache) or `MISS` (freshly generated)
-  - `X-Content-Type-Options`: `nosniff` (MIME sniffing prevention)
   - `Cache-Control`: `public, max-age=60` (cache hit) or `no-cache, no-store, must-revalidate` (cache miss)
 
 **Error Responses**
@@ -75,6 +89,12 @@ Generates an SVG badge and increments the view count for the specified user.
 ```bash
 curl "https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam"
 ```
+
+---
+
+### `GET /favicon.ico`
+
+Returns 204 No Content.
 
 ---
 

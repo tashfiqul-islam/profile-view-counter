@@ -6,7 +6,7 @@
 
 ## Prerequisites
 
-- **Bun** v1.3.10+ installed
+- **Bun** installed (see `engines.bun` in `package.json` for minimum version)
 - **Cloudflare Account** (free tier works)
 - **Wrangler CLI** (included in devDependencies)
 
@@ -19,6 +19,8 @@ git clone https://github.com/tashfiqul-islam/profile-view-counter.git
 cd profile-view-counter
 bun install
 ```
+
+Note: `bunfig.toml` uses `linker = "isolated"` — phantom dependencies will fail immediately, ensuring reproducible builds.
 
 ---
 
@@ -62,16 +64,22 @@ Update `wrangler.jsonc` with your resource IDs:
     {
       "binding": "DB",
       "database_name": "profile-views",
-      "database_id": "YOUR_DATABASE_ID" // <-- Replace
+      "database_id": "YOUR_DATABASE_ID"
     }
   ],
   "kv_namespaces": [
     {
       "binding": "CACHE",
-      "id": "YOUR_KV_ID" // <-- Replace
+      "id": "YOUR_KV_ID"
     }
   ]
 }
+```
+
+After editing, regenerate types:
+
+```bash
+bun run cf-typegen
 ```
 
 ---
@@ -97,6 +105,8 @@ Your API will be available at:
 https://profile-view-counter.<YOUR_SUBDOMAIN>.workers.dev
 ```
 
+Source maps are automatically uploaded (`upload_source_maps: true`) for production error debugging.
+
 ---
 
 ## Local Development
@@ -115,17 +125,17 @@ This runs a local Cloudflare Workers environment with:
 ### Run Tests
 
 ```bash
-bun run test           # Run all tests (unit + integration)
-bun run test:unit      # Badge generator tests (bun:test)
-bun run test:integration  # Worker integration tests (vitest + workerd)
+bun run test              # Run all tests (unit + integration)
+bun run test:unit         # Badge generator tests (bun:test, ~25ms)
+bun run test:integration  # Worker integration tests (vitest + workerd pool)
 ```
 
-### Lint & Format
+### Lint, Format & Type Check
 
 ```bash
-bun run check         # Lint + format check (ultracite)
-bun run fix           # Auto-fix lint & format (ultracite)
-bun run typecheck     # TypeScript type checking
+bun run check         # Lint + format check (ultracite / biome)
+bun run fix           # Auto-fix lint & format
+bun run typecheck     # TypeScript 6 type checking (tsc --noEmit)
 ```
 
 ---
@@ -134,10 +144,11 @@ bun run typecheck     # TypeScript type checking
 
 The project includes GitHub Actions workflows for:
 
-- **CI** (`ci.yml`): Runs on every push/PR — `bun run check`, `typecheck`, `test:unit`, `test:integration`
+- **CI** (`ci.yml`): Runs on every push/PR — `cf-typegen`, `check`, `typecheck`, `test:unit`, `test:integration`
+- **Deploy** (`deploy.yml`): Deploys to Cloudflare Workers after CI succeeds on `master`/`main`
 - **Release** (`release.yml`): Automated semantic versioning & changelog on push to `master`/`main`
 - **Renovate Validate** (`renovate-validate.yml`): Validates `renovate.json` on changes
-- **Renovate**: Automated dependency updates via Mend Renovate
+- **Renovate**: Automated dependency updates with auto-merge for minor/patch, dashboard approval for major
 
 ---
 
@@ -157,6 +168,16 @@ Run migrations locally first to verify:
 ```bash
 bun run db:migrate
 ```
+
+### Integration Tests Timeout
+
+Ensure no stale `workerd` processes are running. Kill them and retry:
+```bash
+taskkill /f /im workerd.exe  # Windows
+pkill workerd                # macOS/Linux
+```
+
+Also verify `bun = true` is NOT set in `bunfig.toml` `[run]` section — it breaks the workerd pool runner.
 
 ---
 
