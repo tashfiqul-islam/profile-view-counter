@@ -57,18 +57,6 @@ commit-msg:
         Example:  feat(badge): add retina scaling
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Interactive commit builder
-# ═══════════════════════════════════════════════════════════════════════════════
-
-prepare-commit-msg:
-  jobs:
-    - name: commitizen
-      interactive: true
-      run: bunx czg --hook || true
-      env:
-        LEFTHOOK: "0"
-
-# ═══════════════════════════════════════════════════════════════════════════════
 # Pre-push: Full quality gate before pushing
 # ═══════════════════════════════════════════════════════════════════════════════
 
