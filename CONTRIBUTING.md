@@ -68,7 +68,7 @@ docs: update API reference
 
 ## Code Standards
 
-- **TypeScript 6** strict mode with `erasableSyntaxOnly`
+- **TypeScript 7** strict mode with `erasableSyntaxOnly`
 - **Double quotes, semicolons** (Ultracite / Biome)
 - **Readonly interfaces**, `as const satisfies Type` for config objects
 - **100% test coverage** across all metrics
@@ -86,6 +86,9 @@ bun run test:unit         # Badge generator (bun:test)
 bun run test:integration  # Hono + D1 + KV (vitest + workerd)
 bun run test              # Both
 ```
+
+> [!WARNING]
+> Never import `cloudflare:test` in bun:test files or `bun:test` in vitest files — the modules don't exist in those runtimes.
 
 ## Git Hooks (Lefthook)
 
@@ -106,7 +109,8 @@ Releases are fully automated via [semantic-release](https://semantic-release.git
 4. GitHub release is created with SLSA provenance
 5. Worker is deployed to Cloudflare
 
-**You do not need to manually version or tag.**
+> [!NOTE]
+> You do not need to manually version or tag.
 
 ## Reporting Issues
 

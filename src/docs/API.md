@@ -20,9 +20,10 @@ All responses include these security and observability headers (via `secureHeade
 |--------|-------|-------------|
 | `X-Request-Id` | UUID | Unique request identifier for tracing |
 | `X-Content-Type-Options` | `nosniff` | MIME sniffing prevention |
-| `Strict-Transport-Security` | `max-age=15552000; includeSubDomains` | HSTS |
-| `X-Frame-Options` | `SAMEORIGIN` | Clickjacking prevention |
+| `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload` | HSTS |
+| `X-Frame-Options` | `DENY` | Clickjacking prevention |
 | `Referrer-Policy` | `no-referrer` | Referrer leakage prevention |
+| `Permissions-Policy` | `camera=(), fullscreen=(), geolocation=(), microphone=()` | Feature restrictions |
 | `Server-Timing` | varies | Request timing metrics |
 
 ---
@@ -69,7 +70,7 @@ Generates an SVG badge and increments the view count for the specified user.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `username` | string | ✅ | GitHub username (1-39 chars, alphanumeric + hyphens) |
+| `username` | string | Yes | GitHub username (1-39 chars, alphanumeric + hyphens) |
 
 **Success Response (200)**
 
@@ -77,18 +78,27 @@ Generates an SVG badge and increments the view count for the specified user.
 - **Additional Headers**:
   - `X-Cache`: `HIT` (served from cache) or `MISS` (freshly generated)
   - `Cache-Control`: `public, max-age=60` (cache hit) or `no-cache, no-store, must-revalidate` (cache miss)
+  - `Content-Security-Policy`: `default-src 'none'; style-src 'unsafe-inline'`
+
+**Examples**
+
+```sh
+# Markdown badge
+[![Profile Views](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam)](https://github.com/tashfiqul-islam/profile-view-counter)
+
+# curl
+curl "https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam"
+
+# HTML
+<img src="https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam" alt="Profile Views" />
+```
 
 **Error Responses**
 
-| Status | Description |
-|--------|-------------|
-| 400 | Invalid or missing `username` parameter |
-| 500 | Internal server error |
-
-**Example**
-```bash
-curl "https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam"
-```
+| Status | Body | Description |
+|--------|------|-------------|
+| 400 | `{"error": "..."}` | Invalid or missing `username` parameter |
+| 500 | `{"error": "Internal Server Error"}` | Server failure |
 
 ---
 
@@ -118,7 +128,7 @@ All errors return JSON with an `error` field:
 
 ## Rate Limiting
 
-Currently, no rate limiting is enforced. The KV cache provides natural protection by serving cached badges for 60 seconds.
+No rate limiting is enforced. The KV cache provides natural protection by serving cached badges for 60 seconds.
 
 ---
 

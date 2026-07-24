@@ -6,6 +6,7 @@ import { getCachedBadge, setCachedBadge } from "../services/cache";
 import { incrementViewCount } from "../services/counter";
 
 interface SvgHeaders {
+  readonly "Content-Security-Policy": string;
   readonly "Content-Type": string;
   readonly "X-Content-Type-Options": string;
 }
@@ -13,6 +14,7 @@ interface SvgHeaders {
 const CACHE_TTL_SECONDS = 60;
 
 const SVG_HEADERS = {
+  "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'",
   "Content-Type": "image/svg+xml",
   "X-Content-Type-Options": "nosniff",
 } as const satisfies SvgHeaders;
@@ -43,7 +45,9 @@ viewCounterRoute.get(
         (err: unknown) =>
           console.error(
             JSON.stringify({
+              context: { cacheKey, username },
               error: "cache-write-failed",
+              level: "warn",
               message: String(err),
             })
           )

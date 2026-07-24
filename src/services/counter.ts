@@ -15,7 +15,7 @@ export async function incrementViewCount(
     .first<{ readonly views: number }>();
 
   if (result === null) {
-    throw new Error("D1 increment returned no rows");
+    throw new Error(`D1 increment returned no rows for username: ${username}`);
   }
 
   return result.views;

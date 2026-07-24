@@ -11,10 +11,12 @@
     "noEmit": true,
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
+    "rewriteRelativeImportExtensions": true,
 
-    // ── TypeScript 6.0 ──────────────────────────────────────────────────
+    // ── TypeScript 7.0 ───────────────────────────────────────────────────
     "erasableSyntaxOnly": true,
     "libReplacement": false,
+    "isolatedDeclarations": false,
 
     // ── Strict Type-Checking ─────────────────────────────────────────────
     "strict": true,
@@ -26,14 +28,17 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitOverride": true,
+    "useUnknownInCatchVariables": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "noUncheckedSideEffectImports": true,
+    "isolatedModules": true,
 
     // ── Interop & Output ─────────────────────────────────────────────────
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "noErrorTruncation": true
+    "noErrorTruncation": true,
+    "resolvePackageJsonExports": true
   },
   "include": [
     "src/**/*",

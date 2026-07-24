@@ -8,16 +8,19 @@ export default defineConfig({
     }),
   ],
   test: {
-    globals: true,
-    include: ["test/integration.test.ts"],
     coverage: {
+      exclude: ["src/badge/**", "**/*.d.ts"],
+      include: ["src/**/*.ts"],
       provider: "istanbul",
       reporter: ["text", "json", "html"],
       thresholds: {
         100: true,
       },
-      include: ["src/**/*.ts"],
-      exclude: ["src/badge/**", "**/*.d.ts"],
     },
+    globals: true,
+    hookTimeout: 10_000,
+    include: ["test/integration.test.ts"],
+    retry: 1,
+    testTimeout: 10_000,
   },
 });

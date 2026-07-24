@@ -1,6 +1,7 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code when working in this repository.
+For universal AI agent context, see [AGENTS.md](AGENTS.md).
 
 ## Overview
 
@@ -17,8 +18,9 @@ bun run test:unit        # Badge generator only (bun:test, ~25ms)
 bun run test:integration # Hono + D1 + KV via workerd pool (vitest)
 bun run check            # Lint + format check (ultracite)
 bun run fix              # Auto-fix lint + format (ultracite)
-bun run typecheck        # tsc --noEmit (TypeScript 6, strict mode)
+bun run typecheck        # tsc --noEmit (TypeScript 7, strict mode)
 bun run cf-typegen       # Regenerate worker-configuration.d.ts from wrangler.jsonc
+bun run db:migrate       # Apply D1 migrations locally
 bun run deploy           # Deploy to Cloudflare Workers
 bun run commit           # Interactive conventional commit (czg)
 ```
@@ -40,14 +42,12 @@ Request --> Hono (requestId, secureHeaders, cors, logger, timing) --> Valibot va
 
 | Module | Responsibility |
 |--------|----------------|
-| `src/index.ts` | Hono app, middleware stack (requestId, secureHeaders, cors, logger, timing), error handler, route mounting |
-| `src/routes/view-counter.ts` | Cache-first badge endpoint, error-safe `waitUntil()` for non-blocking KV writes |
-| `src/badge/generator.ts` | Responsive SVG with viewBox, WCAG a11y (`<title>`, `<desc>`), readonly interfaces |
+| `src/index.ts` | Hono app, typed `Variables` interface, middleware stack, error handler with structured logging |
+| `src/routes/view-counter.ts` | Cache-first badge endpoint, SVG CSP header, error-safe `waitUntil()` |
+| `src/badge/generator.ts` | Responsive SVG: `escapeXml()`, `formatNumber()`, system fonts, a11y |
 | `src/services/counter.ts` | D1 `INSERT ON CONFLICT ... RETURNING` atomic increment |
 | `src/services/cache.ts` | KV get/set with TTL |
-| `src/schemas/query.ts` | Valibot schema with `description()` metadata for `username` param (1-39 chars, GitHub format) |
-
-Note: `Env` interface is auto-generated globally by `wrangler types` in `worker-configuration.d.ts`. No manual `src/types/` needed.
+| `src/schemas/query.ts` | Valibot schema with specific error messages |
 
 ## Key Patterns
 
@@ -56,7 +56,13 @@ Note: `Env` interface is auto-generated globally by `wrangler types` in `worker-
 ```typescript
 c.executionCtx.waitUntil(
   setCachedBadge(c.env.CACHE, cacheKey, svg, CACHE_TTL_SECONDS).catch(
-    (err: unknown) => console.error(JSON.stringify({ error: "cache-write-failed", message: String(err) }))
+    (err: unknown) =>
+      console.error(JSON.stringify({
+        level: "warn",
+        error: "cache-write-failed",
+        message: String(err),
+        context: { cacheKey, username },
+      }))
   )
 );
 ```
@@ -74,9 +80,23 @@ RETURNING views
 
 ```typescript
 const SVG_HEADERS = {
+  "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'",
   "Content-Type": "image/svg+xml",
   "X-Content-Type-Options": "nosniff",
 } as const satisfies SvgHeaders;
+```
+
+### XML escaping for SVG safety
+
+```typescript
+export function escapeXml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
 ```
 
 ## Testing
@@ -85,10 +105,10 @@ Two runners, split by runtime requirement:
 
 | Runner | File | Scope | Coverage |
 |--------|------|-------|----------|
-| `bun:test` | `test/badge-generator.test.ts` | Pure SVG generation (no Workers APIs) | `src/badge/**` |
+| `bun:test` | `test/badge-generator.test.ts` | Pure SVG generation + Valibot schemas (no Workers APIs) | `src/badge/**` |
 | Vitest + `@cloudflare/vitest-pool-workers` | `test/integration.test.ts` | Full Hono app against real workerd | `src/**` minus `src/badge/**` |
 
-- 100% coverage required across all metrics (enforced in both `bunfig.toml` and `vitest.config.ts`)
+- 100% coverage required across all metrics (enforced in `vitest.config.ts`)
 - Integration tests use `createExecutionContext()` / `waitOnExecutionContext()` from `cloudflare:test`
 - Never import `cloudflare:test` in bun:test files (module doesn't exist in Bun runtime)
 - Test randomization enabled (`seed=42`) for flaky test detection
@@ -96,8 +116,11 @@ Two runners, split by runtime requirement:
 ## TypeScript Configuration
 
 - `erasableSyntaxOnly: true` — no enums, namespaces, or parameter properties (safe for type-stripping runtimes)
-- `libReplacement: false` — TS6 lib control
-- `noUncheckedSideEffectImports: true` — safer side-effect imports
+- `libReplacement: false` — TS7 lib control
+- `rewriteRelativeImportExtensions: true` — rewrite `.ts` imports to `.js` in output
+- `isolatedModules: true` — ensures each file can be independently transformed
+- `useUnknownInCatchVariables: true` — catch variables typed as `unknown` by default
+- `noUncheckedSideEffectImports: true` — validates side-effect imports resolve
 - `allowUnreachableCode: false` + `allowUnusedLabels: false` — strict dead code detection
 - `noErrorTruncation: true` — full error messages in diagnostics
 - All strict flags enabled: `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, etc.
@@ -108,15 +131,18 @@ Two runners, split by runtime requirement:
 - `export default app` is the only allowed default export (Workers entry point)
 - Immutable data: `readonly` interfaces, `as const satisfies Type` for config objects
 - All errors return `{ error: string }` JSON with appropriate HTTP status
-- Structured error logging: `console.error(JSON.stringify({ error, message, stack }))`
-- Security: `secureHeaders()` middleware + `X-Content-Type-Options: nosniff` on SVG responses
-- Conventional commits enforced: `feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|types`
+- Structured error logging: `console.error(JSON.stringify({ level, requestId, error, request }))`
+- Security: `secureHeaders()` with explicit DENY + CSP + HSTS, SVG responses get `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'`
+- XML escaping: `escapeXml()` for any dynamic content in SVG (defense in depth)
+- Conventional commits enforced: `feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|types|security`
 - Run `bun run cf-typegen` after any `wrangler.jsonc` change
 
 ## Bun Configuration
 
 - `linker = "isolated"` — phantom deps fail immediately (stricter than hoisted)
 - `saveTextLockfile = true` — text-based `bun.lock` for easier PR reviews
+- `globalStore = true` — shares packages across projects, 7x faster reinstalls
+- `retry = 1` — auto-retry flaky tests once
 - `shell = "bun"` — cross-platform script consistency
 - Do NOT set `bun = true` in `[run]` — it breaks workerd pool runner
 
@@ -129,4 +155,4 @@ Two runners, split by runtime requirement:
 - SVG uses 2x pixel dimensions with viewBox for retina + responsive scaling
 - `placement.mode: "smart"` in `wrangler.jsonc` — Worker runs near D1 primary, not nearest edge
 - `upload_source_maps: true` in `wrangler.jsonc` — source maps uploaded for production debugging
-- `compatibility_date: "2026-04-01"` — `nodejs_compat` flag includes v2 behaviors automatically
+- `compatibility_date: "2026-07-24"` — `nodejs_compat` flag includes v2 behaviors automatically

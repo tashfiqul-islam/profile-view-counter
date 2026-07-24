@@ -65,7 +65,8 @@ src/
     └── DEPLOYMENT.md     # Deployment guide
 ```
 
-Note: `Env` interface (`DB: D1Database`, `CACHE: KVNamespace`) is auto-generated globally by `wrangler types` in `worker-configuration.d.ts`.
+> [!NOTE]
+> `Env` interface (`DB: D1Database`, `CACHE: KVNamespace`) is auto-generated globally by `wrangler types` in `worker-configuration.d.ts`.
 
 ---
 
@@ -76,10 +77,14 @@ Note: `Env` interface (`DB: D1Database`, `CACHE: KVNamespace`) is auto-generated
 The Hono application configures:
 - **Middleware**: `requestId()`, `secureHeaders()`, `cors()`, `logger()`, `timing()`
 - **Routes**: `/`, `/health`, `/favicon.ico`, `/api/*`
-- **Error Handlers**: 404 and 500 with structured JSON logging
+- **Error Handlers**: 404 and 500 with structured JSON logging including `requestId` and `level`
 
 ```typescript
-const app = new Hono<{ Bindings: Env }>();
+interface Variables {
+  readonly requestId: string;
+}
+
+const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 export default app;
 ```
 
@@ -90,7 +95,7 @@ Implements the cache-first pattern:
 1. Validate query params with Valibot
 2. Check KV cache for existing badge
 3. If cache miss: increment D1 count, generate SVG, error-safe non-blocking cache write via `waitUntil()` with `.catch()`
-4. Return SVG with security headers (`X-Content-Type-Options: nosniff`)
+4. Return SVG with security headers (`Content-Security-Policy`, `X-Content-Type-Options: nosniff`)
 
 ### 3. Counter Service (`services/counter.ts`)
 
@@ -108,12 +113,15 @@ RETURNING views
 ### 4. Badge Generator (`badge/generator.ts`)
 
 Creates a responsive SVG badge with:
-- 3D capsule design with rounded corners
-- GitHub logo in a circular frame
-- Dynamic view count formatting (K, M, B)
-- Responsive sizing via `viewBox` + `preserveAspectRatio="xMinYMid meet"`
-- Accessibility attributes (`role`, `aria-labelledby`, `<title>`, `<desc>`)
-- Readonly interfaces for immutable theme and dimension config
+- Capsule design with rounded corners — badge overlaps behind the logo circle
+- GitHub logo in a circular frame with white stroke, positioned on top of badge left edge
+- Dynamic view count formatting (K, M, B) via exported `formatNumber()`
+- `escapeXml()` for defensive XML escaping of all dynamic content
+- Responsive sizing via `viewBox` with negative minX for logo overflow
+- Accessibility: `role="img"`, `aria-labelledby`, `<title>`, `<desc>`, `aria-hidden` on decorative elements
+- System font stack (GitHub strips `@import` from inline SVGs)
+- `text-rendering="geometricPrecision"` for crisp text
+- `font-variant-numeric="tabular-nums"` for count alignment
 
 ---
 
@@ -172,14 +180,14 @@ Tests are split across two runners to maximize performance:
 
 | Runner | Files | Scope |
 |--------|-------|-------|
-| `bun test` | `test/badge-generator.test.ts` | Unit tests for pure SVG generation (no Workers runtime) |
+| `bun test` | `test/badge-generator.test.ts` | Unit tests for pure SVG generation and Valibot schemas (no Workers runtime) |
 | `bunx vitest run` | `test/integration.test.ts` | Integration tests via `@cloudflare/vitest-pool-workers` (workerd runtime) |
 
-Both runners contribute to 100% code coverage across all `src/` files. Test randomization enabled with `seed=42` for flaky test detection.
+Both runners contribute to 100% code coverage across all `src/` files. Test randomization enabled with `seed=42` in bun:test for flaky test detection.
 
 ## Performance Optimizations
 
-- **Smart Placement**: `placement.mode: "smart"` in `wrangler.jsonc` runs the Worker closer to the D1 primary, reducing query latency
+- **Smart Placement**: `placement.mode: "smart"` in `wrangler.jsonc` places the Worker near the D1 primary for optimal latency
 - **Non-blocking cache writes**: `waitUntil()` sends the response immediately while KV write completes in the background (error-safe with `.catch()`)
 - **Edge caching**: KV serves cached badges for 60s, avoiding D1 queries on repeat views
 - **Observability**: Built-in Cloudflare observability with full sampling rate, invocation logs, and source map uploads for production stack traces

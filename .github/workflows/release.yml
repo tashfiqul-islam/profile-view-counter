@@ -30,8 +30,6 @@ permissions:
 
 env:
   NODE_ENV: production
-  DEBUG: ${{ (github.event.inputs.debug == 'true' && 'semantic-release:*') || '' }}
-  DRY_RUN: ${{ (github.event.inputs.dry_run == 'true' && 'true') || 'false' }}
   GIT_AUTHOR_NAME: github-actions[bot]
   GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
   GIT_COMMITTER_NAME: github-actions[bot]
@@ -49,7 +47,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -59,9 +57,17 @@ jobs:
           bun-version-file: package.json
 
       - name: Setup Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: "lts/*"
+
+      - name: Cache Bun modules
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
 
       - name: Install Dependencies
         run: bun install --frozen-lockfile
@@ -84,12 +90,14 @@ jobs:
         id: semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEBUG_ENABLED: ${{ github.event.inputs.debug }}
+          DRY_RUN_ENABLED: ${{ github.event.inputs.dry_run }}
         run: |
           FLAGS=""
-          if [[ "${{ env.DRY_RUN }}" == "true" ]]; then
+          if [[ "$DRY_RUN_ENABLED" == "true" ]]; then
             FLAGS="--dry-run"
           fi
-          if [[ "${{ github.event.inputs.debug }}" == "true" ]]; then
+          if [[ "$DEBUG_ENABLED" == "true" ]]; then
             FLAGS="${FLAGS} --debug"
           fi
           npx semantic-release $FLAGS
@@ -124,18 +132,21 @@ jobs:
 
     steps:
       - name: Generate summary
+        env:
+          VERSION: ${{ needs.release.outputs.version }}
+          SKIP_CI: ${{ needs.release.outputs.skip_ci }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+          RELEASE_RESULT: ${{ needs.release.result }}
         run: |
-          VERSION="${{ needs.release.outputs.version }}"
-          SKIP_CI="${{ needs.release.outputs.skip_ci }}"
           {
             echo "## Semantic Release Results"
             echo ""
             if [[ "$VERSION" != "" ]]; then
               echo "✅ **Version $VERSION released successfully**"
               echo "🔒 **SLSA provenance generated**"
-            elif [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
+            elif [[ "$DRY_RUN" == "true" ]]; then
               echo "✅ **Dry run completed successfully**"
-            elif [[ "${{ needs.release.result }}" != "success" ]]; then
+            elif [[ "$RELEASE_RESULT" != "success" ]]; then
               echo "❌ **Release process failed**"
             else
               echo "ℹ️ **No new version released**"

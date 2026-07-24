@@ -20,7 +20,8 @@ cd profile-view-counter
 bun install
 ```
 
-Note: `bunfig.toml` uses `linker = "isolated"` — phantom dependencies will fail immediately, ensuring reproducible builds.
+> [!NOTE]
+> `bunfig.toml` uses `linker = "isolated"` — phantom dependencies fail immediately, ensuring reproducible builds.
 
 ---
 
@@ -105,7 +106,8 @@ Your API will be available at:
 https://profile-view-counter.<YOUR_SUBDOMAIN>.workers.dev
 ```
 
-Source maps are automatically uploaded (`upload_source_maps: true`) for production error debugging.
+> [!TIP]
+> Source maps are automatically uploaded (`upload_source_maps: true`) for production error debugging.
 
 ---
 
@@ -135,7 +137,7 @@ bun run test:integration  # Worker integration tests (vitest + workerd pool)
 ```bash
 bun run check         # Lint + format check (ultracite / biome)
 bun run fix           # Auto-fix lint & format
-bun run typecheck     # TypeScript 6 type checking (tsc --noEmit)
+bun run typecheck     # TypeScript 7 type checking (tsc --noEmit)
 ```
 
 ---
@@ -177,7 +179,8 @@ taskkill /f /im workerd.exe  # Windows
 pkill workerd                # macOS/Linux
 ```
 
-Also verify `bun = true` is NOT set in `bunfig.toml` `[run]` section — it breaks the workerd pool runner.
+> [!CAUTION]
+> Verify `bun = true` is NOT set in `bunfig.toml` `[run]` section — it breaks the workerd pool runner.
 
 ---
 

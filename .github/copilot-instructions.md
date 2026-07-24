@@ -23,24 +23,25 @@ Profile View Counter — Cloudflare Workers API serving SVG badge images that tr
 
 ```
 src/
-├── index.ts              # Hono app, middleware, error handler
-├── routes/view-counter.ts # Cache-first badge endpoint, waitUntil() KV writes
-├── badge/generator.ts    # Responsive SVG with viewBox, WCAG a11y
-├── services/counter.ts   # D1 INSERT ON CONFLICT RETURNING
+├── index.ts              # Hono app, typed Variables, secureHeaders(DENY/CSP/HSTS), structured logging
+├── routes/view-counter.ts # Cache-first badge endpoint, SVG CSP header, error-safe waitUntil
+├── badge/generator.ts    # SVG: escapeXml(), formatNumber(), responsive, accessible, system fonts
+├── services/counter.ts   # D1 INSERT ON CONFLICT RETURNING, structured error context
 ├── services/cache.ts     # KV get/set with TTL
-├── schemas/query.ts      # Valibot: username 1-39 chars, GitHub format
-└── types/env.ts          # { DB: D1Database, CACHE: KVNamespace }
+└── schemas/query.ts      # Valibot: username 1-39 chars, GitHub format, specific error messages
 ```
+
+Note: `Env` interface is auto-generated globally by `wrangler types` in `worker-configuration.d.ts`.
 
 ## Conventions
 
-- Single quotes, no semicolons, trailing commas (Ultracite/Biome)
+- Double quotes, semicolons (Ultracite / Biome preset)
 - Named exports only; sole exception: `export default app` in `src/index.ts`
 - `as const satisfies T` for typed config objects
 - All errors return `{ error: string }` JSON
-- Structured error logging with `JSON.stringify({ error, message, stack })`
-- Security: `X-Content-Type-Options: nosniff` on SVG responses
-- Conventional commits: `feat|fix|docs|refactor|test|ci|chore|perf|build|revert|types`
+- Structured error logging: `JSON.stringify({ level, requestId, error, request })`
+- Security: `secureHeaders()` with DENY/CSP/HSTS, SVG `Content-Security-Policy`, `escapeXml()` for SVG content
+- Conventional commits: `feat|fix|docs|refactor|test|ci|chore|perf|build|revert|types|security`
 
 ## Testing
 
@@ -48,12 +49,12 @@ Two separate runners — never mix their imports:
 
 | Runner | File | Runtime | Scope |
 |--------|------|---------|-------|
-| `bun:test` | `test/badge-generator.test.ts` | Bun | Pure SVG functions |
-| Vitest + pool-workers | `test/integration.test.ts` | workerd | Hono + D1 + KV |
+| `bun:test` | `test/badge-generator.test.ts` | Bun | Pure SVG functions + escapeXml + formatNumber + querySchema |
+| Vitest + pool-workers | `test/integration.test.ts` | workerd | Hono + D1 + KV + security headers |
 
 - Never import `cloudflare:test` in bun:test files
 - Never import `bun:test` in vitest files
-- 100% line + function coverage enforced
+- 100% line + function + branch coverage enforced
 
 ## Do Not
 

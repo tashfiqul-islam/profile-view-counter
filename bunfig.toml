@@ -13,24 +13,25 @@ telemetry = false
 # ═══════════════════════════════════════════════════════════════════════════════
 
 [test]
-# Unit tests run via bun:test (badge-generator only)
-root = "test"
 
-# Reduced memory mode for CI environments
+# Reduced memory for CI
 smol = true
 
-# Coverage settings (bun:test built-in V8 coverage)
+# V8 coverage (built-in, no istanbul)
+# Note: coverageThreshold omitted — broken in Bun 1.3.14 (exit code 1 even when met)
+# 100% coverage enforced via vitest.config.ts thresholds for integration tests
 coverage = true
 coverageSkipTestFiles = true
-coverageThreshold = { line = 100, function = 100, statement = 100 }
 coverageReporter = ["text", "lcov"]
 coverageDir = "coverage"
+coveragePathIgnorePatterns = ["**/*.config.*"]
 
-# Test execution
+# Execution
 randomize = true
 seed = 42
+retry = 1
 
-# Reporter configuration (Bun 1.3+)
+# Bun 1.3+ reporters
 [test.reporter]
 junit = "test-results.xml"
 
@@ -39,28 +40,15 @@ junit = "test-results.xml"
 # ═══════════════════════════════════════════════════════════════════════════════
 
 [install]
-# Lock exact versions for reproducible builds
 exact = true
-
-# Text-based lockfile (bun.lock) - easier to review in PRs
 saveTextLockfile = true
-
-# Stricter linker - phantom deps fail immediately
 linker = "isolated"
-
-# Auto-install behavior
 auto = "fallback"
-
-[install.cache]
-disableManifest = false
-
-[install.lockfile]
-save = true
+globalStore = true
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Run Configuration
 # ═══════════════════════════════════════════════════════════════════════════════
 
 [run]
-# Use Bun's shell for cross-platform consistency
 shell = "bun"

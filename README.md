@@ -7,7 +7,7 @@
 [![License](https://img.shields.io/github/license/tashfiqul-islam/profile-view-counter?style=for-the-badge)](LICENSE)
 [![CI](https://img.shields.io/github/actions/workflow/status/tashfiqul-islam/profile-view-counter/ci.yml?style=for-the-badge&label=CI&logo=github)](https://github.com/tashfiqul-islam/profile-view-counter/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-success?style=for-the-badge&logo=vitest&logoColor=white)](#testing)
-[![TypeScript](https://img.shields.io/badge/typescript-6-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/typescript-7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Hono](https://img.shields.io/badge/hono-4-E36002?style=for-the-badge&logo=hono&logoColor=white)](https://hono.dev)
 
 <br>
@@ -45,41 +45,41 @@ Add this to your GitHub profile `README.md`:
 
 </details>
 
+> [!NOTE]
 > Replace `YOUR_USERNAME` with your GitHub username.
 
 ---
 
 ## How It Works
 
-```
-README loads <img> --> Cloudflare Edge --> KV Cache HIT? --> Return SVG
-                                              |
-                                             MISS
-                                              |
-                                     D1 atomic increment
-                                              |
-                                        Generate SVG
-                                              |
-                                   waitUntil(KV store) --> Return SVG
+```mermaid
+flowchart LR
+    A[README badge] --> B[Cloudflare Edge]
+    B --> C{KV cache}
+    C -->|HIT| D[Return cached SVG]
+    C -->|MISS| E[D1 atomic increment]
+    E --> F[Generate SVG]
+    F --> G[waitUntil KV store]
+    G --> D
 ```
 
-Every visit to a README embedding the badge triggers an edge request. On cache miss, the view count is atomically incremented in D1, a fresh SVG is generated, and the result is cached in KV for 60 seconds. Cache writes are non-blocking and error-safe via `waitUntil()` so the response returns immediately.
+Every visit to a README embedding the badge triggers an edge request. On cache miss, the view count is atomically incremented in D1, a fresh SVG is generated, and the result is cached in KV for 60 seconds. Cache writes are non-blocking and error-safe via `waitUntil()`.
 
 ---
 
 ## Features
 
-| | Feature | Detail |
-|---|---|---|
-| **Edge-first** | Deployed globally on Cloudflare Workers with [Smart Placement](https://developers.cloudflare.com/workers/configuration/smart-placement/) for optimal D1 latency |
-| **Atomic counting** | `INSERT ON CONFLICT ... RETURNING` in D1 (SQLite) ensures accurate counts with zero race conditions |
-| **Sub-10ms cache** | KV-backed edge cache serves repeat requests in under 10ms globally |
-| **Responsive SVG** | `viewBox` + `preserveAspectRatio` for crisp rendering on any screen size |
-| **Accessible** | WCAG-compliant with `role="img"`, `aria-labelledby`, `<title>`, and `<desc>` |
-| **Secure** | `secureHeaders()` middleware (HSTS, CSP, X-Frame-Options) + `X-Content-Type-Options: nosniff` on all responses |
-| **Observable** | `requestId()` for request tracing, structured JSON error logging, source map uploads |
-| **100% tested** | Split test architecture: `bun:test` for units, Vitest + workerd pool for integration |
-| **Type-safe** | TypeScript 6 strict mode with Valibot schema validation at the boundary |
+| Feature | Detail |
+|---------|--------|
+| **Edge-first** | Global deployment with [Smart Placement](https://developers.cloudflare.com/workers/configuration/smart-placement/) for optimal D1 latency |
+| **Atomic counting** | `INSERT ON CONFLICT ... RETURNING` — zero race conditions |
+| **Sub-10ms cache** | KV-backed edge cache, 60s TTL |
+| **Responsive SVG** | `viewBox` + `preserveAspectRatio` — crisp at any size |
+| **Accessible** | WCAG: `role="img"`, `aria-labelledby`, `<title>`, `<desc>` |
+| **Secure** | `secureHeaders()` (HSTS, CSP, X-Frame-Options) + `nosniff` on SVG |
+| **Observable** | `requestId()` tracing, structured JSON logging, source maps |
+| **100% tested** | `bun:test` units + Vitest workerd integration |
+| **Type-safe** | TypeScript 7 strict + Valibot schema validation |
 
 ---
 
@@ -87,38 +87,37 @@ Every visit to a README embedding the badge triggers an edge request. On cache m
 
 ```
 src/
-├── index.ts              # Hono app, middleware (requestId, secureHeaders, cors, logger, timing)
+├── index.ts              # Hono app, typed Variables, secureHeaders(DENY/CSP/HSTS), structured logging
 ├── routes/
-│   └── view-counter.ts   # Cache-first route with error-safe waitUntil()
+│   └── view-counter.ts   # Cache-first badge endpoint
 ├── badge/
-│   └── generator.ts      # Responsive SVG badge with a11y
+│   └── generator.ts      # Responsive SVG with a11y
 ├── services/
 │   ├── counter.ts        # D1 atomic increment
-│   └── cache.ts          # KV get/set operations
+│   └── cache.ts          # KV get/set with TTL
 └── schemas/
-    └── query.ts          # Valibot input validation with description metadata
+    └── query.ts          # Valibot validation with description metadata
 ```
 
+> [!TIP]
 > Full architecture docs with Mermaid diagrams: [ARCHITECTURE.md](src/docs/ARCHITECTURE.md)
 
 ---
 
 ## Tech Stack
 
-All versions managed in `package.json` — run `bun outdated` to check for updates.
-
 | Layer | Technology | Role |
 |-------|-----------|------|
-| **Runtime** | [Bun](https://bun.sh) | Package manager (isolated linker), script runner, unit test runner |
+| **Runtime** | [Bun](https://bun.sh) | Package manager, script runner, unit test runner |
 | **Edge** | [Cloudflare Workers](https://workers.cloudflare.com) | Global deployment with Smart Placement |
 | **Framework** | [Hono](https://hono.dev) | Ultra-lightweight routing + middleware |
 | **Database** | [Cloudflare D1](https://developers.cloudflare.com/d1/) | Serverless SQLite with atomic operations |
 | **Cache** | [Cloudflare KV](https://developers.cloudflare.com/kv/) | Distributed key-value store (60s TTL) |
-| **Validation** | [Valibot](https://valibot.dev) | Tree-shakeable schema validation with description metadata |
-| **Language** | [TypeScript](https://www.typescriptlang.org/) | Strict mode, `erasableSyntaxOnly`, `noUncheckedSideEffectImports` |
-| **Lint/Format** | [Ultracite](https://github.com/haydenbleasel/ultracite) | Opinionated Biome preset (double quotes, semicolons) |
+| **Validation** | [Valibot](https://valibot.dev) | Tree-shakeable schema validation |
+| **Language** | [TypeScript](https://www.typescriptlang.org/) | Strict mode, `erasableSyntaxOnly` |
+| **Lint/Format** | [Ultracite](https://github.com/haydenbleasel/ultracite) | Opinionated Biome preset |
 | **Unit Tests** | [bun:test](https://bun.sh/docs/cli/test) | Built-in runner with V8 coverage |
-| **Integration Tests** | [Vitest](https://vitest.dev) + [pool-workers](https://developers.cloudflare.com/workers/testing/vitest-integration/) | Workerd runtime testing |
+| **Integration** | [Vitest](https://vitest.dev) + [pool-workers](https://developers.cloudflare.com/workers/testing/vitest-integration/) | Workerd runtime testing |
 | **CI/CD** | [GitHub Actions](https://github.com/features/actions) + [Semantic Release](https://semantic-release.gitbook.io/) | Automated quality gates + versioning |
 
 ---
@@ -131,7 +130,7 @@ All versions managed in `package.json` — run `bun outdated` to check for updat
 | `/health` | GET | Health check (`{ status: "ok" }`) |
 | `/api/view-counter?username=:username` | GET | Generate badge and increment count |
 
-> Full API reference with headers and error codes: [API.md](src/docs/API.md)
+> Full API reference: [API.md](src/docs/API.md)
 
 ---
 
@@ -139,7 +138,7 @@ All versions managed in `package.json` — run `bun outdated` to check for updat
 
 ### Prerequisites
 
-- [Bun](https://bun.sh) — see `engines.bun` in `package.json` for minimum version
+- [Bun](https://bun.sh) — see `engines.bun` in `package.json`
 - [Cloudflare account](https://dash.cloudflare.com/sign-up) (free tier)
 
 ### Setup
@@ -169,8 +168,8 @@ bun install
 
 Tests are split across two runners for optimal performance:
 
-- **`bun:test`** runs badge generator unit tests with built-in V8 coverage
-- **Vitest** runs integration tests against the actual workerd runtime via `@cloudflare/vitest-pool-workers`
+- **`bun:test`** — badge generator unit tests with built-in V8 coverage
+- **Vitest** — integration tests against the workerd runtime via `@cloudflare/vitest-pool-workers`
 
 ```bash
 bun run test   # Runs both — must maintain 100% coverage
@@ -200,8 +199,11 @@ bun run deploy                # Ship it
    bun run fix         # Auto-fix lint/format
    bun run typecheck   # Must pass
    ```
-4. Commit: `bun run commit` (conventional commits enforced via commitlint)
+4. Commit: `bun run commit` (conventional commits enforced)
 5. Push and open a PR
+
+> [!IMPORTANT]
+> All commits must follow [Conventional Commits](https://www.conventionalcommits.org/). See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ---
 

@@ -25,4 +25,6 @@ This code runs on Cloudflare's **workerd** runtime (NOT Node.js/Bun).
 - All errors: `{ error: string }` JSON response
 - Validate input with Valibot schemas at route boundaries
 - Use `as const satisfies T` for typed config objects
-- SVG responses must include `X-Content-Type-Options: nosniff`
+- SVG responses: `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'`
+- Use `escapeXml()` for any dynamic content in SVG generation
+- Structured logging: `JSON.stringify({ level, requestId, error, request })`
