@@ -1,6 +1,6 @@
 <div align="center">
 
-![Profile View Counter Banner](assets/readme-cover.png)
+![Profile View Counter Banner](assets/readme-banner.png)
 
 <br>
 
@@ -18,7 +18,7 @@ Built on **Cloudflare Workers** with **D1** for persistence, **KV** for caching,
 
 <br>
 
-[![Profile View Counter](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=demo-user-123)](https://github.com/tashfiqul-islam/profile-view-counter)
+[![Profile Views](assets/badge-32.7k.svg)](https://github.com/tashfiqul-islam/profile-view-counter)
 
 *Click the badge above to see it in action*
 
