@@ -67,7 +67,7 @@
     "czg": "1.13.1",
     "lefthook": "2.1.10",
     "picocolors": "1.1.1",
-    "semantic-release": "25.0.8",
+    "semantic-release": "25.0.9",
     "typescript": "7.0.2",
     "ultracite": "7.9.4",
     "vitest": "4.1.10",
