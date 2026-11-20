@@ -52,6 +52,10 @@ jobs:
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: bun run format:check
 
+      - name: Check agent docs (router size, guide openings, links)
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
+        run: bun run docs:check
+
       - name: Test the Worker in workerd, 100 % coverage (Vitest)
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: bun run test:worker

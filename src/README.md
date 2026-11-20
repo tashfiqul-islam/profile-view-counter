@@ -37,23 +37,4 @@ JSON.
 `badge/generator.ts` and `schemas/query.ts` are pure: no bindings, no I/O. Keep new rendering and
 parsing logic there and test it directly; keep bindings in `services/` and wire them in routes.
 
-## Invariants
-
-- Every dynamic value in the SVG passes through `escapeXml()`.
-- The count only changes through `incrementViewCount()`; its SQL is the only write.
-- The badge is 28 px tall and sized 1:1 to its `viewBox`; it scales as a vector, so no 2× sizing.
-- Layout widths come from `textWidth()` (Arial Bold metrics plus tracking) and each `<text>` is
-  pinned to that width with `textLength` + `lengthAdjust="spacing"`: whatever font the viewer has,
-  text fills exactly its slot, never overflows, and stays centred. Keep both in sync when changing
-  sizes or the label.
-- The font stack is system fonts only: GitHub's image proxy strips `@import`. No filters or
-  external references: they render differently across viewers.
-
-## Recipes
-
-- **New route:** add `routes/<name>.ts` exporting a `Hono<{ Bindings: Env }>`, mount it in
-  `index.ts`, cover it in `index.test.ts` through `app.fetch()`, document it in `docs/API.md`.
-- **Schema change:** add `migrations/000N_<name>.sql` (never edit an applied one), run
-  `bun run db:migrate`; tests pick it up automatically. Deploy applies it remotely before the new
-  code goes live.
-- **New binding:** add it to `wrangler.jsonc`, run `bun run cf-typegen`, then use `c.env.<NAME>`.
+Rules for changing this code live in the agent guides: [Worker](../docs/agents/worker.md) and [Badge](../docs/agents/badge.md).

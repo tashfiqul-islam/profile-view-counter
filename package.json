@@ -21,11 +21,12 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "check": "bun run typecheck && bun run lint && bun run format:check && bun run test",
+    "check": "bun run typecheck && bun run lint && bun run format:check && bun run docs:check && bun run test",
     "typecheck": "tsc",
     "lint": "oxlint --deny-warnings",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
+    "docs:check": "bun scripts/agent-docs.ts",
     "test": "bun run test:worker && bun run test:scripts",
     "test:worker": "vitest run --coverage",
     "test:scripts": "bun test scripts/",
