@@ -53,28 +53,28 @@ describe("checkAgentDocs", () => {
   });
 });
 
-describe("cli", () => {
-  /** Runs `body` against a throwaway repo; removes exactly that directory afterwards. */
-  async function withRepo(
-    agents: string,
-    guides: Record<string, string>,
-    body: (root: string) => Promise<void>,
-  ): Promise<void> {
-    const root = await mkdtemp(join(tmpdir(), "agent-docs-"));
-    try {
-      await mkdir(join(root, "docs", "agents"), { recursive: true });
-      await writeFile(join(root, "AGENTS.md"), agents);
-      await Promise.all(
-        Object.entries(guides).map(([name, content]) =>
-          writeFile(join(root, "docs", "agents", name), content),
-        ),
-      );
-      await body(root);
-    } finally {
-      await rm(root, { force: true, recursive: true });
-    }
+/** Runs `body` against a throwaway repo; removes exactly that directory afterwards. */
+async function withRepo(
+  agents: string,
+  guides: Record<string, string>,
+  body: (root: string) => Promise<void>,
+): Promise<void> {
+  const root = await mkdtemp(join(tmpdir(), "agent-docs-"));
+  try {
+    await mkdir(join(root, "docs", "agents"), { recursive: true });
+    await writeFile(join(root, "AGENTS.md"), agents);
+    await Promise.all(
+      Object.entries(guides).map(([name, content]) =>
+        writeFile(join(root, "docs", "agents", name), content),
+      ),
+    );
+    await body(root);
+  } finally {
+    await rm(root, { force: true, recursive: true });
   }
+}
 
+describe("cli", () => {
   test("returns 0 and reports the guide count when the docs hold", async () => {
     await withRepo(
       "[t](docs/agents/testing.md)\n",

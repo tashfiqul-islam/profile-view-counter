@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { escapeXml, formatNumber, generateModernBadge, textWidth } from "./generator";
+import {
+  escapeXml,
+  formatNumber,
+  generateModernBadge,
+  readableText,
+  resolvePalette,
+  textWidth,
+  THEME_NAMES,
+  THEMES,
+} from "./generator";
 
 /** The numbers the layout depends on, read back from the rendered SVG. */
 function geometry(svg: string) {
@@ -8,7 +17,11 @@ function geometry(svg: string) {
     if (match?.[1] === undefined) throw new Error(`no match for ${pattern}`);
     return Number(match[1]);
   };
-  const texts = [...svg.matchAll(/<text x="([\d.]+)"[^>]*textLength="([\d.]+)"[^>]*>([^<]*)</g)];
+  const texts = [
+    ...svg.matchAll(
+      /<text(?: class="[^"]*")? x="([\d.]+)"[^>]*textLength="([\d.]+)"[^>]*>([^<]*)</g,
+    ),
+  ];
   const [label, count] = texts.map(([, x, length, content]) => ({
     content,
     length: Number(length),
@@ -19,7 +32,7 @@ function geometry(svg: string) {
     count,
     height: number(/<svg[^>]* height="([\d.]+)"/),
     label,
-    labelSegment: number(/<path d="M[\d.]+ 0H([\d.]+)V/),
+    labelSegment: number(/<path(?: class="pvc-label")? d="M[\d.]+ 0H([\d.]+)V/),
     viewBoxWidth: number(/viewBox="0 0 ([\d.]+) /),
     width: number(/<svg[^>]* width="([\d.]+)"/),
   };
@@ -139,5 +152,104 @@ describe("generateModernBadge", () => {
     for (const count of COUNTS) {
       expect(generateModernBadge(count)).not.toMatch(/NaN|Infinity|undefined/);
     }
+  });
+});
+
+/** Fill colours of the four themed parts, read back from the SVG. */
+const fills = (svg: string) => ({
+  count: /<rect width="[\d.]+" height="28" rx="14" fill="([^"]+)"\/>/.exec(svg)?.[1],
+  countText: /<text x="[\d.]+" y="[\d.]+" fill="([^"]+)"[^>]*text-anchor="middle"/.exec(svg)?.[1],
+  label: /<path(?: class="pvc-label")? d="M[^"]+" fill="([^"]+)"/.exec(svg)?.[1],
+  labelText: /<text(?: class="pvc-label-text")? x="31" y="[\d.]+" fill="([^"]+)"/.exec(svg)?.[1],
+});
+
+describe("themes and custom colours", () => {
+  it("defaults to graphite: GitHub ink label, GitHub blue count, white text", () => {
+    expect(fills(generateModernBadge(42))).toEqual({
+      count: "#0969da",
+      countText: "#ffffff",
+      label: "#1f2328",
+      labelText: "#ffffff",
+    });
+    expect(generateModernBadge(42)).toBe(generateModernBadge(42, { theme: "graphite" }));
+  });
+
+  it.each(THEME_NAMES)("renders the %s theme with its own palette and the same layout", (theme) => {
+    const svg = generateModernBadge(32_700, { theme });
+    const palette = THEMES[theme];
+    const f = fills(svg);
+    expect(f.label).toBe(palette.label);
+    expect(f.labelText).toBe(palette.labelText);
+    expect(f.countText).toBe(palette.countText);
+    expect(geometry(svg).width).toBe(geometry(generateModernBadge(32_700)).width);
+  });
+
+  it("draws aurora's count as a left-to-right gradient", () => {
+    const svg = generateModernBadge(7, { theme: "aurora" });
+    expect(fills(svg).count).toBe("url(#pvc-accent)");
+    expect(svg).toContain('<linearGradient id="pvc-accent" x2="1">');
+    expect(svg).toContain('stop-color="#2f81f7"');
+    expect(svg).toContain('stop-color="#a371f7"');
+    expect(generateModernBadge(7)).not.toContain("pvc-accent");
+  });
+
+  it("separates mono's same-coloured segments with a divider", () => {
+    expect(generateModernBadge(7, { theme: "mono" })).toContain('height="14" fill="#ffffff"');
+    expect(generateModernBadge(7)).not.toContain('height="14" fill="#ffffff"');
+  });
+
+  it("gives paper a visible hairline edge for light pages", () => {
+    expect(generateModernBadge(7, { theme: "paper" })).toContain(
+      'stroke="#d0d7de" stroke-opacity="1"',
+    );
+  });
+
+  it("switches adaptive's label to light for viewers who prefer a light scheme", () => {
+    const svg = generateModernBadge(7, { theme: "adaptive" });
+    expect(svg).toContain("@media (prefers-color-scheme: light)");
+    expect(svg).toContain('<path class="pvc-label" d=');
+    expect(svg).toContain('<text class="pvc-label-text" x="31"');
+  });
+
+  it("drops the adaptive switch when the caller sets the label colour", () => {
+    const svg = generateModernBadge(7, { labelColor: "000000", theme: "adaptive" });
+    expect(svg).not.toContain("prefers-color-scheme");
+    expect(fills(svg).label).toBe("#000000");
+  });
+
+  it("applies custom colours over the theme and picks readable text for each", () => {
+    expect(fills(generateModernBadge(7, { color: "fde047", labelColor: "0f172a" }))).toEqual({
+      count: "#fde047",
+      countText: "#1f2328",
+      label: "#0f172a",
+      labelText: "#ffffff",
+    });
+    expect(fills(generateModernBadge(7, { color: "e11d48", theme: "aurora" })).count).toBe(
+      "#e11d48",
+    );
+  });
+
+  it("keeps the divider only while both segments share one colour", () => {
+    expect(generateModernBadge(7, { color: "e11d48", theme: "mono" })).not.toContain(
+      'height="14" fill="#ffffff"',
+    );
+  });
+});
+
+describe("readableText", () => {
+  it.each([
+    ["#000000", "#ffffff"],
+    ["#0969da", "#ffffff"],
+    ["#ffffff", "#1f2328"],
+    ["#fde047", "#1f2328"],
+    ["#1a7f37", "#ffffff"],
+  ])("puts %s text on a %s background", (background, text) => {
+    expect(readableText(background)).toBe(text);
+  });
+});
+
+describe("resolvePalette", () => {
+  it("returns the graphite palette when nothing is set", () => {
+    expect(resolvePalette()).toEqual(THEMES.graphite);
   });
 });

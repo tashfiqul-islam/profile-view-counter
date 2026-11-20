@@ -4,20 +4,38 @@ import {
   maxLength,
   minLength,
   object,
+  optional,
+  picklist,
   pipe,
   regex,
   string,
   toLowerCase,
 } from "valibot";
+import { THEME_NAMES } from "../badge/generator";
 
 const GITHUB_USERNAME_REGEX = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$/;
+const HEX_COLOR_REGEX = /^[0-9a-fA-F]{6}$/;
+
+/** A 6-digit hex colour without `#` (a `#` would start the URL fragment), output lowercase. */
+const hexColor = (name: string) =>
+  optional(
+    pipe(
+      string(`${name} must be a 6-digit hex colour like 0969da`),
+      regex(HEX_COLOR_REGEX, `${name} must be a 6-digit hex colour like 0969da`),
+      toLowerCase(),
+    ),
+  );
 
 /**
  * Query string of `GET /api/view-counter`: a GitHub username, output lowercase because GitHub
- * logins are case-insensitive (`Octocat` and `octocat` are one account, so one counter).
+ * logins are case-insensitive (`Octocat` and `octocat` are one account, so one counter), plus
+ * optional styling that never affects the count.
  */
 export const querySchema = object(
   {
+    color: hexColor("color"),
+    label_color: hexColor("label_color"),
+    theme: optional(picklist(THEME_NAMES, `theme must be one of: ${THEME_NAMES.join(", ")}`)),
     username: pipe(
       string("Username is required"),
       minLength(1, "Username is required"),

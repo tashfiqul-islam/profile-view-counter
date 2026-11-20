@@ -105,6 +105,43 @@ describe("Integration Tests (Hono + D1)", () => {
       expect(await viewsOf("MixedCase")).toBeUndefined();
     });
 
+    it("applies the theme and custom colours from the query", async () => {
+      const res = await fetchApp(
+        "/api/view-counter?username=styled&theme=aurora&color=E11D48&label_color=0F172A",
+      );
+      const svg = await res.text();
+
+      expect(res.status).toBe(200);
+      expect(svg).toContain('rx="14" fill="#e11d48"');
+      expect(svg).toContain('fill="#0f172a"');
+      expect(svg).not.toContain("pvc-accent");
+    });
+
+    it("uses the theme alone when no custom colour is given", async () => {
+      const svg = await (await fetchApp("/api/view-counter?username=themed&theme=aurora")).text();
+      expect(svg).toContain('fill="url(#pvc-accent)"');
+    });
+
+    it("keeps one counter per username whatever the styling", async () => {
+      await fetchApp("/api/view-counter?username=one-counter&theme=paper");
+      await fetchApp("/api/view-counter?username=one-counter&color=1a7f37");
+      await fetchApp("/api/view-counter?username=one-counter");
+
+      expect(await viewsOf("one-counter")).toBe(3);
+    });
+
+    it.each([
+      ["theme=neon", "theme must be one of: graphite, aurora, mono, paper, contribution, adaptive"],
+      ["color=red", "color must be a 6-digit hex colour like 0969da"],
+      ["label_color=12345", "label_color must be a 6-digit hex colour like 0969da"],
+    ])("rejects %s with 400 { error } and counts nothing", async (style, error) => {
+      const res = await fetchApp(`/api/view-counter?username=bad-style&${style}`);
+
+      expect(res.status).toBe(400);
+      expect(await res.json()).toEqual({ error });
+      expect(await viewsOf("bad-style")).toBeUndefined();
+    });
+
     it("answers HEAD with the badge headers without counting a view", async () => {
       const res = await fetchApp("/api/view-counter?username=head-check", "HEAD");
 

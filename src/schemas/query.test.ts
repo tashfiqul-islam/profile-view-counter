@@ -67,3 +67,30 @@ describe("querySchema", () => {
     expect(safeParse(querySchema, {}).issues?.[0]?.message).toBe("Username is required");
   });
 });
+
+describe("querySchema styling", () => {
+  it("accepts every theme and lowercases hex colours", () => {
+    expect(
+      safeParse(querySchema, {
+        color: "E11D48",
+        label_color: "0F172A",
+        theme: "aurora",
+        username: "octocat",
+      }).output,
+    ).toEqual({ color: "e11d48", label_color: "0f172a", theme: "aurora", username: "octocat" });
+  });
+
+  it.each([
+    [
+      { theme: "neon" },
+      "theme must be one of: graphite, aurora, mono, paper, contribution, adaptive",
+    ],
+    [{ color: "#0969da" }, "color must be a 6-digit hex colour like 0969da"],
+    [{ color: "fff" }, "color must be a 6-digit hex colour like 0969da"],
+    [{ label_color: "gggggg" }, "label_color must be a 6-digit hex colour like 0969da"],
+  ])("rejects %j", (style, message) => {
+    expect(safeParse(querySchema, { username: "octocat", ...style }).issues?.[0]?.message).toBe(
+      message,
+    );
+  });
+});

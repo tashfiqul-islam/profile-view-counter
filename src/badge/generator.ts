@@ -2,7 +2,9 @@
  * Pure SVG rendering of the "PROFILE VISITORS" badge: no bindings, no I/O.
  *
  * Layout is computed from estimated text widths, then every text run is pinned to that width with
- * `textLength`, so the text fits and stays centred whatever font the viewer's system picks.
+ * `textLength`, so the text fits and stays centred whatever font the viewer's system picks. Colours
+ * come from a named theme, optionally overridden by caller-supplied hex colours; text colour on a
+ * custom background is picked by contrast.
  *
  * @module
  */
@@ -17,6 +19,106 @@ interface TextStyle {
   readonly tracking: number;
 }
 
+/** Colours of one badge. Hex strings with a leading `#`. */
+export interface Palette {
+  /** Left segment background. */
+  readonly label: string;
+  /** Right segment background: a solid colour or a left-to-right gradient. */
+  readonly count: string | readonly [string, string];
+  /** Label text and GitHub mark. */
+  readonly labelText: string;
+  /** Count text. */
+  readonly countText: string;
+  /** Hairline edge colour and opacity. */
+  readonly edge: readonly [string, number];
+  /** Sheen opacities: white at the top, black at the bottom. */
+  readonly sheen: readonly [number, number];
+}
+
+/** Names of the built-in themes, in display order. */
+export const THEME_NAMES = [
+  "graphite",
+  "aurora",
+  "mono",
+  "paper",
+  "contribution",
+  "adaptive",
+] as const;
+
+/** A built-in theme name. */
+export type ThemeName = (typeof THEME_NAMES)[number];
+
+/** Optional styling for {@link generateModernBadge}. */
+export interface BadgeOptions {
+  /** Built-in theme; defaults to `graphite`. */
+  readonly theme?: ThemeName;
+  /** Count segment background as 6-digit hex without `#`, e.g. `e11d48`. Overrides the theme. */
+  readonly color?: string;
+  /** Label segment background as 6-digit hex without `#`. Overrides the theme. */
+  readonly labelColor?: string;
+}
+
+const WHITE = "#ffffff";
+const INK = "#1f2328";
+const DARK_EDGE = [WHITE, 0.12] as const;
+const DARK_SHEEN = [0.14, 0.12] as const;
+
+/** The built-in palettes. `adaptive` is `graphite` plus a light-mode override (see `ADAPTIVE_CSS`). */
+export const THEMES: Readonly<Record<ThemeName, Palette>> = {
+  adaptive: {
+    count: "#0969da",
+    countText: WHITE,
+    edge: DARK_EDGE,
+    label: INK,
+    labelText: WHITE,
+    sheen: DARK_SHEEN,
+  },
+  aurora: {
+    count: ["#2f81f7", "#a371f7"],
+    countText: WHITE,
+    edge: DARK_EDGE,
+    label: "#0d1117",
+    labelText: WHITE,
+    sheen: DARK_SHEEN,
+  },
+  contribution: {
+    count: "#1a7f37",
+    countText: WHITE,
+    edge: DARK_EDGE,
+    label: INK,
+    labelText: WHITE,
+    sheen: DARK_SHEEN,
+  },
+  graphite: {
+    count: "#0969da",
+    countText: WHITE,
+    edge: DARK_EDGE,
+    label: INK,
+    labelText: WHITE,
+    sheen: DARK_SHEEN,
+  },
+  mono: {
+    count: "#24292f",
+    countText: "#58a6ff",
+    edge: DARK_EDGE,
+    label: "#24292f",
+    labelText: WHITE,
+    sheen: DARK_SHEEN,
+  },
+  paper: {
+    count: "#0969da",
+    countText: WHITE,
+    edge: ["#d0d7de", 1],
+    label: WHITE,
+    labelText: INK,
+    sheen: [0, 0.04],
+  },
+};
+
+// Switches the label segment to light when the viewer prefers a light colour scheme.
+const ADAPTIVE_CSS =
+  "@media (prefers-color-scheme: light){.pvc-label{fill:#f6f8fa}.pvc-label-text{fill:#1f2328}}";
+
 const HEIGHT = 28;
 const RADIUS = HEIGHT / 2;
 const PAD = 11;
@@ -27,12 +129,6 @@ const MIN_COUNT_SEGMENT = 36;
 const LABEL = "PROFILE VISITORS";
 const LABEL_STYLE = { size: 10, tracking: 0.9, weight: 600 } as const satisfies TextStyle;
 const COUNT_STYLE = { size: 12, tracking: 0.4, weight: 700 } as const satisfies TextStyle;
-
-const COLORS = {
-  count: "#0969da",
-  label: "#1f2328",
-  text: "#ffffff",
-} as const satisfies Record<string, string>;
 
 const FONT_STACK =
   "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif";
@@ -116,6 +212,49 @@ export function textWidth(text: string, style: TextStyle): number {
   return round((units / 1000) * style.size + style.tracking * Math.max(text.length - 1, 0));
 }
 
+const LUMINANCE_WEIGHTS = [0.2126, 0.7152, 0.0722] as const;
+
+/** WCAG relative luminance of a `#rrggbb` colour. */
+const luminance = (hex: string): number =>
+  LUMINANCE_WEIGHTS.reduce((sum, weight, i) => {
+    const c = Number.parseInt(hex.slice(1 + 2 * i, 3 + 2 * i), 16) / 255;
+    return sum + weight * (c <= 0.039_28 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  }, 0);
+
+/** WCAG contrast ratio between two `#rrggbb` colours. */
+const contrast = (a: string, b: string): number => {
+  const [la, lb] = [luminance(a), luminance(b)];
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+};
+
+/**
+ * Text colour for a background: white or GitHub ink, whichever contrasts more.
+ *
+ * @param background - `#rrggbb` background colour.
+ * @returns `#ffffff` or `#1f2328`.
+ */
+export function readableText(background: string): string {
+  return contrast(background, WHITE) >= contrast(background, INK) ? WHITE : INK;
+}
+
+/**
+ * The palette for a theme with optional custom colours applied; custom backgrounds get readable
+ * text automatically.
+ *
+ * @param options - Theme and custom colours.
+ * @returns The palette to draw with.
+ */
+export function resolvePalette(options: BadgeOptions = {}): Palette {
+  const base = THEMES[options.theme ?? "graphite"];
+  const label = options.labelColor === undefined ? undefined : `#${options.labelColor}`;
+  const count = options.color === undefined ? undefined : `#${options.color}`;
+  return {
+    ...base,
+    ...(label === undefined ? {} : { label, labelText: readableText(label) }),
+    ...(count === undefined ? {} : { count, countText: readableText(count) }),
+  };
+}
+
 /** Baseline that centres capitals of `size` vertically in the badge. */
 const baseline = (size: number): number => round(HEIGHT / 2 + size * 0.35);
 
@@ -124,9 +263,12 @@ const baseline = (size: number): number => round(HEIGHT / 2 + size * 0.35);
  * count on the right. Width grows with the count; text never overflows its segment.
  *
  * @param count - View count to show.
+ * @param options - Theme and custom colours; defaults to the `graphite` theme.
  * @returns A standalone, accessible SVG document sized 1:1 to its `viewBox`.
  */
-export function generateModernBadge(count: number): string {
+export function generateModernBadge(count: number, options: BadgeOptions = {}): string {
+  const palette = resolvePalette(options);
+  const adaptive = options.theme === "adaptive" && options.labelColor === undefined;
   const value = escapeXml(formatNumber(count));
   const label = escapeXml(LABEL);
   const title = `Profile visitors: ${value}`;
@@ -137,22 +279,47 @@ export function generateModernBadge(count: number): string {
   const countSegment = round(Math.max(PAD + countText + PAD, MIN_COUNT_SEGMENT));
   const width = round(labelSegment + countSegment);
 
+  const gradient = typeof palette.count === "string" ? undefined : palette.count;
+  const countFill = typeof palette.count === "string" ? palette.count : "url(#pvc-accent)";
+  const labelClass = adaptive ? ' class="pvc-label"' : "";
+  const labelTextClass = adaptive ? ' class="pvc-label-text"' : "";
+  const [edgeColor, edgeOpacity] = palette.edge;
+  const [sheenTop, sheenBottom] = palette.sheen;
+
+  const defs = [
+    adaptive ? `    <style>${ADAPTIVE_CSS}</style>` : "",
+    `    <linearGradient id="pvc-sheen" x2="0" y2="1">
+      <stop offset="0" stop-color="${WHITE}" stop-opacity="${sheenTop}"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="${sheenBottom}"/>
+    </linearGradient>`,
+    gradient === undefined
+      ? ""
+      : `    <linearGradient id="pvc-accent" x2="1">
+      <stop offset="0" stop-color="${gradient[0]}"/>
+      <stop offset="1" stop-color="${gradient[1]}"/>
+    </linearGradient>`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+  // Same colour on both segments: a short divider keeps them apart.
+  const divider =
+    palette.label === palette.count
+      ? `\n  <rect x="${labelSegment}" y="7" width="1" height="14" fill="${WHITE}" fill-opacity=".18"/>`
+      : "";
+
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${HEIGHT}" viewBox="0 0 ${width} ${HEIGHT}" role="img" aria-label="${title}">
   <title>${title}</title>
   <defs>
-    <linearGradient id="pvc-sheen" x2="0" y2="1">
-      <stop offset="0" stop-color="#ffffff" stop-opacity=".14"/>
-      <stop offset="1" stop-color="#000000" stop-opacity=".12"/>
-    </linearGradient>
+${defs}
   </defs>
-  <rect width="${width}" height="${HEIGHT}" rx="${RADIUS}" fill="${COLORS.count}"/>
-  <path d="M${RADIUS} 0H${labelSegment}V${HEIGHT}H${RADIUS}A${RADIUS} ${RADIUS} 0 0 1 ${RADIUS} 0Z" fill="${COLORS.label}"/>
+  <rect width="${width}" height="${HEIGHT}" rx="${RADIUS}" fill="${countFill}"/>
+  <path${labelClass} d="M${RADIUS} 0H${labelSegment}V${HEIGHT}H${RADIUS}A${RADIUS} ${RADIUS} 0 0 1 ${RADIUS} 0Z" fill="${palette.label}"/>
   <rect width="${width}" height="${HEIGHT}" rx="${RADIUS}" fill="url(#pvc-sheen)"/>
-  <rect x=".5" y=".5" width="${round(width - 1)}" height="${HEIGHT - 1}" rx="${RADIUS - 0.5}" fill="none" stroke="#ffffff" stroke-opacity=".12"/>
-  <g fill="${COLORS.text}" font-family="${FONT_STACK}" text-rendering="geometricPrecision">
-    <path aria-hidden="true" transform="translate(${PAD} ${(HEIGHT - ICON) / 2}) scale(${ICON / 16})" d="${GITHUB_MARK}"/>
-    <text x="${PAD + ICON + ICON_GAP}" y="${baseline(LABEL_STYLE.size)}" font-size="${LABEL_STYLE.size}" font-weight="${LABEL_STYLE.weight}" textLength="${labelText}" lengthAdjust="spacing">${label}</text>
-    <text x="${round(labelSegment + countSegment / 2)}" y="${baseline(COUNT_STYLE.size)}" font-size="${COUNT_STYLE.size}" font-weight="${COUNT_STYLE.weight}" text-anchor="middle" font-variant-numeric="tabular-nums" textLength="${countText}" lengthAdjust="spacing">${value}</text>
+  <rect x=".5" y=".5" width="${round(width - 1)}" height="${HEIGHT - 1}" rx="${RADIUS - 0.5}" fill="none" stroke="${edgeColor}" stroke-opacity="${edgeOpacity}"/>${divider}
+  <g font-family="${FONT_STACK}" text-rendering="geometricPrecision">
+    <path${labelTextClass} aria-hidden="true" fill="${palette.labelText}" transform="translate(${PAD} ${(HEIGHT - ICON) / 2}) scale(${ICON / 16})" d="${GITHUB_MARK}"/>
+    <text${labelTextClass} x="${PAD + ICON + ICON_GAP}" y="${baseline(LABEL_STYLE.size)}" fill="${palette.labelText}" font-size="${LABEL_STYLE.size}" font-weight="${LABEL_STYLE.weight}" textLength="${labelText}" lengthAdjust="spacing">${label}</text>
+    <text x="${round(labelSegment + countSegment / 2)}" y="${baseline(COUNT_STYLE.size)}" fill="${palette.countText}" font-size="${COUNT_STYLE.size}" font-weight="${COUNT_STYLE.weight}" text-anchor="middle" font-variant-numeric="tabular-nums" textLength="${countText}" lengthAdjust="spacing">${value}</text>
   </g>
 </svg>`;
 }

@@ -33,8 +33,13 @@ viewCounterRoute.get(
     // HEAD comes from link checkers and crawlers, not readers: answer it without counting.
     if (c.req.method === "HEAD") return c.body(null, 200, SVG_HEADERS);
 
-    const { username } = c.req.valid("query");
+    const { color, label_color: labelColor, theme, username } = c.req.valid("query");
     const count = await incrementViewCount(c.env.DB, username);
-    return c.body(generateModernBadge(count), 200, SVG_HEADERS);
+    const svg = generateModernBadge(count, {
+      ...(theme === undefined ? {} : { theme }),
+      ...(color === undefined ? {} : { color }),
+      ...(labelColor === undefined ? {} : { labelColor }),
+    });
+    return c.body(svg, 200, SVG_HEADERS);
   },
 );
