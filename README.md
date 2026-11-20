@@ -14,7 +14,7 @@
 
 A **blazing-fast, edge-deployed** profile view counter for GitHub READMEs.
 
-Built on **Cloudflare Workers** with **D1** for persistence, **KV** for caching, and **Hono** for routing.
+Built on **Cloudflare Workers** with **D1** for persistence and **Hono** for routing.
 
 <br>
 
@@ -57,32 +57,31 @@ Add this to your GitHub profile `README.md`:
 
 ```mermaid
 flowchart LR
-    A[README badge] --> B[Cloudflare Edge]
-    B --> C{KV cache}
-    C -->|HIT| D[Return cached SVG]
-    C -->|MISS| E[D1 atomic increment]
+    A[README badge] --> B[GitHub image proxy]
+    B --> C[Cloudflare Worker]
+    C --> D[Validate username]
+    D --> E[D1 atomic increment]
     E --> F[Generate SVG]
-    F --> G[waitUntil KV store]
-    G --> D
+    F --> B
 ```
 
-Every visit to a README embedding the badge triggers an edge request. On cache miss, the view count is atomically incremented in D1, a fresh SVG is generated, and the result is cached in KV for 60 seconds. Cache writes are non-blocking and error-safe via `waitUntil()`.
+Every time someone opens a README with the badge, GitHub's image proxy fetches it from the Worker. The badge is sent with `no-store`, so every view reaches the Worker: the username is lowercased (GitHub logins are case-insensitive), the count is atomically incremented in D1, and a fresh SVG is returned. `HEAD` requests from link checkers get the headers without being counted.
 
 ---
 
 ## Features
 
-| Feature             | Detail                                                                                                                                    |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Edge-first**      | Global deployment with [Smart Placement](https://developers.cloudflare.com/workers/configuration/smart-placement/) for optimal D1 latency |
-| **Atomic counting** | `INSERT ON CONFLICT ... RETURNING` — zero race conditions                                                                                 |
-| **Sub-10ms cache**  | KV-backed edge cache, 60s TTL                                                                                                             |
-| **Responsive SVG**  | `viewBox` + `preserveAspectRatio` — crisp at any size                                                                                     |
-| **Accessible**      | WCAG: `role="img"`, `aria-labelledby`, `<title>`, `<desc>`                                                                                |
-| **Secure**          | `secureHeaders()` (HSTS, CSP, X-Frame-Options) + `nosniff` on SVG                                                                         |
-| **Observable**      | `requestId()` tracing, structured JSON logging, source maps                                                                               |
-| **100% tested**     | Vitest in workerd against real D1 and KV, 100 % coverage enforced                                                                         |
-| **Type-safe**       | TypeScript 7 strict + Valibot schema validation                                                                                           |
+| Feature               | Detail                                                                                                                                    |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Edge-first**        | Global deployment with [Smart Placement](https://developers.cloudflare.com/workers/configuration/smart-placement/) for optimal D1 latency |
+| **Atomic counting**   | `INSERT ON CONFLICT ... RETURNING` — zero race conditions                                                                                 |
+| **Every view counts** | `no-store` badge, case-insensitive usernames, `HEAD` not counted                                                                          |
+| **Responsive SVG**    | `viewBox` + `preserveAspectRatio` — crisp at any size                                                                                     |
+| **Accessible**        | WCAG: `role="img"`, `aria-labelledby`, `<title>`, `<desc>`                                                                                |
+| **Secure**            | `secureHeaders()` (HSTS, CSP, X-Frame-Options) + `nosniff` on SVG                                                                         |
+| **Observable**        | `requestId()` tracing, structured JSON error logs, Workers Logs, source maps                                                              |
+| **100% tested**       | Vitest in workerd against real D1 and migrations, 100 % coverage enforced                                                                 |
+| **Type-safe**         | TypeScript 7 strict + Valibot schema validation                                                                                           |
 
 ---
 
@@ -92,12 +91,11 @@ Every visit to a README embedding the badge triggers an edge request. On cache m
 src/
 ├── index.ts              # Hono app: middleware, /, /health, 404 and error handler
 ├── routes/
-│   └── view-counter.ts   # Cache-first badge endpoint
+│   └── view-counter.ts   # Badge endpoint: validate, count, render
 ├── badge/
 │   └── generator.ts      # Responsive SVG with a11y
 ├── services/
-│   ├── counter.ts        # D1 atomic increment
-│   └── cache.ts          # KV get/set with TTL
+│   └── counter.ts        # D1 atomic increment
 └── schemas/
     └── query.ts          # Valibot validation of the username
 ```
@@ -114,7 +112,6 @@ src/
 | **Edge**        | [Cloudflare Workers](https://workers.cloudflare.com)                                                                      | Global deployment with Smart Placement      |
 | **Framework**   | [Hono](https://hono.dev)                                                                                                  | Ultra-lightweight routing + middleware      |
 | **Database**    | [Cloudflare D1](https://developers.cloudflare.com/d1/)                                                                    | Serverless SQLite with atomic operations    |
-| **Cache**       | [Cloudflare KV](https://developers.cloudflare.com/kv/)                                                                    | Distributed key-value store (60s TTL)       |
 | **Validation**  | [Valibot](https://valibot.dev)                                                                                            | Tree-shakeable schema validation            |
 | **Language**    | [TypeScript 7](https://www.typescriptlang.org/)                                                                           | Native `tsgo` checker, every strict flag    |
 | **Toolchain**   | [mise](https://mise.jdx.dev) + [Bun](https://bun.sh)                                                                      | Pinned tools; package manager               |

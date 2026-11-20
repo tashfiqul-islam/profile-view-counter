@@ -56,4 +56,14 @@ describe("querySchema", () => {
   it("returns the username as output", () => {
     expect(safeParse(querySchema, { username: "test" }).output).toEqual({ username: "test" });
   });
+
+  it("lowercases the username, since GitHub logins are case-insensitive", () => {
+    expect(safeParse(querySchema, { username: "Octo-Cat" }).output).toEqual({
+      username: "octo-cat",
+    });
+  });
+
+  it("reports a missing username as required", () => {
+    expect(safeParse(querySchema, {}).issues?.[0]?.message).toBe("Username is required");
+  });
 });

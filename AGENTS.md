@@ -1,8 +1,8 @@
 # AGENTS.md
 
 Cloudflare Worker that serves the "PROFILE VISITORS" SVG badge for GitHub READMEs and counts a view
-per request. Hono routes, Valibot validates the `username` query, D1 stores the counts, KV caches
-rendered badges for 60 s. Live at `https://profile-view-counter.tashfiq61.workers.dev`.
+per request. Hono routes, Valibot validates (and lowercases) the `username` query, D1 stores the
+counts. Live at `https://profile-view-counter.tashfiq61.workers.dev`.
 
 `src/` runs on **workerd**, not Bun or Node: no `Bun.*`, `fs`, `process` or `require()` there. Bun
 is the package manager and runs `scripts/`.
@@ -31,7 +31,7 @@ role, invariants and recipes. [`scripts/README.md`](scripts/README.md) covers re
 covers self-hosting. Keep them current when routes, modules or contracts change.
 
 Tests sit next to their module as `*.test.ts`. `src/index.test.ts` drives the whole app through
-`app.fetch()` against real D1 and KV in workerd; `src/test-setup.ts` applies `migrations/` to each
+`app.fetch()` against real D1 in workerd; `src/test-setup.ts` applies `migrations/` to each
 test file's isolated database.
 
 ## Working agreement
@@ -46,11 +46,10 @@ test file's isolated database.
 - Escape every dynamic value that enters SVG with `escapeXml()`.
 - Bind every SQL value with `.bind()`; never build SQL from strings.
 - Non-blocking work goes through `c.executionCtx.waitUntil()` with a `.catch()` that logs.
-- 404 and 500 reach clients as `{ error: string }` JSON; details go to
-  `console.error(JSON.stringify({ level, requestId, error, request }))`. A 400 from `vValidator` is
-  currently Valibot's raw result (`{ success: false, issues: […] }`).
+- Errors reach clients as `{ error: string }` JSON (400 carries the first Valibot issue message);
+  details go to `console.error(JSON.stringify({ level, requestId, error, request }))`.
 - Derive types from data: `as const satisfies T` for config objects, `readonly` interfaces.
-- Mock at the seam with `vi.spyOn()` on the binding (`env.DB`, `env.CACHE`) or `console`; the
+- Mock at the seam with `vi.spyOn()` on the binding (`env.DB`) or `console`; the
   `afterEach` in `src/index.test.ts` restores them.
 - Document in TSDoc, enforced by oxlint: every export gets a one-line summary, then
   `@param name - …`, `@returns`, `@throws` where relevant. Types live in TypeScript, never in JSDoc
@@ -66,8 +65,9 @@ test file's isolated database.
   opposite: `bun:test`, run by `bun test`.
 - **`bun run dev` needs `bun run db:migrate` first**, or the first request fails with
   `no such table: view_counts`.
-- **A cache HIT does not count a view** (`src/routes/view-counter.ts`); counts grow at most once
-  per 60 s per username.
+- **Every GET is a view.** The badge is sent with `no-store` so GitHub's image proxy never caches
+  it; `HEAD` is answered without counting. Usernames are lowercased by the schema, and the
+  `view_counts` key has a `CHECK (username = lower(username))`.
 - **`conventional-changelog-conventionalcommits` stays on v8.** v9+ templates break the writer
   bundled with semantic-release (empty release notes). Renovate holds it via `allowedVersions`.
 - **Never write `[skip ci]` or `[skip actions]` in a commit message or PR body**, not even quoted:

@@ -7,30 +7,29 @@ The Worker. Everything here runs on workerd and is bundled by wrangler from `ind
 ```text
 GET /api/view-counter?username=X
   │
-  ├─ middleware (index.ts): requestId → logger → timing → cors (GET, HEAD) → secureHeaders
-  ├─ vValidator("query", querySchema)          400 Valibot issues JSON on bad input
-  ├─ KV get "badge:X" ── HIT ──► cached SVG, Cache-Control: public, max-age=60, X-Cache: HIT
-  │                              (the view is not counted)
-  └─ MISS
+  ├─ middleware (index.ts): requestId → cors (GET, HEAD) → secureHeaders
+  ├─ vValidator("query", querySchema)          400 { error: <first issue> }; lowercases the username
+  ├─ HEAD ──► badge headers, empty body, not counted
+  └─ GET
        ├─ D1 upsert, RETURNING views            atomic, no read-modify-write race
        ├─ generateModernBadge(views)
-       ├─ waitUntil(KV put, 60 s TTL)            failure logged, never fails the request
-       └─ SVG, Cache-Control: no-cache, no-store, must-revalidate, X-Cache: MISS
+       └─ SVG, Cache-Control: max-age=0, no-cache, no-store, must-revalidate
 ```
 
-Every SVG response also carries `Content-Security-Policy: default-src 'none'; style-src
-'unsafe-inline'` and `X-Content-Type-Options: nosniff`. Unknown routes return `404 { error }`;
-thrown errors return `500 { error: "Internal Server Error" }` and log structured JSON.
+`no-store` keeps GitHub's image proxy from caching the badge, so every README view reaches the
+Worker and counts. Every SVG response also carries `Content-Security-Policy: default-src 'none';
+style-src 'unsafe-inline'` and `X-Content-Type-Options: nosniff`. Unknown routes return
+`404 { error }`; thrown errors return `500 { error: "Internal Server Error" }` and log structured
+JSON.
 
 ## Modules
 
 | File                     | Role                                                                         |
 | ------------------------ | ---------------------------------------------------------------------------- |
 | `index.ts`               | Hono app: middleware, `/`, `/health`, `/favicon.ico`, 404 and error handler  |
-| `routes/view-counter.ts` | `GET /api/view-counter`: cache check, count, render, cache write             |
-| `schemas/query.ts`       | Valibot schema for the `username` query (GitHub login rules, 1–39 chars)     |
+| `routes/view-counter.ts` | `GET /api/view-counter`: validate, count, render; `HEAD` without counting    |
+| `schemas/query.ts`       | Valibot schema for `username` (GitHub login rules, 1–39 chars), lowercased   |
 | `services/counter.ts`    | `incrementViewCount()`: D1 `INSERT … ON CONFLICT DO UPDATE … RETURNING`      |
-| `services/cache.ts`      | `getCachedBadge()` / `setCachedBadge()`: KV text get/put with TTL            |
 | `badge/generator.ts`     | Pure SVG rendering: `formatNumber()`, `escapeXml()`, `generateModernBadge()` |
 | `test-setup.ts`          | Vitest setup: applies `migrations/` to each test file's isolated D1          |
 | `test-env.d.ts`          | Types for the test-only `TEST_MIGRATIONS` binding                            |

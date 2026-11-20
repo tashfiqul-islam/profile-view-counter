@@ -14,7 +14,7 @@ https://profile-view-counter.tashfiq61.workers.dev
 
 ## Common Headers
 
-All responses include these security and observability headers (via `secureHeaders()` middleware):
+All responses include these headers (`requestId()` and `secureHeaders()` middleware):
 
 | Header                      | Value                                                     | Description                           |
 | --------------------------- | --------------------------------------------------------- | ------------------------------------- |
@@ -24,7 +24,6 @@ All responses include these security and observability headers (via `secureHeade
 | `X-Frame-Options`           | `DENY`                                                    | Clickjacking prevention               |
 | `Referrer-Policy`           | `no-referrer`                                             | Referrer leakage prevention           |
 | `Permissions-Policy`        | `camera=(), fullscreen=(), geolocation=(), microphone=()` | Feature restrictions                  |
-| `Server-Timing`             | varies                                                    | Request timing metrics                |
 
 ---
 
@@ -66,20 +65,19 @@ Health check endpoint for monitoring.
 
 ### `GET /api/view-counter`
 
-Generates an SVG badge and increments the view count for the specified user.
+Counts one view for the user and returns the badge with the new count. Usernames are case-insensitive (`Octocat` and `octocat` share one counter). `HEAD` returns the same headers with an empty body and does not count.
 
 **Query Parameters**
 
-| Parameter  | Type   | Required | Description                                          |
-| ---------- | ------ | -------- | ---------------------------------------------------- |
-| `username` | string | Yes      | GitHub username (1-39 chars, alphanumeric + hyphens) |
+| Parameter  | Type   | Required | Description                                                            |
+| ---------- | ------ | -------- | ---------------------------------------------------------------------- |
+| `username` | string | Yes      | GitHub username (1-39 chars, alphanumeric + hyphens), case-insensitive |
 
 **Success Response (200)**
 
 - **Content-Type**: `image/svg+xml`
 - **Additional Headers**:
-  - `X-Cache`: `HIT` (served from cache) or `MISS` (freshly generated)
-  - `Cache-Control`: `public, max-age=60` (cache hit) or `no-cache, no-store, must-revalidate` (cache miss)
+  - `Cache-Control`: `max-age=0, no-cache, no-store, must-revalidate`, so GitHub's image proxy fetches (and counts) every view
   - `Content-Security-Policy`: `default-src 'none'; style-src 'unsafe-inline'`
 
 **Examples**
@@ -97,10 +95,10 @@ curl "https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?userna
 
 **Error Responses**
 
-| Status | Body                                                                      | Description                             |
-| ------ | ------------------------------------------------------------------------- | --------------------------------------- |
-| 400    | Valibot result: `{"success": false, "issues": [{"message": "...", ...}]}` | Invalid or missing `username` parameter |
-| 500    | `{"error": "Internal Server Error"}`                                      | Server failure                          |
+| Status | Body                                                          | Description                             |
+| ------ | ------------------------------------------------------------- | --------------------------------------- |
+| 400    | `{"error": "Username is required"}` (or the rule that failed) | Invalid or missing `username` parameter |
+| 500    | `{"error": "Internal Server Error"}`                          | Server failure                          |
 
 ---
 
@@ -112,7 +110,7 @@ Returns 204 No Content.
 
 ## Error Handling
 
-404 and 500 errors return JSON with an `error` field:
+All errors return JSON with an `error` field:
 
 ```json
 {
@@ -120,17 +118,17 @@ Returns 204 No Content.
 }
 ```
 
-| Status | Message                                |
-| ------ | -------------------------------------- |
-| 400    | Valibot result with `issues[].message` |
-| 404    | `Not Found`                            |
-| 500    | `Internal Server Error`                |
+| Status | Message                                                             |
+| ------ | ------------------------------------------------------------------- |
+| 400    | The failed validation rule, e.g. `Username must be 1-39 characters` |
+| 404    | `Not Found`                                                         |
+| 500    | `Internal Server Error`                                             |
 
 ---
 
 ## Rate Limiting
 
-No rate limiting is enforced. The KV cache provides natural protection by serving cached badges for 60 seconds.
+No rate limiting is enforced. Counts are vanity metrics and the badge is unauthenticated, so repeated requests do raise the count; see the threat model in [SECURITY.md](../.github/SECURITY.md).
 
 ---
 
