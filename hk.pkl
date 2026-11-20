@@ -1,0 +1,71 @@
+amends "package://github.com/jdx/hk/releases/download/v2.13.0/hk@2.13.0#/Config.pkl"
+
+local typescript = List("*.ts")
+
+local oxfmt = new Step {
+  glob = List("*.{ts,json,jsonc,md,yml,yaml,toml}")
+  exclude = List("CHANGELOG.md", "bun.lock", "worker-configuration.d.ts")
+  check = "bunx oxfmt --check {{files}}"
+  fix = "bunx oxfmt {{files}}"
+}
+
+local oxlint = new Step {
+  glob = typescript
+  exclude = List("worker-configuration.d.ts")
+  check = "bunx oxlint --deny-warnings {{files}}"
+  fix = "bunx oxlint --fix {{files}}"
+}
+
+local typecheck = new Step {
+  glob = typescript
+  check = "bunx tsc"
+}
+
+local actionlint = new Step {
+  glob = List(".github/workflows/*.yml")
+  check = "actionlint {{files}}"
+}
+
+local zizmor = new Step {
+  // zizmor also audits composite actions; actionlint only understands workflows.
+  glob = List(".github/workflows/*.yml", ".github/actions/**/action.yml")
+  check = "zizmor --offline --persona auditor {{files}}"
+}
+
+local lychee = new Step {
+  glob = List("*.md")
+  exclude = List("CHANGELOG.md")
+  check = "lychee --offline --include-fragments --no-progress {{files}}"
+}
+
+local linters = new Mapping<String, Step> {
+  ["oxlint"] = oxlint
+  ["oxfmt"] = (oxfmt) { depends = "oxlint" }
+  ["typecheck"] = typecheck
+  ["actionlint"] = actionlint
+  ["zizmor"] = zizmor
+  ["lychee"] = lychee
+}
+
+hooks {
+  ["pre-commit"] {
+    fix = true
+    stash = "git"
+    steps = linters
+  }
+  ["commit-msg"] {
+    steps {
+      ["commitlint"] { check = "bunx commitlint --edit {{commit_msg_file}}" }
+    }
+  }
+  ["pre-push"] {
+    steps {
+      ["check"] { check = "bun run check" }
+    }
+  }
+  ["check"] { steps = linters }
+  ["fix"] {
+    fix = true
+    steps = linters
+  }
+}
