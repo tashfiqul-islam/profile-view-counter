@@ -2,10 +2,11 @@
 
 Repository tooling that runs on Bun, outside the Worker.
 
-| Script                           | Runs in                       | Tested by                                  |
-| -------------------------------- | ----------------------------- | ------------------------------------------ |
-| [`pr-labels.ts`](pr-labels.ts)   | `pr.yml` → **labels** job     | [`pr-labels.test.ts`](pr-labels.test.ts)   |
-| [`agent-docs.ts`](agent-docs.ts) | `bun run check`, Quality gate | [`agent-docs.test.ts`](agent-docs.test.ts) |
+| Script                                 | Runs in                          | Tested by                                        |
+| -------------------------------------- | -------------------------------- | ------------------------------------------------ |
+| [`pr-labels.ts`](pr-labels.ts)         | `pr.yml` → **labels** job        | [`pr-labels.test.ts`](pr-labels.test.ts)         |
+| [`agent-docs.ts`](agent-docs.ts)       | `bun run check`, Quality gate    | [`agent-docs.test.ts`](agent-docs.test.ts)       |
+| [`badge-gallery.ts`](badge-gallery.ts) | `bun run badge:gallery`, by hand | [`badge-gallery.test.ts`](badge-gallery.test.ts) |
 
 ## `pr-labels.ts`
 
@@ -28,6 +29,13 @@ Keeps `AGENTS.md` a router: it stays at most 8,192 bytes, each guide in `docs/ag
 6,144 bytes, every guide opens with `# Title` and `Read when: …`, and every guide is linked from
 `AGENTS.md`. `checkAgentDocs()` is the pure core; the CLI reads the files and exits 1 on a
 violation.
+
+## `badge-gallery.ts`
+
+Renders `assets/badge-themes.svg`, the README theme gallery: every theme plus two custom-colour
+examples, each on GitHub's light and dark backgrounds with the query that produces it. A test
+fails when the committed asset drifts from the generator, so run `bun run badge:gallery` after any
+theme or layout change.
 
 ```sh
 bun test scripts/

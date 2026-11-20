@@ -27,6 +27,7 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "docs:check": "bun scripts/agent-docs.ts",
+    "badge:gallery": "bun scripts/badge-gallery.ts",
     "test": "bun run test:worker && bun run test:scripts",
     "test:worker": "vitest run --coverage",
     "test:scripts": "bun test scripts/",

@@ -51,6 +51,27 @@ Add this to your GitHub profile `README.md`:
 > [!NOTE]
 > Replace `YOUR_USERNAME` with your GitHub username.
 
+### Themes and colours
+
+Add `&theme=` for a built-in look, or `&color=` / `&label_color=` for your own colours (6-digit hex,
+no `#`). Text colour adapts automatically, so any colour stays readable.
+
+```markdown
+![Profile Views](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=YOUR_USERNAME&theme=aurora)
+![Profile Views](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=YOUR_USERNAME&color=e11d48&label_color=0f172a)
+```
+
+| Parameter     | Values                                                            | Default    |
+| ------------- | ----------------------------------------------------------------- | ---------- |
+| `theme`       | `graphite`, `aurora`, `mono`, `paper`, `contribution`, `adaptive` | `graphite` |
+| `color`       | count background, hex like `0969da`                               | theme's    |
+| `label_color` | label background, hex like `1f2328`                               | theme's    |
+
+![Every badge theme and two custom-colour examples, on light and dark backgrounds](assets/badge-themes.svg)
+
+`adaptive` switches its label to light when the viewer's system prefers a light scheme. Styling
+never changes the count.
+
 ---
 
 ## How It Works

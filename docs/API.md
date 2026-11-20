@@ -69,9 +69,15 @@ Counts one view for the user and returns the badge with the new count. Usernames
 
 **Query Parameters**
 
-| Parameter  | Type   | Required | Description                                                            |
-| ---------- | ------ | -------- | ---------------------------------------------------------------------- |
-| `username` | string | Yes      | GitHub username (1-39 chars, alphanumeric + hyphens), case-insensitive |
+| Parameter     | Type   | Required | Description                                                                     |
+| ------------- | ------ | -------- | ------------------------------------------------------------------------------- |
+| `username`    | string | Yes      | GitHub username (1-39 chars, alphanumeric + hyphens), case-insensitive          |
+| `theme`       | string | No       | `graphite` (default), `aurora`, `mono`, `paper`, `contribution` or `adaptive`   |
+| `color`       | string | No       | Count background as 6-digit hex without `#`, e.g. `e11d48`; overrides the theme |
+| `label_color` | string | No       | Label background as 6-digit hex without `#`; overrides the theme                |
+
+Styling parameters never affect the count; text colour on a custom background is chosen by
+contrast. Invalid values return 400, e.g. `{"error": "color must be a 6-digit hex colour like 0969da"}`.
 
 **Success Response (200)**
 

@@ -14,6 +14,8 @@ D1 schema or a migration.
   alphanumeric and inner hyphens; legacy logins with double hyphens stay valid).
 - **The only write** is `incrementViewCount()`: one atomic
   `INSERT … ON CONFLICT DO UPDATE … RETURNING views`. Keep it a single statement.
+- **Styling** (`theme`, `color`, `label_color`) is optional, validated in `querySchema`, and only
+  reaches the badge renderer; the counter key is the username alone.
 - **Validation** lives in a Valibot schema in `src/schemas/` and runs through `vValidator` at the
   route with the hook that returns `400 { error: <first issue message> }`.
 - **Errors** reach clients as `{ error: string }` (400, 404, 500); details go to
