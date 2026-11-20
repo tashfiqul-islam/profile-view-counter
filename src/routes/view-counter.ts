@@ -19,45 +19,41 @@ const SVG_HEADERS = {
   "X-Content-Type-Options": "nosniff",
 } as const satisfies SvgHeaders;
 
+/** `GET /view-counter`: counts a view and returns the badge (mounted under `/api`). */
 export const viewCounterRoute = new Hono<{ Bindings: Env }>();
 
-viewCounterRoute.get(
-  "/view-counter",
-  vValidator("query", querySchema),
-  async (c) => {
-    const { username } = c.req.valid("query");
-    const cacheKey = `badge:${username}`;
+viewCounterRoute.get("/view-counter", vValidator("query", querySchema), async (c) => {
+  const { username } = c.req.valid("query");
+  const cacheKey = `badge:${username}`;
 
-    const cached = await getCachedBadge(c.env.CACHE, cacheKey);
-    if (cached !== null) {
-      return c.body(cached, 200, {
-        ...SVG_HEADERS,
-        "Cache-Control": "public, max-age=60",
-        "X-Cache": "HIT",
-      });
-    }
-
-    const count = await incrementViewCount(c.env.DB, username);
-    const svg = generateModernBadge(count);
-
-    c.executionCtx.waitUntil(
-      setCachedBadge(c.env.CACHE, cacheKey, svg, CACHE_TTL_SECONDS).catch(
-        (err: unknown) =>
-          console.error(
-            JSON.stringify({
-              context: { cacheKey, username },
-              error: "cache-write-failed",
-              level: "warn",
-              message: String(err),
-            })
-          )
-      )
-    );
-
-    return c.body(svg, 200, {
+  const cached = await getCachedBadge(c.env.CACHE, cacheKey);
+  if (cached !== null) {
+    return c.body(cached, 200, {
       ...SVG_HEADERS,
-      "Cache-Control": "no-cache, no-store, must-revalidate",
-      "X-Cache": "MISS",
+      "Cache-Control": "public, max-age=60",
+      "X-Cache": "HIT",
     });
   }
-);
+
+  const count = await incrementViewCount(c.env.DB, username);
+  const svg = generateModernBadge(count);
+
+  c.executionCtx.waitUntil(
+    setCachedBadge(c.env.CACHE, cacheKey, svg, CACHE_TTL_SECONDS).catch((err: unknown) =>
+      console.error(
+        JSON.stringify({
+          context: { cacheKey, username },
+          error: "cache-write-failed",
+          level: "warn",
+          message: String(err),
+        }),
+      ),
+    ),
+  );
+
+  return c.body(svg, 200, {
+    ...SVG_HEADERS,
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+    "X-Cache": "MISS",
+  });
+});

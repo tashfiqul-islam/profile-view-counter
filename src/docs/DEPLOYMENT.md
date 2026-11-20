@@ -65,15 +65,15 @@ Update `wrangler.jsonc` with your resource IDs:
     {
       "binding": "DB",
       "database_name": "profile-views",
-      "database_id": "YOUR_DATABASE_ID"
-    }
+      "database_id": "YOUR_DATABASE_ID",
+    },
   ],
   "kv_namespaces": [
     {
       "binding": "CACHE",
-      "id": "YOUR_KV_ID"
-    }
-  ]
+      "id": "YOUR_KV_ID",
+    },
+  ],
 }
 ```
 
@@ -102,6 +102,7 @@ bun run deploy
 ```
 
 Your API will be available at:
+
 ```
 https://profile-view-counter.<YOUR_SUBDOMAIN>.workers.dev
 ```
@@ -120,6 +121,7 @@ bun run dev
 ```
 
 This runs a local Cloudflare Workers environment with:
+
 - D1 emulated locally
 - KV emulated locally
 - Hot reload on file changes
@@ -167,6 +169,7 @@ Ensure `id` in `kv_namespaces` matches the output from `wrangler kv namespace cr
 ### Migrations Fail
 
 Run migrations locally first to verify:
+
 ```bash
 bun run db:migrate
 ```
@@ -174,6 +177,7 @@ bun run db:migrate
 ### Integration Tests Timeout
 
 Ensure no stale `workerd` processes are running. Kill them and retry:
+
 ```bash
 taskkill /f /im workerd.exe  # Windows
 pkill workerd                # macOS/Linux

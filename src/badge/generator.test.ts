@@ -1,11 +1,5 @@
-import { describe, expect, it } from "bun:test";
-import { safeParse } from "valibot";
-import {
-  escapeXml,
-  formatNumber,
-  generateModernBadge,
-} from "../src/badge/generator";
-import { querySchema } from "../src/schemas/query";
+import { describe, expect, it } from "vitest";
+import { escapeXml, formatNumber, generateModernBadge } from "./generator";
 
 const WIDTH_REGEX = /width="\d+(\.\d+)?"/;
 const HEIGHT_REGEX = /height="\d+(\.\d+)?"/;
@@ -37,12 +31,6 @@ describe("formatNumber", () => {
     expect(formatNumber(1_500_000_000)).toBe("1.5B");
     expect(formatNumber(2_000_000_000)).toBe("2B");
   });
-
-  it("strips trailing .0 from formatted numbers", () => {
-    expect(formatNumber(1000)).toBe("1K");
-    expect(formatNumber(1_000_000)).toBe("1M");
-    expect(formatNumber(1_000_000_000)).toBe("1B");
-  });
 });
 
 describe("escapeXml", () => {
@@ -72,79 +60,6 @@ describe("escapeXml", () => {
 
   it("escapes multiple special characters in one string", () => {
     expect(escapeXml("<a&b\"c'd>")).toBe("&lt;a&amp;b&quot;c&apos;d&gt;");
-  });
-});
-
-describe("querySchema", () => {
-  it("accepts valid GitHub usernames", () => {
-    expect(safeParse(querySchema, { username: "tashfiq61" }).success).toBe(
-      true
-    );
-    expect(safeParse(querySchema, { username: "a" }).success).toBe(true);
-    expect(safeParse(querySchema, { username: "a".repeat(39) }).success).toBe(
-      true
-    );
-    expect(safeParse(querySchema, { username: "my-org" }).success).toBe(true);
-    expect(safeParse(querySchema, { username: "org-name" }).success).toBe(true);
-  });
-
-  it("rejects empty username", () => {
-    const result = safeParse(querySchema, { username: "" });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects missing username", () => {
-    const result = safeParse(querySchema, {});
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects 40-char username (over max length)", () => {
-    const result = safeParse(querySchema, { username: "a".repeat(40) });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects username starting with dash", () => {
-    const result = safeParse(querySchema, { username: "-invalid" });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects username ending with dash", () => {
-    const result = safeParse(querySchema, { username: "invalid-" });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects username with special characters", () => {
-    expect(safeParse(querySchema, { username: "user@name" }).success).toBe(
-      false
-    );
-    expect(safeParse(querySchema, { username: "user name" }).success).toBe(
-      false
-    );
-    expect(safeParse(querySchema, { username: "user.name" }).success).toBe(
-      false
-    );
-  });
-
-  it("returns specific error messages", () => {
-    const empty = safeParse(querySchema, { username: "" });
-    expect(empty.success).toBe(false);
-    if (!empty.success) {
-      expect(empty.issues[0].message).toBeTruthy();
-    }
-
-    const tooLong = safeParse(querySchema, { username: "a".repeat(40) });
-    expect(tooLong.success).toBe(false);
-    if (!tooLong.success) {
-      expect(tooLong.issues[0].message).toBeTruthy();
-    }
-  });
-
-  it("returns valid output type with username field", () => {
-    const result = safeParse(querySchema, { username: "test" });
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.output.username).toBe("test");
-    }
   });
 });
 
@@ -252,13 +167,6 @@ describe("generateModernBadge", () => {
     const svg = generateModernBadge(42);
 
     expect(svg).toContain('letter-spacing="2"');
-  });
-
-  it("escapes XML in count (defense in depth)", () => {
-    const svg = generateModernBadge(42);
-
-    expect(svg).not.toContain("<script>");
-    expect(svg).not.toContain("javascript:");
   });
 
   it("always produces valid SVG with xmlns", () => {

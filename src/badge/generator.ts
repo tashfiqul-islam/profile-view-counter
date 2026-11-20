@@ -52,6 +52,12 @@ const SVG_DEFS = `
        <feDropShadow dx="1" dy="1" stdDeviation="0" flood-color="#000" flood-opacity="0.5"/>
     </filter>`;
 
+/**
+ * Escapes the five XML special characters so a value is safe inside SVG text or attributes.
+ *
+ * @param str - Untrusted text.
+ * @returns The escaped text.
+ */
 export function escapeXml(str: string): string {
   return str
     .replace(/&/g, "&amp;")
@@ -61,6 +67,12 @@ export function escapeXml(str: string): string {
     .replace(/'/g, "&apos;");
 }
 
+/**
+ * Shortens a count with K, M or B suffixes and one decimal, dropping a trailing `.0`.
+ *
+ * @param num - Non-negative view count.
+ * @returns For example `"999"`, `"1.2K"`, `"1M"`.
+ */
 export function formatNumber(num: number): string {
   if (num >= 1_000_000_000) {
     return `${(num / 1_000_000_000).toFixed(1).replace(TRAILING_ZERO_REGEX, "")}B`;
@@ -74,6 +86,12 @@ export function formatNumber(num: number): string {
   return num.toString();
 }
 
+/**
+ * Renders the "PROFILE VISITORS" badge: GitHub logo, label and formatted count, at 2x size.
+ *
+ * @param count - View count to show.
+ * @returns A standalone, accessible SVG document.
+ */
 export function generateModernBadge(count: number): string {
   const formattedCount = formatNumber(count);
   const safeCount = escapeXml(formattedCount);
@@ -97,19 +115,16 @@ export function generateModernBadge(count: number): string {
 
   const textPadLeft = logoCenterX + logoRadius - badgeStartX + d.countPadX + 1;
   const labelSectionWidth = textPadLeft + labelTextWidth + d.countPadX;
-  const badgeInnerWidth =
-    textPadLeft + labelTextWidth + d.countPadX + countSectionWidth;
+  const badgeInnerWidth = textPadLeft + labelTextWidth + d.countPadX + countSectionWidth;
 
   const viewBoxMinX = -(logoCenterX + logoRadius + logoStrokeHalf + 5);
-  const viewBoxDisplayWidth =
-    badgeStartX + badgeInnerWidth + d.outerPadX - viewBoxMinX;
+  const viewBoxDisplayWidth = badgeStartX + badgeInnerWidth + d.outerPadX - viewBoxMinX;
 
   const logoIconScale = LOGO_ICON_SIZE / 16;
   const countLetterSpacing = safeCount.length > 1 ? "2" : "0";
 
   const labelTextCenterX = textPadLeft + labelTextWidth / 2;
-  const countTextCenterX =
-    textPadLeft + labelTextWidth + d.countPadX + countSectionWidth / 2;
+  const countTextCenterX = textPadLeft + labelTextWidth + d.countPadX + countSectionWidth / 2;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${viewBoxDisplayWidth * 2}" height="${totalHeight * 2}" viewBox="${viewBoxMinX} 0 ${viewBoxDisplayWidth} ${totalHeight}" preserveAspectRatio="xMinYMid meet" role="img" aria-labelledby="badge-title badge-desc">
   <title id="badge-title">${LABEL}: ${safeCount}</title>

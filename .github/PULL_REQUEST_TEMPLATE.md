@@ -1,13 +1,16 @@
 # Description
+
 [Brief description of the changes]
 
 # Type of Change
+
 - [ ] 🚀 New Feature
 - [ ] 🐛 Bug Fix
 - [ ] 🔧 Refactoring
 - [ ] 📝 Documentation
 
 # Checklist
+
 - [ ] 🧪 100% Coverage (`bun run test --coverage`)
 - [ ] ✅ Linting Passed (`bun run check`)
 - [ ] 📘 Types Verified (`bun run typecheck`)
@@ -15,4 +18,5 @@
 - [ ] 📚 Docs Updated (if applicable)
 
 # Related Issues
+
 Closes #

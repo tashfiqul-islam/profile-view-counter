@@ -2,10 +2,10 @@
 
 ## Supported Versions
 
-| Version | Supported |
-|---------|-----------|
-| Latest  | Yes       |
-| < Latest | No       |
+| Version  | Supported |
+| -------- | --------- |
+| Latest   | Yes       |
+| < Latest | No        |
 
 Only the latest release receives security updates.
 
@@ -18,12 +18,12 @@ Report vulnerabilities via [GitHub Security Advisories](https://github.com/tashf
 
 ### Response Timeline
 
-| Stage | Timeline |
-|-------|----------|
-| Acknowledgment | 48 hours |
-| Initial assessment | 1 week |
-| Fix release (critical) | 2 weeks |
-| Fix release (other) | 1 month |
+| Stage                  | Timeline |
+| ---------------------- | -------- |
+| Acknowledgment         | 48 hours |
+| Initial assessment     | 1 week   |
+| Fix release (critical) | 2 weeks  |
+| Fix release (other)    | 1 month  |
 
 Confirmed vulnerabilities are fixed as a patch release and credited in the changelog.
 

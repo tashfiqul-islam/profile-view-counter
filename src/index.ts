@@ -29,12 +29,10 @@ app.use(
     strictTransportSecurity: "max-age=63072000; includeSubDomains; preload",
     xFrameOptions: "DENY",
     xXssProtection: "0",
-  })
+  }),
 );
 
-app.get("/favicon.ico", (c) =>
-  c.body(null, 204, { "X-Content-Type-Options": "nosniff" })
-);
+app.get("/favicon.ico", (c) => c.body(null, 204, { "X-Content-Type-Options": "nosniff" }));
 
 app.get("/health", (c) => c.json({ status: "ok", timestamp: Date.now() }));
 
@@ -46,7 +44,7 @@ app.get("/", (c) =>
       view_counter: "/api/view-counter?username=:username",
     },
     message: "Profile View Counter API is running 🚀",
-  })
+  }),
 );
 
 app.route("/api", viewCounterRoute);
@@ -67,7 +65,7 @@ app.onError((err, c) => {
         path: c.req.path,
       },
       requestId: c.get("requestId"),
-    })
+    }),
   );
   return c.json({ error: "Internal Server Error" }, 500);
 });

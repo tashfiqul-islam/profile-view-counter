@@ -13,11 +13,13 @@ bun install
 ## Development Workflow
 
 1. **Create a branch** from `main`:
+
    ```bash
    git checkout -b feat/your-feature
    ```
 
 2. **Make changes** and verify:
+
    ```bash
    bun run cf-typegen    # Regenerate types after wrangler.jsonc changes
    bun run check         # Lint + format check
@@ -26,11 +28,13 @@ bun install
    ```
 
 3. **Auto-fix** formatting issues:
+
    ```bash
    bun run fix
    ```
 
 4. **Commit** using conventional commits:
+
    ```bash
    bun run commit
    ```
@@ -41,25 +45,26 @@ bun install
 
 All commits must follow [Conventional Commits](https://www.conventionalcommits.org/). Enforced by commitlint via lefthook pre-commit hook.
 
-| Type | Description |
-|------|-------------|
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `docs` | Documentation only |
-| `style` | Formatting, no logic change |
+| Type       | Description                            |
+| ---------- | -------------------------------------- |
+| `feat`     | New feature                            |
+| `fix`      | Bug fix                                |
+| `docs`     | Documentation only                     |
+| `style`    | Formatting, no logic change            |
 | `refactor` | Code restructuring, no behavior change |
-| `perf` | Performance improvement |
-| `test` | Adding or updating tests |
-| `build` | Build system or dependencies |
-| `ci` | CI/CD changes |
-| `chore` | Maintenance tasks |
-| `revert` | Reverting a previous commit |
-| `types` | Type definition changes |
-| `security` | Security fixes or hardening |
+| `perf`     | Performance improvement                |
+| `test`     | Adding or updating tests               |
+| `build`    | Build system or dependencies           |
+| `ci`       | CI/CD changes                          |
+| `chore`    | Maintenance tasks                      |
+| `revert`   | Reverting a previous commit            |
+| `types`    | Type definition changes                |
+| `security` | Security fixes or hardening            |
 
 **Format:** `<type>(<optional scope>): <description>`
 
 **Examples:**
+
 ```
 feat(badge): add dark mode theme
 fix(cache): handle KV timeout gracefully
@@ -92,12 +97,12 @@ bun run test              # Both
 
 ## Git Hooks (Lefthook)
 
-| Hook | What it does |
-|------|-------------|
-| **pre-commit** | Format, typecheck, fast unit tests |
-| **commit-msg** | Commitlint validation |
-| **pre-push** | Full typecheck + all tests + lint check |
-| **post-merge** | Auto-install if lockfile changed |
+| Hook           | What it does                            |
+| -------------- | --------------------------------------- |
+| **pre-commit** | Format, typecheck, fast unit tests      |
+| **commit-msg** | Commitlint validation                   |
+| **pre-push**   | Full typecheck + all tests + lint check |
+| **post-merge** | Auto-install if lockfile changed        |
 
 ## Release Process
 

@@ -40,14 +40,14 @@ Request --> Hono (requestId, secureHeaders, cors, logger, timing) --> Valibot va
     MISS --> D1 atomic increment --> Generate SVG --> waitUntil(KV store) --> Return SVG
 ```
 
-| Module | Responsibility |
-|--------|----------------|
-| `src/index.ts` | Hono app, typed `Variables` interface, middleware stack, error handler with structured logging |
-| `src/routes/view-counter.ts` | Cache-first badge endpoint, SVG CSP header, error-safe `waitUntil()` |
-| `src/badge/generator.ts` | Responsive SVG: `escapeXml()`, `formatNumber()`, system fonts, a11y |
-| `src/services/counter.ts` | D1 `INSERT ON CONFLICT ... RETURNING` atomic increment |
-| `src/services/cache.ts` | KV get/set with TTL |
-| `src/schemas/query.ts` | Valibot schema with specific error messages |
+| Module                       | Responsibility                                                                                 |
+| ---------------------------- | ---------------------------------------------------------------------------------------------- |
+| `src/index.ts`               | Hono app, typed `Variables` interface, middleware stack, error handler with structured logging |
+| `src/routes/view-counter.ts` | Cache-first badge endpoint, SVG CSP header, error-safe `waitUntil()`                           |
+| `src/badge/generator.ts`     | Responsive SVG: `escapeXml()`, `formatNumber()`, system fonts, a11y                            |
+| `src/services/counter.ts`    | D1 `INSERT ON CONFLICT ... RETURNING` atomic increment                                         |
+| `src/services/cache.ts`      | KV get/set with TTL                                                                            |
+| `src/schemas/query.ts`       | Valibot schema with specific error messages                                                    |
 
 ## Key Patterns
 
@@ -55,15 +55,16 @@ Request --> Hono (requestId, secureHeaders, cors, logger, timing) --> Valibot va
 
 ```typescript
 c.executionCtx.waitUntil(
-  setCachedBadge(c.env.CACHE, cacheKey, svg, CACHE_TTL_SECONDS).catch(
-    (err: unknown) =>
-      console.error(JSON.stringify({
+  setCachedBadge(c.env.CACHE, cacheKey, svg, CACHE_TTL_SECONDS).catch((err: unknown) =>
+    console.error(
+      JSON.stringify({
         level: "warn",
         error: "cache-write-failed",
         message: String(err),
         context: { cacheKey, username },
-      }))
-  )
+      }),
+    ),
+  ),
 );
 ```
 
@@ -103,10 +104,10 @@ export function escapeXml(str: string): string {
 
 Two runners, split by runtime requirement:
 
-| Runner | File | Scope | Coverage |
-|--------|------|-------|----------|
-| `bun:test` | `test/badge-generator.test.ts` | Pure SVG generation + Valibot schemas (no Workers APIs) | `src/badge/**` |
-| Vitest + `@cloudflare/vitest-plugin` | `test/integration.test.ts` | Full Hono app against real workerd | `src/**` minus `src/badge/**` |
+| Runner                               | File                           | Scope                                                   | Coverage                      |
+| ------------------------------------ | ------------------------------ | ------------------------------------------------------- | ----------------------------- |
+| `bun:test`                           | `test/badge-generator.test.ts` | Pure SVG generation + Valibot schemas (no Workers APIs) | `src/badge/**`                |
+| Vitest + `@cloudflare/vitest-plugin` | `test/integration.test.ts`     | Full Hono app against real workerd                      | `src/**` minus `src/badge/**` |
 
 - 100% coverage required across all metrics (enforced in `vitest.config.ts`)
 - Integration tests use `createExecutionContext()` / `waitOnExecutionContext()` from `cloudflare:test`

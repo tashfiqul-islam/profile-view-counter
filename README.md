@@ -20,7 +20,7 @@ Built on **Cloudflare Workers** with **D1** for persistence, **KV** for caching,
 
 [![Profile Views](assets/badge-32.7k.svg)](https://github.com/tashfiqul-islam/profile-view-counter)
 
-*Click the badge above to see it in action*
+_Click the badge above to see it in action_
 
 </div>
 
@@ -39,7 +39,10 @@ Add this to your GitHub profile `README.md`:
 
 ```html
 <a href="https://github.com/tashfiqul-islam/profile-view-counter">
-  <img src="https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=YOUR_USERNAME" alt="Profile Views" />
+  <img
+    src="https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=YOUR_USERNAME"
+    alt="Profile Views"
+  />
 </a>
 ```
 
@@ -69,17 +72,17 @@ Every visit to a README embedding the badge triggers an edge request. On cache m
 
 ## Features
 
-| Feature | Detail |
-|---------|--------|
-| **Edge-first** | Global deployment with [Smart Placement](https://developers.cloudflare.com/workers/configuration/smart-placement/) for optimal D1 latency |
-| **Atomic counting** | `INSERT ON CONFLICT ... RETURNING` — zero race conditions |
-| **Sub-10ms cache** | KV-backed edge cache, 60s TTL |
-| **Responsive SVG** | `viewBox` + `preserveAspectRatio` — crisp at any size |
-| **Accessible** | WCAG: `role="img"`, `aria-labelledby`, `<title>`, `<desc>` |
-| **Secure** | `secureHeaders()` (HSTS, CSP, X-Frame-Options) + `nosniff` on SVG |
-| **Observable** | `requestId()` tracing, structured JSON logging, source maps |
-| **100% tested** | `bun:test` units + Vitest workerd integration |
-| **Type-safe** | TypeScript 7 strict + Valibot schema validation |
+| Feature             | Detail                                                                                                                                    |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Edge-first**      | Global deployment with [Smart Placement](https://developers.cloudflare.com/workers/configuration/smart-placement/) for optimal D1 latency |
+| **Atomic counting** | `INSERT ON CONFLICT ... RETURNING` — zero race conditions                                                                                 |
+| **Sub-10ms cache**  | KV-backed edge cache, 60s TTL                                                                                                             |
+| **Responsive SVG**  | `viewBox` + `preserveAspectRatio` — crisp at any size                                                                                     |
+| **Accessible**      | WCAG: `role="img"`, `aria-labelledby`, `<title>`, `<desc>`                                                                                |
+| **Secure**          | `secureHeaders()` (HSTS, CSP, X-Frame-Options) + `nosniff` on SVG                                                                         |
+| **Observable**      | `requestId()` tracing, structured JSON logging, source maps                                                                               |
+| **100% tested**     | `bun:test` units + Vitest workerd integration                                                                                             |
+| **Type-safe**       | TypeScript 7 strict + Valibot schema validation                                                                                           |
 
 ---
 
@@ -106,29 +109,29 @@ src/
 
 ## Tech Stack
 
-| Layer | Technology | Role |
-|-------|-----------|------|
-| **Runtime** | [Bun](https://bun.sh) | Package manager, script runner, unit test runner |
-| **Edge** | [Cloudflare Workers](https://workers.cloudflare.com) | Global deployment with Smart Placement |
-| **Framework** | [Hono](https://hono.dev) | Ultra-lightweight routing + middleware |
-| **Database** | [Cloudflare D1](https://developers.cloudflare.com/d1/) | Serverless SQLite with atomic operations |
-| **Cache** | [Cloudflare KV](https://developers.cloudflare.com/kv/) | Distributed key-value store (60s TTL) |
-| **Validation** | [Valibot](https://valibot.dev) | Tree-shakeable schema validation |
-| **Language** | [TypeScript](https://www.typescriptlang.org/) | Strict mode, `erasableSyntaxOnly` |
-| **Lint/Format** | [Ultracite](https://github.com/haydenbleasel/ultracite) | Opinionated Biome preset |
-| **Unit Tests** | [bun:test](https://bun.sh/docs/cli/test) | Built-in runner with V8 coverage |
-| **Integration** | [Vitest](https://vitest.dev) + [pool-workers](https://developers.cloudflare.com/workers/testing/vitest-integration/) | Workerd runtime testing |
-| **CI/CD** | [GitHub Actions](https://github.com/features/actions) + [Semantic Release](https://semantic-release.gitbook.io/) | Automated quality gates + versioning |
+| Layer           | Technology                                                                                                           | Role                                             |
+| --------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| **Runtime**     | [Bun](https://bun.sh)                                                                                                | Package manager, script runner, unit test runner |
+| **Edge**        | [Cloudflare Workers](https://workers.cloudflare.com)                                                                 | Global deployment with Smart Placement           |
+| **Framework**   | [Hono](https://hono.dev)                                                                                             | Ultra-lightweight routing + middleware           |
+| **Database**    | [Cloudflare D1](https://developers.cloudflare.com/d1/)                                                               | Serverless SQLite with atomic operations         |
+| **Cache**       | [Cloudflare KV](https://developers.cloudflare.com/kv/)                                                               | Distributed key-value store (60s TTL)            |
+| **Validation**  | [Valibot](https://valibot.dev)                                                                                       | Tree-shakeable schema validation                 |
+| **Language**    | [TypeScript](https://www.typescriptlang.org/)                                                                        | Strict mode, `erasableSyntaxOnly`                |
+| **Lint/Format** | [Ultracite](https://github.com/haydenbleasel/ultracite)                                                              | Opinionated Biome preset                         |
+| **Unit Tests**  | [bun:test](https://bun.sh/docs/cli/test)                                                                             | Built-in runner with V8 coverage                 |
+| **Integration** | [Vitest](https://vitest.dev) + [pool-workers](https://developers.cloudflare.com/workers/testing/vitest-integration/) | Workerd runtime testing                          |
+| **CI/CD**       | [GitHub Actions](https://github.com/features/actions) + [Semantic Release](https://semantic-release.gitbook.io/)     | Automated quality gates + versioning             |
 
 ---
 
 ## API
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | API info and available endpoints |
-| `/health` | GET | Health check (`{ status: "ok" }`) |
-| `/api/view-counter?username=:username` | GET | Generate badge and increment count |
+| Endpoint                               | Method | Description                        |
+| -------------------------------------- | ------ | ---------------------------------- |
+| `/`                                    | GET    | API info and available endpoints   |
+| `/health`                              | GET    | Health check (`{ status: "ok" }`)  |
+| `/api/view-counter?username=:username` | GET    | Generate badge and increment count |
 
 > Full API reference: [API.md](src/docs/API.md)
 
@@ -151,18 +154,18 @@ bun install
 
 ### Commands
 
-| Command | Description |
-|---------|-------------|
-| `bun run dev` | Start local Workers dev server |
-| `bun run test` | Run all tests (unit + integration) |
-| `bun run test:unit` | Badge generator tests (`bun:test`) |
+| Command                    | Description                                 |
+| -------------------------- | ------------------------------------------- |
+| `bun run dev`              | Start local Workers dev server              |
+| `bun run test`             | Run all tests (unit + integration)          |
+| `bun run test:unit`        | Badge generator tests (`bun:test`)          |
 | `bun run test:integration` | Worker integration tests (Vitest + workerd) |
-| `bun run check` | Lint + format check (Ultracite) |
-| `bun run fix` | Auto-fix lint + format issues |
-| `bun run typecheck` | TypeScript strict type checking |
-| `bun run cf-typegen` | Regenerate types from `wrangler.jsonc` |
-| `bun run deploy` | Deploy to Cloudflare Workers |
-| `bun run commit` | Interactive conventional commit wizard |
+| `bun run check`            | Lint + format check (Ultracite)             |
+| `bun run fix`              | Auto-fix lint + format issues               |
+| `bun run typecheck`        | TypeScript strict type checking             |
+| `bun run cf-typegen`       | Regenerate types from `wrangler.jsonc`      |
+| `bun run deploy`           | Deploy to Cloudflare Workers                |
+| `bun run commit`           | Interactive conventional commit wizard      |
 
 ### Testing
 

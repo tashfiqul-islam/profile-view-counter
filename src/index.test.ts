@@ -1,25 +1,15 @@
-import {
-  createExecutionContext,
-  env,
-  waitOnExecutionContext,
-} from "cloudflare:test";
-import { beforeAll, describe, expect, it } from "vitest";
-import app from "../src/index";
+import { createExecutionContext, waitOnExecutionContext } from "cloudflare:test";
+import { env } from "cloudflare:workers";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import app from "./index";
 
-const testEnv = env as unknown as Env;
+const testEnv: Env = env;
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("Integration Tests (Hono + D1 + KV)", () => {
-  beforeAll(async () => {
-    await testEnv.DB.prepare(`
-      CREATE TABLE IF NOT EXISTS view_counts (
-        username TEXT PRIMARY KEY NOT NULL,
-        views INTEGER NOT NULL DEFAULT 0,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-      )
-    `).run();
-  });
-
   describe("GET /", () => {
     it("returns API info with all required fields", async () => {
       const req = new Request("http://localhost/");
@@ -29,10 +19,7 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
 
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body).toHaveProperty(
-        "message",
-        "Profile View Counter API is running 🚀"
-      );
+      expect(body).toHaveProperty("message", "Profile View Counter API is running 🚀");
       expect(body).toHaveProperty("endpoints");
       expect(body).toHaveProperty("documentation");
     });
@@ -46,10 +33,7 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
       await waitOnExecutionContext(ctx);
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as {
-        readonly status: string;
-        readonly timestamp: number;
-      };
+      const body = await res.json<{ readonly status: string; readonly timestamp: number }>();
       expect(body.status).toBe("ok");
       expect(body.timestamp).toBeGreaterThan(0);
     });
@@ -71,9 +55,7 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
     it("increments count, generates badge, and caches result", async () => {
       const username = "integration-test";
 
-      const req1 = new Request(
-        `http://localhost/api/view-counter?username=${username}`
-      );
+      const req1 = new Request(`http://localhost/api/view-counter?username=${username}`);
       const ctx1 = createExecutionContext();
       const res1 = await app.fetch(req1, testEnv, ctx1);
       await waitOnExecutionContext(ctx1);
@@ -83,16 +65,12 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
       expect(res1.headers.get("X-Content-Type-Options")).toBe("nosniff");
       expect(await res1.text()).toContain("PROFILE VISITORS");
 
-      const dbResult = await testEnv.DB.prepare(
-        "SELECT views FROM view_counts WHERE username = ?"
-      )
+      const dbResult = await testEnv.DB.prepare("SELECT views FROM view_counts WHERE username = ?")
         .bind(username)
         .first<{ views: number }>();
       expect(dbResult?.views).toBe(1);
 
-      const req2 = new Request(
-        `http://localhost/api/view-counter?username=${username}`
-      );
+      const req2 = new Request(`http://localhost/api/view-counter?username=${username}`);
       const ctx2 = createExecutionContext();
       const res2 = await app.fetch(req2, testEnv, ctx2);
       await waitOnExecutionContext(ctx2);
@@ -103,23 +81,19 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
     });
 
     it("returns SVG with Content-Security-Policy header", async () => {
-      const req = new Request(
-        "http://localhost/api/view-counter?username=csp-test"
-      );
+      const req = new Request("http://localhost/api/view-counter?username=csp-test");
       const ctx = createExecutionContext();
       const res = await app.fetch(req, testEnv, ctx);
       await waitOnExecutionContext(ctx);
 
       expect(res.status).toBe(200);
       expect(res.headers.get("Content-Security-Policy")).toBe(
-        "default-src 'none'; style-src 'unsafe-inline'"
+        "default-src 'none'; style-src 'unsafe-inline'",
       );
     });
 
     it("returns response with X-Request-Id header", async () => {
-      const req = new Request(
-        "http://localhost/api/view-counter?username=requestid-test"
-      );
+      const req = new Request("http://localhost/api/view-counter?username=requestid-test");
       const ctx = createExecutionContext();
       const res = await app.fetch(req, testEnv, ctx);
       await waitOnExecutionContext(ctx);
@@ -138,9 +112,7 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
     });
 
     it("validates invalid username format returns 400", async () => {
-      const req = new Request(
-        "http://localhost/api/view-counter?username=-starts-with-dash"
-      );
+      const req = new Request("http://localhost/api/view-counter?username=-starts-with-dash");
       const ctx = createExecutionContext();
       const res = await app.fetch(req, testEnv, ctx);
       await waitOnExecutionContext(ctx);
@@ -150,9 +122,7 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
 
     it("validates too-long username returns 400", async () => {
       const longUsername = "a".repeat(40);
-      const req = new Request(
-        `http://localhost/api/view-counter?username=${longUsername}`
-      );
+      const req = new Request(`http://localhost/api/view-counter?username=${longUsername}`);
       const ctx = createExecutionContext();
       const res = await app.fetch(req, testEnv, ctx);
       await waitOnExecutionContext(ctx);
@@ -166,32 +136,26 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
 
       const results = await Promise.all(
         Array.from({ length: count }, (_, i) => {
-          const req = new Request(
-            `http://localhost/api/view-counter?username=${username}&_=${i}`
-          );
+          const req = new Request(`http://localhost/api/view-counter?username=${username}&_=${i}`);
           const ctx = createExecutionContext();
           return (async () => {
             const res = await app.fetch(req, testEnv, ctx);
             await waitOnExecutionContext(ctx);
             return res;
           })();
-        })
+        }),
       );
 
       expect(results.every((r) => r.status === 200)).toBe(true);
 
-      const dbResult = await testEnv.DB.prepare(
-        "SELECT views FROM view_counts WHERE username = ?"
-      )
+      const dbResult = await testEnv.DB.prepare("SELECT views FROM view_counts WHERE username = ?")
         .bind(username)
         .first<{ views: number }>();
       expect(dbResult?.views).toBe(count);
     });
 
     it("returns correct Content-Type for SVG", async () => {
-      const req = new Request(
-        "http://localhost/api/view-counter?username=content-type-test"
-      );
+      const req = new Request("http://localhost/api/view-counter?username=content-type-test");
       const ctx = createExecutionContext();
       const res = await app.fetch(req, testEnv, ctx);
       await waitOnExecutionContext(ctx);
@@ -202,16 +166,12 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
     it("returns X-Cache HIT on second request for same user", async () => {
       const username = "cache-hit-test";
 
-      const req1 = new Request(
-        `http://localhost/api/view-counter?username=${username}`
-      );
+      const req1 = new Request(`http://localhost/api/view-counter?username=${username}`);
       const ctx1 = createExecutionContext();
       await app.fetch(req1, testEnv, ctx1);
       await waitOnExecutionContext(ctx1);
 
-      const req2 = new Request(
-        `http://localhost/api/view-counter?username=${username}`
-      );
+      const req2 = new Request(`http://localhost/api/view-counter?username=${username}`);
       const ctx2 = createExecutionContext();
       const res2 = await app.fetch(req2, testEnv, ctx2);
       await waitOnExecutionContext(ctx2);
@@ -233,71 +193,51 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
     });
 
     it("handles 500 errors with structured logging", async () => {
-      const originalPrepare = testEnv.DB.prepare;
-      testEnv.DB.prepare = () => {
+      vi.spyOn(testEnv.DB, "prepare").mockImplementation(() => {
         throw new Error("Database failure");
-      };
+      });
+      const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
-      try {
-        const req = new Request(
-          "http://localhost/api/view-counter?username=error-test"
-        );
-        const ctx = createExecutionContext();
-        const res = await app.fetch(req, testEnv, ctx);
-        await waitOnExecutionContext(ctx);
+      const req = new Request("http://localhost/api/view-counter?username=error-test");
+      const ctx = createExecutionContext();
+      const res = await app.fetch(req, testEnv, ctx);
+      await waitOnExecutionContext(ctx);
 
-        expect(res.status).toBe(500);
-        const body = await res.json();
-        expect(body).toEqual({ error: "Internal Server Error" });
-      } finally {
-        testEnv.DB.prepare = originalPrepare;
-      }
+      expect(res.status).toBe(500);
+      expect(await res.json()).toEqual({ error: "Internal Server Error" });
+      expect(log).toHaveBeenCalledWith(expect.stringContaining('"message":"Database failure"'));
     });
 
     it("handles KV cache write failure gracefully", async () => {
-      const username = "cache-fail-test";
-      const originalPut = testEnv.CACHE.put;
+      vi.spyOn(testEnv.CACHE, "put").mockRejectedValue(new Error("KV write failed"));
+      const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
-      testEnv.CACHE.put = () => Promise.reject(new Error("KV write failed"));
+      const req = new Request("http://localhost/api/view-counter?username=cache-fail-test");
+      const ctx = createExecutionContext();
+      const res = await app.fetch(req, testEnv, ctx);
+      await waitOnExecutionContext(ctx);
 
-      try {
-        const req = new Request(
-          `http://localhost/api/view-counter?username=${username}`
-        );
-        const ctx = createExecutionContext();
-        const res = await app.fetch(req, testEnv, ctx);
-        await waitOnExecutionContext(ctx);
-
-        expect(res.status).toBe(200);
-        expect(res.headers.get("X-Cache")).toBe("MISS");
-      } finally {
-        testEnv.CACHE.put = originalPut;
-      }
+      expect(res.status).toBe(200);
+      expect(res.headers.get("X-Cache")).toBe("MISS");
+      expect(log).toHaveBeenCalledWith(expect.stringContaining('"error":"cache-write-failed"'));
     });
 
     it("counter service throws on null D1 result", async () => {
-      const originalPrepare = testEnv.DB.prepare;
-      testEnv.DB.prepare = () =>
-        ({
-          bind: () => ({
-            first: async () => null,
-          }),
-        }) as unknown as D1PreparedStatement;
+      // Every D1 statement shares one prototype, so this also covers the statement `bind()` returns.
+      const statement: D1PreparedStatement = Object.getPrototypeOf(testEnv.DB.prepare("SELECT 1"));
+      vi.spyOn(statement, "first").mockResolvedValue(null);
+      const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
-      try {
-        const req = new Request(
-          "http://localhost/api/view-counter?username=null-result-test"
-        );
-        const ctx = createExecutionContext();
-        const res = await app.fetch(req, testEnv, ctx);
-        await waitOnExecutionContext(ctx);
+      const req = new Request("http://localhost/api/view-counter?username=null-result-test");
+      const ctx = createExecutionContext();
+      const res = await app.fetch(req, testEnv, ctx);
+      await waitOnExecutionContext(ctx);
 
-        expect(res.status).toBe(500);
-        const body = await res.json();
-        expect(body).toEqual({ error: "Internal Server Error" });
-      } finally {
-        testEnv.DB.prepare = originalPrepare;
-      }
+      expect(res.status).toBe(500);
+      expect(await res.json()).toEqual({ error: "Internal Server Error" });
+      expect(log).toHaveBeenCalledWith(
+        expect.stringContaining("D1 increment returned no rows for username: null-result-test"),
+      );
     });
   });
 
@@ -329,9 +269,7 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
         const res = await app.fetch(req, testEnv, ctx);
         await waitOnExecutionContext(ctx);
 
-        expect(res.headers.get("Strict-Transport-Security")).toContain(
-          "max-age="
-        );
+        expect(res.headers.get("Strict-Transport-Security")).toContain("max-age=");
       });
 
       it(`${route} returns X-Content-Type-Options nosniff`, async () => {
@@ -363,7 +301,7 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
       const res = await app.fetch(req, testEnv, ctx);
       await waitOnExecutionContext(ctx);
 
-      const body = (await res.json()) as Record<string, unknown>;
+      const body = await res.json<Record<string, unknown>>();
       expect(body).toMatchObject({
         documentation: expect.any(String),
         endpoints: expect.any(Object),
@@ -377,7 +315,7 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
       const res = await app.fetch(req, testEnv, ctx);
       await waitOnExecutionContext(ctx);
 
-      const body = (await res.json()) as Record<string, unknown>;
+      const body = await res.json<Record<string, unknown>>();
       expect(body).toMatchObject({
         status: "ok",
         timestamp: expect.any(Number),
@@ -390,14 +328,12 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
       const res = await app.fetch(req, testEnv, ctx);
       await waitOnExecutionContext(ctx);
 
-      const body = (await res.json()) as Record<string, unknown>;
+      const body = await res.json<Record<string, unknown>>();
       expect(body).toEqual({ error: expect.any(String) });
     });
 
     it("SVG response is valid XML", async () => {
-      const req = new Request(
-        "http://localhost/api/view-counter?username=xml-test"
-      );
+      const req = new Request("http://localhost/api/view-counter?username=xml-test");
       const ctx = createExecutionContext();
       const res = await app.fetch(req, testEnv, ctx);
       await waitOnExecutionContext(ctx);

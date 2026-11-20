@@ -8,16 +8,16 @@ Profile View Counter — Cloudflare Workers API serving SVG badge images that tr
 
 ## Commands
 
-| Action | Command |
-|--------|---------|
-| Dev server | `bun run dev` |
-| All tests | `bun run test` |
-| Unit tests | `bun run test:unit` |
+| Action            | Command                    |
+| ----------------- | -------------------------- |
+| Dev server        | `bun run dev`              |
+| All tests         | `bun run test`             |
+| Unit tests        | `bun run test:unit`        |
 | Integration tests | `bun run test:integration` |
-| Lint + format | `bun run check` |
-| Auto-fix | `bun run fix` |
-| Type check | `bun run typecheck` |
-| Regen CF types | `bun run cf-typegen` |
+| Lint + format     | `bun run check`            |
+| Auto-fix          | `bun run fix`              |
+| Type check        | `bun run typecheck`        |
+| Regen CF types    | `bun run cf-typegen`       |
 
 ## Architecture
 
@@ -47,10 +47,10 @@ Note: `Env` interface is auto-generated globally by `wrangler types` in `worker-
 
 Two separate runners — never mix their imports:
 
-| Runner | File | Runtime | Scope |
-|--------|------|---------|-------|
-| `bun:test` | `test/badge-generator.test.ts` | Bun | Pure SVG functions + escapeXml + formatNumber + querySchema |
-| Vitest + pool-workers | `test/integration.test.ts` | workerd | Hono + D1 + KV + security headers |
+| Runner                | File                           | Runtime | Scope                                                       |
+| --------------------- | ------------------------------ | ------- | ----------------------------------------------------------- |
+| `bun:test`            | `test/badge-generator.test.ts` | Bun     | Pure SVG functions + escapeXml + formatNumber + querySchema |
+| Vitest + pool-workers | `test/integration.test.ts`     | workerd | Hono + D1 + KV + security headers                           |
 
 - Never import `cloudflare:test` in bun:test files
 - Never import `bun:test` in vitest files

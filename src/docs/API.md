@@ -16,15 +16,15 @@ https://profile-view-counter.tashfiq61.workers.dev
 
 All responses include these security and observability headers (via `secureHeaders()` middleware):
 
-| Header | Value | Description |
-|--------|-------|-------------|
-| `X-Request-Id` | UUID | Unique request identifier for tracing |
-| `X-Content-Type-Options` | `nosniff` | MIME sniffing prevention |
-| `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload` | HSTS |
-| `X-Frame-Options` | `DENY` | Clickjacking prevention |
-| `Referrer-Policy` | `no-referrer` | Referrer leakage prevention |
-| `Permissions-Policy` | `camera=(), fullscreen=(), geolocation=(), microphone=()` | Feature restrictions |
-| `Server-Timing` | varies | Request timing metrics |
+| Header                      | Value                                                     | Description                           |
+| --------------------------- | --------------------------------------------------------- | ------------------------------------- |
+| `X-Request-Id`              | UUID                                                      | Unique request identifier for tracing |
+| `X-Content-Type-Options`    | `nosniff`                                                 | MIME sniffing prevention              |
+| `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload`            | HSTS                                  |
+| `X-Frame-Options`           | `DENY`                                                    | Clickjacking prevention               |
+| `Referrer-Policy`           | `no-referrer`                                             | Referrer leakage prevention           |
+| `Permissions-Policy`        | `camera=(), fullscreen=(), geolocation=(), microphone=()` | Feature restrictions                  |
+| `Server-Timing`             | varies                                                    | Request timing metrics                |
 
 ---
 
@@ -35,6 +35,7 @@ All responses include these security and observability headers (via `secureHeade
 Returns API information and available endpoints.
 
 **Response**
+
 ```json
 {
   "message": "Profile View Counter API is running 🚀",
@@ -53,6 +54,7 @@ Returns API information and available endpoints.
 Health check endpoint for monitoring.
 
 **Response**
+
 ```json
 {
   "status": "ok",
@@ -68,9 +70,9 @@ Generates an SVG badge and increments the view count for the specified user.
 
 **Query Parameters**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `username` | string | Yes | GitHub username (1-39 chars, alphanumeric + hyphens) |
+| Parameter  | Type   | Required | Description                                          |
+| ---------- | ------ | -------- | ---------------------------------------------------- |
+| `username` | string | Yes      | GitHub username (1-39 chars, alphanumeric + hyphens) |
 
 **Success Response (200)**
 
@@ -95,10 +97,10 @@ curl "https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?userna
 
 **Error Responses**
 
-| Status | Body | Description |
-|--------|------|-------------|
-| 400 | `{"error": "..."}` | Invalid or missing `username` parameter |
-| 500 | `{"error": "Internal Server Error"}` | Server failure |
+| Status | Body                                 | Description                             |
+| ------ | ------------------------------------ | --------------------------------------- |
+| 400    | `{"error": "..."}`                   | Invalid or missing `username` parameter |
+| 500    | `{"error": "Internal Server Error"}` | Server failure                          |
 
 ---
 
@@ -118,11 +120,11 @@ All errors return JSON with an `error` field:
 }
 ```
 
-| Status | Message |
-|--------|---------|
-| 400 | Validation error details |
-| 404 | `Not Found` |
-| 500 | `Internal Server Error` |
+| Status | Message                  |
+| ------ | ------------------------ |
+| 400    | Validation error details |
+| 404    | `Not Found`              |
+| 500    | `Internal Server Error`  |
 
 ---
 

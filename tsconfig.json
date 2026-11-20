@@ -1,50 +1,39 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    // ── Emit & Module ────────────────────────────────────────────────────
-    "lib": ["ESNext"],
-    "target": "ESNext",
-    "module": "Preserve",
-    "moduleDetection": "force",
-    "moduleResolution": "bundler",
-    "types": ["@types/bun", "@cloudflare/vitest-plugin/types"],
+    // TypeScript 7 (native tsgo) type-checks only; wrangler bundles src/ and Bun runs scripts/.
     "noEmit": true,
+    "incremental": true,
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo",
+
+    // Runtimes: workerd for src/ (types from `wrangler types`), Bun for scripts/, Vitest for tests.
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    "types": ["@types/bun", "@cloudflare/vitest-plugin/types"],
+
+    // Modules: bundler-style resolution, imports kept verbatim, only erasable TS syntax.
+    "module": "Preserve",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
-    "rewriteRelativeImportExtensions": true,
-
-    // ── TypeScript 7.0 ───────────────────────────────────────────────────
     "erasableSyntaxOnly": true,
-    "libReplacement": false,
-    "isolatedDeclarations": false,
+    "noUncheckedSideEffectImports": true,
 
-    // ── Strict Type-Checking ─────────────────────────────────────────────
+    // Strictness: everything on.
     "strict": true,
+    "exactOptionalPropertyTypes": true,
     "noUncheckedIndexedAccess": true,
     "noPropertyAccessFromIndexSignature": true,
-    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitOverride": true,
-    "useUnknownInCatchVariables": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
-    "noUncheckedSideEffectImports": true,
-    "isolatedModules": true,
 
-    // ── Interop & Output ─────────────────────────────────────────────────
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "noErrorTruncation": true,
-    "resolvePackageJsonExports": true
+    "skipLibCheck": true
   },
-  "include": [
-    "src/**/*",
-    "test/**/*",
-    "*.config.ts",
-    "worker-configuration.d.ts"
-  ],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*.ts", "scripts/**/*.ts", "*.config.ts", "worker-configuration.d.ts"]
 }

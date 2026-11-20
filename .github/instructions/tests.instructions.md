@@ -6,10 +6,10 @@ applyTo: "test/**/*.ts"
 
 ## Two Runners — Never Mix
 
-| Runner | File | Import From |
-|--------|------|-------------|
-| bun:test | `badge-generator.test.ts` | `import { describe, expect, it } from 'bun:test'` |
-| Vitest | `integration.test.ts` | `import { describe, expect, it, beforeAll } from 'vitest'` + globals |
+| Runner   | File                      | Import From                                                          |
+| -------- | ------------------------- | -------------------------------------------------------------------- |
+| bun:test | `badge-generator.test.ts` | `import { describe, expect, it } from 'bun:test'`                    |
+| Vitest   | `integration.test.ts`     | `import { describe, expect, it, beforeAll } from 'vitest'` + globals |
 
 ## Critical Rules
 
@@ -21,7 +21,7 @@ applyTo: "test/**/*.ts"
 
 ## Coverage Split
 
-| Runner | Covers |
-|--------|--------|
+| Runner   | Covers                                                                                        |
+| -------- | --------------------------------------------------------------------------------------------- |
 | bun:test | `src/badge/**` + `src/schemas/**` (formatNumber, escapeXml, generateModernBadge, querySchema) |
-| vitest | `src/**` minus `src/badge/**` (index, routes, services, schemas) |
+| vitest   | `src/**` minus `src/badge/**` (index, routes, services, schemas)                              |

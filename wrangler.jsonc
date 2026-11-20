@@ -11,21 +11,21 @@
       "binding": "DB",
       "database_name": "profile-views",
       "database_id": "9d6c774f-2160-47fc-84fb-ab3cc831e133",
-      "migrations_dir": "migrations"
-    }
+      "migrations_dir": "migrations",
+    },
   ],
   "kv_namespaces": [
     {
       "binding": "CACHE",
-      "id": "8959c1ef82fe471aa40f3d501edddeb2"
-    }
+      "id": "8959c1ef82fe471aa40f3d501edddeb2",
+    },
   ],
   "observability": {
     "enabled": true,
     "logs": {
       "enabled": true,
       "head_sampling_rate": 1,
-      "invocation_logs": true
-    }
-  }
+      "invocation_logs": true,
+    },
+  },
 }

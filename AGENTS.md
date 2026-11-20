@@ -11,55 +11,55 @@ For Claude Code-specific instructions, see [CLAUDE.md](CLAUDE.md).
 
 ## Quick Reference
 
-| Action | Command |
-|--------|---------|
-| Install | `bun install` |
-| Dev server | `bun run dev` |
-| All tests | `bun run test` |
-| Unit tests | `bun run test:unit` |
-| Integration tests | `bun run test:integration` |
-| Lint + format check | `bun run check` |
-| Lint + format fix | `bun run fix` |
-| Type check | `bun run typecheck` |
-| Regen CF types | `bun run cf-typegen` |
-| Deploy | `bun run deploy` |
-| Commit | `bun run commit` |
-| DB migrate (local) | `bun run db:migrate` |
-| DB migrate (prod) | `bun run db:migrate:prod` |
+| Action              | Command                    |
+| ------------------- | -------------------------- |
+| Install             | `bun install`              |
+| Dev server          | `bun run dev`              |
+| All tests           | `bun run test`             |
+| Unit tests          | `bun run test:unit`        |
+| Integration tests   | `bun run test:integration` |
+| Lint + format check | `bun run check`            |
+| Lint + format fix   | `bun run fix`              |
+| Type check          | `bun run typecheck`        |
+| Regen CF types      | `bun run cf-typegen`       |
+| Deploy              | `bun run deploy`           |
+| Commit              | `bun run commit`           |
+| DB migrate (local)  | `bun run db:migrate`       |
+| DB migrate (prod)   | `bun run db:migrate:prod`  |
 
 ## Stack
 
 All versions managed in `package.json` — run `bun outdated` to check for updates.
 
-| Layer | Technology |
-|-------|-----------|
-| Runtime | Cloudflare Workers (workerd) — see `compatibility_date` in `wrangler.jsonc` |
-| Tooling | Bun — see `engines.bun` in `package.json` |
-| Language | TypeScript 7 — `erasableSyntaxOnly`, `libReplacement`, strict |
-| Router | Hono |
-| Database | Cloudflare D1 (SQLite) |
-| Cache | Cloudflare KV (60s TTL) |
-| Validation | Valibot |
-| Lint/Format | Ultracite (Biome preset) |
-| Unit tests | bun:test (built-in) |
-| Integration tests | Vitest + `@cloudflare/vitest-plugin` |
-| Deployment | Wrangler |
-| CI/CD | GitHub Actions + Semantic Release |
+| Layer             | Technology                                                                  |
+| ----------------- | --------------------------------------------------------------------------- |
+| Runtime           | Cloudflare Workers (workerd) — see `compatibility_date` in `wrangler.jsonc` |
+| Tooling           | Bun — see `engines.bun` in `package.json`                                   |
+| Language          | TypeScript 7 — `erasableSyntaxOnly`, `libReplacement`, strict               |
+| Router            | Hono                                                                        |
+| Database          | Cloudflare D1 (SQLite)                                                      |
+| Cache             | Cloudflare KV (60s TTL)                                                     |
+| Validation        | Valibot                                                                     |
+| Lint/Format       | Ultracite (Biome preset)                                                    |
+| Unit tests        | bun:test (built-in)                                                         |
+| Integration tests | Vitest + `@cloudflare/vitest-plugin`                                        |
+| Deployment        | Wrangler                                                                    |
+| CI/CD             | GitHub Actions + Semantic Release                                           |
 
 ## WHERE TO LOOK
 
-| Task | File(s) |
-|------|---------|
-| Add new route | `src/routes/`, mount in `src/index.ts` |
-| Change badge design | `src/badge/generator.ts` |
-| Modify DB schema | `migrations/`, `src/services/counter.ts` |
-| Change cache behavior | `src/services/cache.ts`, `src/routes/view-counter.ts` |
-| Update validation | `src/schemas/query.ts` |
-| Change security headers | `src/index.ts` (secureHeaders config) |
-| Add new test | `test/badge-generator.test.ts` (unit) or `test/integration.test.ts` (integration) |
-| Change CI pipeline | `.github/workflows/ci.yml` |
-| Update wrangler config | `wrangler.jsonc`, then run `bun run cf-typegen` |
-| Update dependencies | `renovate.json`, `package.json` |
+| Task                    | File(s)                                                                           |
+| ----------------------- | --------------------------------------------------------------------------------- |
+| Add new route           | `src/routes/`, mount in `src/index.ts`                                            |
+| Change badge design     | `src/badge/generator.ts`                                                          |
+| Modify DB schema        | `migrations/`, `src/services/counter.ts`                                          |
+| Change cache behavior   | `src/services/cache.ts`, `src/routes/view-counter.ts`                             |
+| Update validation       | `src/schemas/query.ts`                                                            |
+| Change security headers | `src/index.ts` (secureHeaders config)                                             |
+| Add new test            | `test/badge-generator.test.ts` (unit) or `test/integration.test.ts` (integration) |
+| Change CI pipeline      | `.github/workflows/ci.yml`                                                        |
+| Update wrangler config  | `wrangler.jsonc`, then run `bun run cf-typegen`                                   |
+| Update dependencies     | `renovate.json`, `package.json`                                                   |
 
 ## Source Map
 
@@ -131,13 +131,13 @@ Migrations: `migrations/` directory, applied via `bun run db:migrate` (local) or
 
 ## API Endpoints
 
-| Method | Path | Response | Notes |
-|--------|------|----------|-------|
-| GET | `/` | JSON | API info, available endpoints |
-| GET | `/health` | `{ status: "ok", timestamp }` | Health check |
-| GET | `/api/view-counter?username=X` | `image/svg+xml` | Badge with view count |
-| GET | `/favicon.ico` | 204 | No content |
-| * | `*` | `{ error: "Not Found" }` 404 | Catch-all |
+| Method | Path                           | Response                      | Notes                         |
+| ------ | ------------------------------ | ----------------------------- | ----------------------------- |
+| GET    | `/`                            | JSON                          | API info, available endpoints |
+| GET    | `/health`                      | `{ status: "ok", timestamp }` | Health check                  |
+| GET    | `/api/view-counter?username=X` | `image/svg+xml`               | Badge with view count         |
+| GET    | `/favicon.ico`                 | 204                           | No content                    |
+| *      | `*`                            | `{ error: "Not Found" }` 404  | Catch-all                     |
 
 ## Code Style
 
@@ -153,10 +153,10 @@ Migrations: `migrations/` directory, applied via `bun run db:migrate` (local) or
 
 Two runners, split by runtime requirement:
 
-| Runner | File | Scope | Coverage |
-|--------|------|-------|----------|
-| `bun:test` | `test/badge-generator.test.ts` | Pure SVG generation (no Workers APIs) | `src/badge/**` |
-| Vitest + `@cloudflare/vitest-plugin` | `test/integration.test.ts` | Full Hono app against real workerd | `src/**` minus `src/badge/**` |
+| Runner                               | File                           | Scope                                 | Coverage                      |
+| ------------------------------------ | ------------------------------ | ------------------------------------- | ----------------------------- |
+| `bun:test`                           | `test/badge-generator.test.ts` | Pure SVG generation (no Workers APIs) | `src/badge/**`                |
+| Vitest + `@cloudflare/vitest-plugin` | `test/integration.test.ts`     | Full Hono app against real workerd    | `src/**` minus `src/badge/**` |
 
 - 100% coverage required across all metrics (enforced in `vitest.config.ts`)
 - Integration tests use `createExecutionContext()` / `waitOnExecutionContext()` from `cloudflare:test`
@@ -202,31 +202,37 @@ These are explicitly forbidden:
 ## Gotchas
 
 ### `worker-configuration.d.ts` is auto-generated
+
 - **Context**: Declares global `Env` interface via `Cloudflare.Env` namespace
 - **Problem**: Editing it manually gets overwritten by `bun run cf-typegen`
 - **Solution**: Edit `wrangler.jsonc` bindings, then run `bun run cf-typegen`
 
 ### Vitest config excludes badge tests
+
 - **Context**: `vitest.config.ts` includes only `test/integration.test.ts`
 - **Problem**: Badge tests are run by `bun:test`, not vitest
 - **Solution**: `coverage.exclude: ["src/badge/**"]` in vitest.config.ts — bun:test covers it
 
 ### KV and D1 bindings in tests
+
 - **Context**: Test env bindings come from `cloudflare:test`
 - **Problem**: `env` type is `Cloudflare.Env`, not your project's `Env`
 - **Solution**: Cast via `env as unknown as Env`
 
 ### `bun run dev` requires local migration
+
 - **Context**: Local D1 database starts empty
 - **Problem**: `no such table: view_counts` error on first request
 - **Solution**: Run `bun run db:migrate` before `bun run dev`
 
 ### SVG uses 2x pixel dimensions
+
 - **Context**: `width` and `height` are `viewBox * 2` for retina displays
 - **Problem**: Appears larger than expected if viewBox is misread
 - **Solution**: viewBox defines logical size, `* 2` is physical pixels for DPR
 
 ### Smart Placement runs near D1, not nearest edge
+
 - **Context**: `placement.mode: "smart"` in wrangler.jsonc
 - **Problem**: Worker may not be at the geographically nearest edge
 - **Solution**: This is intentional — D1 latency optimization takes priority

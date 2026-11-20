@@ -75,6 +75,7 @@ src/
 ### 1. Entry Point (`index.ts`)
 
 The Hono application configures:
+
 - **Middleware**: `requestId()`, `secureHeaders()`, `cors()`, `logger()`, `timing()`
 - **Routes**: `/`, `/health`, `/favicon.ico`, `/api/*`
 - **Error Handlers**: 404 and 500 with structured JSON logging including `requestId` and `level`
@@ -113,6 +114,7 @@ RETURNING views
 ### 4. Badge Generator (`badge/generator.ts`)
 
 Creates a responsive SVG badge with:
+
 - Capsule design with rounded corners — badge overlaps behind the logo circle
 - GitHub logo in a circular frame with white stroke, positioned on top of badge left edge
 - Dynamic view count formatting (K, M, B) via exported `formatNumber()`
@@ -127,15 +129,15 @@ Creates a responsive SVG badge with:
 
 ## Data Flow
 
-| Step | Component | Action |
-|------|-----------|--------|
-| 1 | Hono Middleware | Assign request ID, set security headers, log request, add timing headers, set CORS |
-| 2 | Valibot Validator | Validate `username` query parameter |
-| 3 | Cache Service | Check KV for cached badge |
-| 4 | Counter Service | Atomic increment in D1 (if cache miss) |
-| 5 | Badge Generator | Create SVG string |
-| 6 | Cache Service | Error-safe non-blocking KV store via `waitUntil()` with 60s TTL |
-| 7 | Response | Return SVG with security + cache headers |
+| Step | Component         | Action                                                                             |
+| ---- | ----------------- | ---------------------------------------------------------------------------------- |
+| 1    | Hono Middleware   | Assign request ID, set security headers, log request, add timing headers, set CORS |
+| 2    | Valibot Validator | Validate `username` query parameter                                                |
+| 3    | Cache Service     | Check KV for cached badge                                                          |
+| 4    | Counter Service   | Atomic increment in D1 (if cache miss)                                             |
+| 5    | Badge Generator   | Create SVG string                                                                  |
+| 6    | Cache Service     | Error-safe non-blocking KV store via `waitUntil()` with 60s TTL                    |
+| 7    | Response          | Return SVG with security + cache headers                                           |
 
 ---
 
@@ -145,12 +147,12 @@ Creates a responsive SVG badge with:
 
 **Table: `view_counts`**
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `username` | TEXT (PK) | GitHub username |
-| `views` | INTEGER | Total view count |
-| `created_at` | TEXT | First view timestamp |
-| `updated_at` | TEXT | Last view timestamp |
+| Column       | Type      | Description          |
+| ------------ | --------- | -------------------- |
+| `username`   | TEXT (PK) | GitHub username      |
+| `views`      | INTEGER   | Total view count     |
+| `created_at` | TEXT      | First view timestamp |
+| `updated_at` | TEXT      | Last view timestamp  |
 
 ### Cloudflare KV
 
@@ -164,24 +166,24 @@ Creates a responsive SVG badge with:
 
 All versions managed in `package.json` — run `bun outdated` to check for updates.
 
-| Tool | Purpose |
-|------|---------|
-| **Bun** | Package manager (isolated linker), script runner, unit test runner (`bun:test`) |
-| **TypeScript** | Strict type checking with `erasableSyntaxOnly`, `verbatimModuleSyntax`, `noUncheckedSideEffectImports` |
-| **Ultracite** | Opinionated Biome preset layer for linting & formatting (double quotes, semicolons) |
-| **Vitest** | Integration test runner with `@cloudflare/vitest-plugin` |
-| **Wrangler** | Cloudflare Workers CLI, type generation, local dev, source map uploads |
-| **Lefthook** | Git hooks (pre-commit: format+typecheck+test, pre-push: full gate, post-merge: auto-install) |
-| **Semantic Release** | Automated versioning & changelog from conventional commits |
+| Tool                 | Purpose                                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------------------------ |
+| **Bun**              | Package manager (isolated linker), script runner, unit test runner (`bun:test`)                        |
+| **TypeScript**       | Strict type checking with `erasableSyntaxOnly`, `verbatimModuleSyntax`, `noUncheckedSideEffectImports` |
+| **Ultracite**        | Opinionated Biome preset layer for linting & formatting (double quotes, semicolons)                    |
+| **Vitest**           | Integration test runner with `@cloudflare/vitest-plugin`                                               |
+| **Wrangler**         | Cloudflare Workers CLI, type generation, local dev, source map uploads                                 |
+| **Lefthook**         | Git hooks (pre-commit: format+typecheck+test, pre-push: full gate, post-merge: auto-install)           |
+| **Semantic Release** | Automated versioning & changelog from conventional commits                                             |
 
 ## Testing Architecture
 
 Tests are split across two runners to maximize performance:
 
-| Runner | Files | Scope |
-|--------|-------|-------|
-| `bun test` | `test/badge-generator.test.ts` | Unit tests for pure SVG generation and Valibot schemas (no Workers runtime) |
-| `bunx vitest run` | `test/integration.test.ts` | Integration tests via `@cloudflare/vitest-plugin` (workerd runtime) |
+| Runner            | Files                          | Scope                                                                       |
+| ----------------- | ------------------------------ | --------------------------------------------------------------------------- |
+| `bun test`        | `test/badge-generator.test.ts` | Unit tests for pure SVG generation and Valibot schemas (no Workers runtime) |
+| `bunx vitest run` | `test/integration.test.ts`     | Integration tests via `@cloudflare/vitest-plugin` (workerd runtime)         |
 
 Both runners contribute to 100% code coverage across all `src/` files. Test randomization enabled with `seed=42` in bun:test for flaky test detection.
 
