@@ -7,7 +7,7 @@
     "module": "Preserve",
     "moduleDetection": "force",
     "moduleResolution": "bundler",
-    "types": ["@types/bun", "@cloudflare/vitest-pool-workers/types"],
+    "types": ["@types/bun", "@cloudflare/vitest-plugin/types"],
     "noEmit": true,
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,

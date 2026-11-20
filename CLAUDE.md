@@ -106,7 +106,7 @@ Two runners, split by runtime requirement:
 | Runner | File | Scope | Coverage |
 |--------|------|-------|----------|
 | `bun:test` | `test/badge-generator.test.ts` | Pure SVG generation + Valibot schemas (no Workers APIs) | `src/badge/**` |
-| Vitest + `@cloudflare/vitest-pool-workers` | `test/integration.test.ts` | Full Hono app against real workerd | `src/**` minus `src/badge/**` |
+| Vitest + `@cloudflare/vitest-plugin` | `test/integration.test.ts` | Full Hono app against real workerd | `src/**` minus `src/badge/**` |
 
 - 100% coverage required across all metrics (enforced in `vitest.config.ts`)
 - Integration tests use `createExecutionContext()` / `waitOnExecutionContext()` from `cloudflare:test`

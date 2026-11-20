@@ -25,8 +25,6 @@
   "separateMinorPatch": false,
   "commitMessageTopic": "{{depName}}",
   "commitMessageExtra": "{{newVersion}}",
-  "commitMessageSuffix": "[skip actions]",
-  "commitBody": "[skip actions]",
   "lockFileMaintenance": {
     "enabled": true,
     "schedule": ["before 3am on the first day of the month"]
@@ -173,10 +171,5 @@
       "versioningTemplate": "semver"
     }
   ],
-  "ignorePaths": ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
-  "postUpgradeTasks": {
-    "commands": ["bun install --frozen-lockfile || bun install"],
-    "fileFilters": ["package.json", "bun.lock"],
-    "executionMode": "update"
-  }
+  "ignorePaths": ["**/node_modules/**", "**/dist/**", "**/coverage/**"]
 }

@@ -169,7 +169,7 @@ bun install
 Tests are split across two runners for optimal performance:
 
 - **`bun:test`** — badge generator unit tests with built-in V8 coverage
-- **Vitest** — integration tests against the workerd runtime via `@cloudflare/vitest-pool-workers`
+- **Vitest** — integration tests against the workerd runtime via `@cloudflare/vitest-plugin`
 
 ```bash
 bun run test   # Runs both — must maintain 100% coverage
