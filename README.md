@@ -71,17 +71,17 @@ Every time someone opens a README with the badge, GitHub's image proxy fetches i
 
 ## Features
 
-| Feature               | Detail                                                                                                                                    |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Edge-first**        | Global deployment with [Smart Placement](https://developers.cloudflare.com/workers/configuration/smart-placement/) for optimal D1 latency |
-| **Atomic counting**   | `INSERT ON CONFLICT ... RETURNING` — zero race conditions                                                                                 |
-| **Every view counts** | `no-store` badge, case-insensitive usernames, `HEAD` not counted                                                                          |
-| **Responsive SVG**    | `viewBox` + `preserveAspectRatio` — crisp at any size                                                                                     |
-| **Accessible**        | WCAG: `role="img"`, `aria-labelledby`, `<title>`, `<desc>`                                                                                |
-| **Secure**            | `secureHeaders()` (HSTS, CSP, X-Frame-Options) + `nosniff` on SVG                                                                         |
-| **Observable**        | `requestId()` tracing, structured JSON error logs, Workers Logs, source maps                                                              |
-| **100% tested**       | Vitest in workerd against real D1 and migrations, 100 % coverage enforced                                                                 |
-| **Type-safe**         | TypeScript 7 strict + Valibot schema validation                                                                                           |
+| Feature                  | Detail                                                                                                                                    |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Edge-first**           | Global deployment with [Smart Placement](https://developers.cloudflare.com/workers/configuration/smart-placement/) for optimal D1 latency |
+| **Atomic counting**      | `INSERT ON CONFLICT ... RETURNING` — zero race conditions                                                                                 |
+| **Every view counts**    | `no-store` badge, case-insensitive usernames, `HEAD` not counted                                                                          |
+| **Pristine at any size** | 28 px pill sized 1:1 to its `viewBox`; every text run pinned with `textLength`, so it never overflows and stays centred in any font       |
+| **Accessible**           | WCAG: `role="img"`, `aria-labelledby`, `<title>`, `<desc>`                                                                                |
+| **Secure**               | `secureHeaders()` (HSTS, CSP, X-Frame-Options) + `nosniff` on SVG                                                                         |
+| **Observable**           | `requestId()` tracing, structured JSON error logs, Workers Logs, source maps                                                              |
+| **100% tested**          | Vitest in workerd against real D1 and migrations, 100 % coverage enforced                                                                 |
+| **Type-safe**            | TypeScript 7 strict + Valibot schema validation                                                                                           |
 
 ---
 
@@ -93,7 +93,7 @@ src/
 ├── routes/
 │   └── view-counter.ts   # Badge endpoint: validate, count, render
 ├── badge/
-│   └── generator.ts      # Responsive SVG with a11y
+│   └── generator.ts      # Pure SVG: pill layout, textLength-pinned text, a11y
 ├── services/
 │   └── counter.ts        # D1 atomic increment
 └── schemas/

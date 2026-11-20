@@ -1,179 +1,143 @@
 import { describe, expect, it } from "vitest";
-import { escapeXml, formatNumber, generateModernBadge } from "./generator";
+import { escapeXml, formatNumber, generateModernBadge, textWidth } from "./generator";
 
-const WIDTH_REGEX = /width="\d+(\.\d+)?"/;
-const HEIGHT_REGEX = /height="\d+(\.\d+)?"/;
+/** The numbers the layout depends on, read back from the rendered SVG. */
+function geometry(svg: string) {
+  const number = (pattern: RegExp): number => {
+    const match = pattern.exec(svg);
+    if (match?.[1] === undefined) throw new Error(`no match for ${pattern}`);
+    return Number(match[1]);
+  };
+  const texts = [...svg.matchAll(/<text x="([\d.]+)"[^>]*textLength="([\d.]+)"[^>]*>([^<]*)</g)];
+  const [label, count] = texts.map(([, x, length, content]) => ({
+    content,
+    length: Number(length),
+    x: Number(x),
+  }));
+  if (label === undefined || count === undefined) throw new Error("expected two text runs");
+  return {
+    count,
+    height: number(/<svg[^>]* height="([\d.]+)"/),
+    label,
+    labelSegment: number(/<path d="M[\d.]+ 0H([\d.]+)V/),
+    viewBoxWidth: number(/viewBox="0 0 ([\d.]+) /),
+    width: number(/<svg[^>]* width="([\d.]+)"/),
+  };
+}
+
+const COUNTS = [0, 7, 42, 999, 1000, 32_700, 999_499, 999_999, 1_234_567, 1_500_000_000, 2.5e15];
 
 describe("formatNumber", () => {
-  it("returns plain number below 1000", () => {
-    expect(formatNumber(0)).toBe("0");
-    expect(formatNumber(1)).toBe("1");
-    expect(formatNumber(999)).toBe("999");
-  });
-
-  it("formats thousands with K suffix", () => {
-    expect(formatNumber(1000)).toBe("1K");
-    expect(formatNumber(1200)).toBe("1.2K");
-    expect(formatNumber(10_300)).toBe("10.3K");
-    expect(formatNumber(115_400)).toBe("115.4K");
-    expect(formatNumber(999_999)).toBe("1000K");
-  });
-
-  it("formats millions with M suffix", () => {
-    expect(formatNumber(1_000_000)).toBe("1M");
-    expect(formatNumber(1_200_000)).toBe("1.2M");
-    expect(formatNumber(1_500_000)).toBe("1.5M");
-    expect(formatNumber(999_999_999)).toBe("1000M");
-  });
-
-  it("formats billions with B suffix", () => {
-    expect(formatNumber(1_000_000_000)).toBe("1B");
-    expect(formatNumber(1_500_000_000)).toBe("1.5B");
-    expect(formatNumber(2_000_000_000)).toBe("2B");
+  it.each([
+    [0, "0"],
+    [999, "999"],
+    [1000, "1K"],
+    [1200, "1.2K"],
+    [10_300, "10.3K"],
+    [115_400, "115.4K"],
+    [999_499, "999.5K"],
+    [999_999, "1M"],
+    [1_234_567, "1.2M"],
+    [999_999_999, "1B"],
+    [1_500_000_000, "1.5B"],
+    [1e12, "1T"],
+  ])("formats %d as %s", (input, expected) => {
+    expect(formatNumber(input)).toBe(expected);
   });
 });
 
 describe("escapeXml", () => {
-  it("escapes ampersands", () => {
-    expect(escapeXml("a&b")).toBe("a&amp;b");
+  it("escapes all five XML special characters", () => {
+    expect(escapeXml(`<a&b"c'd>`)).toBe("&lt;a&amp;b&quot;c&apos;d&gt;");
   });
 
-  it("escapes angle brackets", () => {
-    expect(escapeXml("<script>")).toBe("&lt;script&gt;");
-  });
-
-  it("escapes quotes", () => {
-    expect(escapeXml('"test"')).toBe("&quot;test&quot;");
-  });
-
-  it("escapes single quotes", () => {
-    expect(escapeXml("'test'")).toBe("&apos;test&apos;");
-  });
-
-  it("returns unchanged string with no special chars", () => {
+  it("leaves plain text and the empty string unchanged", () => {
     expect(escapeXml("hello world")).toBe("hello world");
-  });
-
-  it("handles empty string", () => {
     expect(escapeXml("")).toBe("");
   });
+});
 
-  it("escapes multiple special characters in one string", () => {
-    expect(escapeXml("<a&b\"c'd>")).toBe("&lt;a&amp;b&quot;c&apos;d&gt;");
+describe("textWidth", () => {
+  const style = { size: 10, tracking: 1, weight: 700 } as const;
+
+  it("is zero for an empty run", () => {
+    expect(textWidth("", style)).toBe(0);
+  });
+
+  it("adds the advances and the tracking between glyphs (Arial Bold metrics)", () => {
+    // "1K": (556 + 722) / 1000 × 10 px + one gap of 1 px.
+    expect(textWidth("1K", style)).toBe(13.8);
+  });
+
+  it("falls back to an average capital width for glyphs it has no metrics for", () => {
+    expect(textWidth("é", style)).toBe(textWidth("P", style));
   });
 });
 
 describe("generateModernBadge", () => {
-  it("generates valid SVG with view count", () => {
-    const svg = generateModernBadge(42);
-
-    expect(svg).toContain("<svg");
-    expect(svg).toContain("PROFILE VISITORS");
-    expect(svg).toContain("42");
-    expect(svg).toContain("</svg>");
+  it("is sized 1:1 to its viewBox at a fixed 28 px height", () => {
+    for (const count of COUNTS) {
+      const g = geometry(generateModernBadge(count));
+      expect(g.width).toBe(g.viewBoxWidth);
+      expect(g.height).toBe(28);
+    }
   });
 
-  it("formats large numbers correctly in SVG", () => {
-    expect(generateModernBadge(1200)).toContain("1.2K");
-    expect(generateModernBadge(10_300)).toContain("10.3K");
-    expect(generateModernBadge(115_400)).toContain("115.4K");
-    expect(generateModernBadge(1_200_000)).toContain("1.2M");
-    expect(generateModernBadge(1_500_000_000)).toContain("1.5B");
-  });
-
-  it("includes 3D design elements", () => {
-    const svg = generateModernBadge(100);
-
-    expect(svg).toContain('filter="url(#logo-shadow)"');
-    expect(svg).toContain('filter="url(#text-3d)"');
-    expect(svg).toContain("<circle");
-    expect(svg).toContain('stroke="#fff"');
-  });
-
-  it("includes GitHub icon", () => {
-    const svg = generateModernBadge(1);
-
-    expect(svg).toContain("<path");
-    expect(svg).toContain('fill="#fff"');
-  });
-
-  it("has accessible attributes", () => {
-    const svg = generateModernBadge(999);
-
-    expect(svg).toContain('role="img"');
-    expect(svg).toContain('aria-labelledby="badge-title badge-desc"');
-    expect(svg).toContain('<title id="badge-title">');
-    expect(svg).toContain('<desc id="badge-desc">');
-  });
-
-  it("is responsive with viewBox and preserveAspectRatio", () => {
-    const svg = generateModernBadge(42);
-
-    expect(svg).toContain("viewBox=");
-    expect(svg).toContain('preserveAspectRatio="xMinYMid meet"');
-    expect(svg).toMatch(WIDTH_REGEX);
-    expect(svg).toMatch(HEIGHT_REGEX);
-  });
-
-  it("uses system font stack for GitHub README compatibility", () => {
-    const svg = generateModernBadge(42);
-
-    expect(svg).toContain("-apple-system");
-    expect(svg).toContain("BlinkMacSystemFont");
-    expect(svg).toContain("Segoe UI");
-    expect(svg).not.toContain("@import");
-  });
-
-  it("has geometricPrecision text rendering", () => {
-    const svg = generateModernBadge(42);
-
-    expect(svg).toContain('text-rendering="geometricPrecision"');
-  });
-
-  it("has tabular-nums on count for alignment", () => {
-    const svg = generateModernBadge(42);
-
-    expect(svg).toContain('font-variant-numeric="tabular-nums"');
-  });
-
-  it("marks logo group as aria-hidden", () => {
-    const svg = generateModernBadge(42);
-
-    expect(svg).toContain('aria-hidden="true"');
-  });
-
-  it("uses correct theme colors", () => {
-    const svg = generateModernBadge(42);
-
-    expect(svg).toContain('fill="#444444"');
-    expect(svg).toContain('fill="#007ec6"');
-    expect(svg).toContain('fill="#24292e"');
-    expect(svg).toContain('fill="#ffffff"');
-  });
-
-  it("has negative viewBox minX for logo overflow", () => {
-    const svg = generateModernBadge(42);
-
-    expect(svg).toContain('viewBox="-');
-  });
-
-  it("single-digit count has letter-spacing 0", () => {
-    const svg = generateModernBadge(1);
-
-    expect(svg).toContain('letter-spacing="0"');
-  });
-
-  it("multi-digit count has letter-spacing 2", () => {
-    const svg = generateModernBadge(42);
-
-    expect(svg).toContain('letter-spacing="2"');
-  });
-
-  it("always produces valid SVG with xmlns", () => {
-    for (const count of [0, 1, 42, 999, 1000, 1_000_000, 1_000_000_000]) {
+  it("pins every text run to its measured width, so no font can push it out", () => {
+    for (const count of COUNTS) {
       const svg = generateModernBadge(count);
-      expect(svg).toContain('xmlns="http://www.w3.org/2000/svg"');
-      expect(svg).toContain("</svg>");
+      const g = geometry(svg);
+      expect(g.label.length).toBe(
+        textWidth("PROFILE VISITORS", { size: 10, tracking: 0.9, weight: 600 }),
+      );
+      expect(g.count.length).toBe(
+        textWidth(formatNumber(count), { size: 12, tracking: 0.4, weight: 700 }),
+      );
+      expect(svg.match(/lengthAdjust="spacing"/g)).toHaveLength(2);
+    }
+  });
+
+  it("keeps the count centred in its segment with padding on both sides", () => {
+    for (const count of COUNTS) {
+      const g = geometry(generateModernBadge(count));
+      const countSegment = g.width - g.labelSegment;
+      // Coordinates are rounded to 0.1 px in the SVG.
+      expect(Math.abs(g.count.x - (g.labelSegment + countSegment / 2))).toBeLessThanOrEqual(0.1);
+      expect(g.count.length + 2 * 11).toBeLessThanOrEqual(countSegment + 0.1);
+    }
+  });
+
+  it("starts the label after the icon and ends it inside the label segment", () => {
+    const g = geometry(generateModernBadge(42));
+    expect(g.label.x).toBe(31);
+    expect(g.label.x + g.label.length + 11).toBeCloseTo(g.labelSegment, 1);
+  });
+
+  it("grows only as wide as the count needs, with a minimum segment for short counts", () => {
+    const widths = [7, 42, 1_234_567, 32_700].map((c) => geometry(generateModernBadge(c)).width);
+    expect(widths[0]).toBe(widths[1]);
+    expect(widths[2]).toBeGreaterThan(widths[1] ?? 0);
+    expect(widths[3]).toBeGreaterThan(widths[2] ?? 0);
+  });
+
+  it("shows the formatted count and names it for screen readers", () => {
+    const svg = generateModernBadge(1200);
+    expect(geometry(svg).count.content).toBe("1.2K");
+    expect(svg).toContain('role="img" aria-label="Profile visitors: 1.2K"');
+    expect(svg).toContain("<title>Profile visitors: 1.2K</title>");
+    expect(svg).toContain('<path aria-hidden="true"');
+  });
+
+  it("is self-contained: system fonts only, no filters, no external references", () => {
+    const svg = generateModernBadge(42);
+    expect(svg).toContain("'Segoe UI'");
+    expect(svg).not.toMatch(/@import|<filter|<image|href=/);
+    expect(svg.match(/https?:\/\/[^"]+/g)).toEqual(["http://www.w3.org/2000/svg"]);
+  });
+
+  it("never emits NaN, Infinity or undefined", () => {
+    for (const count of COUNTS) {
+      expect(generateModernBadge(count)).not.toMatch(/NaN|Infinity|undefined/);
     }
   });
 });

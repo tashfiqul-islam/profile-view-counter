@@ -41,8 +41,13 @@ parsing logic there and test it directly; keep bindings in `services/` and wire 
 
 - Every dynamic value in the SVG passes through `escapeXml()`.
 - The count only changes through `incrementViewCount()`; its SQL is the only write.
-- SVG dimensions are 2× the `viewBox` for retina displays; the `viewBox` is the logical size.
-- The font stack is system fonts only: GitHub's image proxy strips `@import`.
+- The badge is 28 px tall and sized 1:1 to its `viewBox`; it scales as a vector, so no 2× sizing.
+- Layout widths come from `textWidth()` (Arial Bold metrics plus tracking) and each `<text>` is
+  pinned to that width with `textLength` + `lengthAdjust="spacing"`: whatever font the viewer has,
+  text fills exactly its slot, never overflows, and stays centred. Keep both in sync when changing
+  sizes or the label.
+- The font stack is system fonts only: GitHub's image proxy strips `@import`. No filters or
+  external references: they render differently across viewers.
 
 ## Recipes
 

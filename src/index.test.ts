@@ -81,8 +81,8 @@ describe("Integration Tests (Hono + D1)", () => {
       const second = await fetchApp("/api/view-counter?username=every-view");
 
       expect(first.status).toBe(200);
-      expect(await first.text()).toContain('<title id="badge-title">PROFILE VISITORS: 1</title>');
-      expect(await second.text()).toContain('<title id="badge-title">PROFILE VISITORS: 2</title>');
+      expect(await first.text()).toContain("<title>Profile visitors: 1</title>");
+      expect(await second.text()).toContain("<title>Profile visitors: 2</title>");
       expect(await viewsOf("every-view")).toBe(2);
     });
 
@@ -100,7 +100,7 @@ describe("Integration Tests (Hono + D1)", () => {
       await fetchApp("/api/view-counter?username=mixedcase");
       const res = await fetchApp("/api/view-counter?username=MIXEDCASE");
 
-      expect(await res.text()).toContain("PROFILE VISITORS: 3");
+      expect(await res.text()).toContain("<title>Profile visitors: 3</title>");
       expect(await viewsOf("mixedcase")).toBe(3);
       expect(await viewsOf("MixedCase")).toBeUndefined();
     });

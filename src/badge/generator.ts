@@ -1,56 +1,82 @@
-interface BadgeTheme {
-  readonly countBg: string;
-  readonly labelBg: string;
-  readonly logoBg: string;
-  readonly textColor: string;
+/**
+ * Pure SVG rendering of the "PROFILE VISITORS" badge: no bindings, no I/O.
+ *
+ * Layout is computed from estimated text widths, then every text run is pinned to that width with
+ * `textLength`, so the text fits and stays centred whatever font the viewer's system picks.
+ *
+ * @module
+ */
+
+/** Typography of one text run. */
+interface TextStyle {
+  /** Font size in px. */
+  readonly size: number;
+  /** Font weight. */
+  readonly weight: number;
+  /** Extra space per gap between glyphs, in px; also the slack that absorbs wider fonts. */
+  readonly tracking: number;
 }
 
-interface BadgeDimensions {
-  readonly badgeHeight: number;
-  readonly badgeRadius: number;
-  readonly charWidth: number;
-  readonly countCharWidth: number;
-  readonly countPadX: number;
-  readonly fontSize: number;
-  readonly logoCircleSize: number;
-  readonly logoStrokeWidth: number;
-  readonly outerPadX: number;
-}
-
-const THEME = {
-  countBg: "#007ec6",
-  labelBg: "#444444",
-  logoBg: "#24292e",
-  textColor: "#ffffff",
-} as const satisfies BadgeTheme;
-
-const DIMENSIONS = {
-  badgeHeight: 24,
-  badgeRadius: 4,
-  charWidth: 6.4,
-  countCharWidth: 7.5,
-  countPadX: 10,
-  fontSize: 11,
-  logoCircleSize: 30,
-  logoStrokeWidth: 2,
-  outerPadX: 6,
-} as const satisfies BadgeDimensions;
+const HEIGHT = 28;
+const RADIUS = HEIGHT / 2;
+const PAD = 11;
+const ICON = 14;
+const ICON_GAP = 6;
+const MIN_COUNT_SEGMENT = 36;
 
 const LABEL = "PROFILE VISITORS";
-const LOGO_ICON_SIZE = 16;
-const TRAILING_ZERO_REGEX = /\.0$/;
+const LABEL_STYLE = { size: 10, tracking: 0.9, weight: 600 } as const satisfies TextStyle;
+const COUNT_STYLE = { size: 12, tracking: 0.4, weight: 700 } as const satisfies TextStyle;
 
-const GITHUB_ICON_PATH =
+const COLORS = {
+  count: "#0969da",
+  label: "#1f2328",
+  text: "#ffffff",
+} as const satisfies Record<string, string>;
+
+const FONT_STACK =
+  "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif";
+
+/** Advance widths in 1/1000 em of a bold grotesque (Arial Bold metrics). */
+const ADVANCE: Readonly<Record<string, number>> = {
+  " ": 278,
+  ".": 278,
+  ...Object.fromEntries("0123456789".split("").map((digit) => [digit, 556])),
+  A: 722,
+  B: 722,
+  C: 722,
+  D: 722,
+  E: 667,
+  F: 611,
+  G: 778,
+  H: 722,
+  I: 278,
+  J: 556,
+  K: 722,
+  L: 611,
+  M: 833,
+  N: 722,
+  O: 778,
+  P: 667,
+  Q: 778,
+  R: 722,
+  S: 667,
+  T: 611,
+  U: 722,
+  V: 667,
+  W: 944,
+  X: 667,
+  Y: 667,
+  Z: 611,
+};
+const FALLBACK_ADVANCE = 667;
+
+const GITHUB_MARK =
   "M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z";
 
-const SVG_DEFS = `
-    <filter id="logo-shadow" x="-50%" y="-50%" width="200%" height="200%">
-      <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#000" flood-opacity="0.3"/>
-    </filter>
+const COMPACT = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1, notation: "compact" });
 
-    <filter id="text-3d">
-       <feDropShadow dx="1" dy="1" stdDeviation="0" flood-color="#000" flood-opacity="0.5"/>
-    </filter>`;
+const round = (value: number): number => Math.round(value * 10) / 10;
 
 /**
  * Escapes the five XML special characters so a value is safe inside SVG text or attributes.
@@ -68,89 +94,65 @@ export function escapeXml(str: string): string {
 }
 
 /**
- * Shortens a count with K, M or B suffixes and one decimal, dropping a trailing `.0`.
+ * Shortens a count the way GitHub does: compact notation with at most one decimal.
  *
  * @param num - Non-negative view count.
- * @returns For example `"999"`, `"1.2K"`, `"1M"`.
+ * @returns For example `"999"`, `"1.2K"`, `"1M"` (999,999 rounds up to `1M`, never `1000K`).
  */
 export function formatNumber(num: number): string {
-  if (num >= 1_000_000_000) {
-    return `${(num / 1_000_000_000).toFixed(1).replace(TRAILING_ZERO_REGEX, "")}B`;
-  }
-  if (num >= 1_000_000) {
-    return `${(num / 1_000_000).toFixed(1).replace(TRAILING_ZERO_REGEX, "")}M`;
-  }
-  if (num >= 1000) {
-    return `${(num / 1000).toFixed(1).replace(TRAILING_ZERO_REGEX, "")}K`;
-  }
-  return num.toString();
+  return COMPACT.format(num);
 }
 
 /**
- * Renders the "PROFILE VISITORS" badge: GitHub logo, label and formatted count, at 2x size.
+ * Estimated rendered width of `text`, including tracking between glyphs.
+ *
+ * @param text - The run to measure.
+ * @param style - Its typography.
+ * @returns Width in px, rounded to 0.1.
+ */
+export function textWidth(text: string, style: TextStyle): number {
+  let units = 0;
+  for (const glyph of text) units += ADVANCE[glyph] ?? FALLBACK_ADVANCE;
+  return round((units / 1000) * style.size + style.tracking * Math.max(text.length - 1, 0));
+}
+
+/** Baseline that centres capitals of `size` vertically in the badge. */
+const baseline = (size: number): number => round(HEIGHT / 2 + size * 0.35);
+
+/**
+ * Renders the badge: a 28 px pill with the GitHub mark and label on the left and the formatted
+ * count on the right. Width grows with the count; text never overflows its segment.
  *
  * @param count - View count to show.
- * @returns A standalone, accessible SVG document.
+ * @returns A standalone, accessible SVG document sized 1:1 to its `viewBox`.
  */
 export function generateModernBadge(count: number): string {
-  const formattedCount = formatNumber(count);
-  const safeCount = escapeXml(formattedCount);
-  const d = DIMENSIONS;
+  const value = escapeXml(formatNumber(count));
+  const label = escapeXml(LABEL);
+  const title = `Profile visitors: ${value}`;
 
-  const logoDiameter = d.logoCircleSize;
-  const logoRadius = logoDiameter / 2;
-  const logoStrokeHalf = d.logoStrokeWidth / 2;
+  const labelText = textWidth(LABEL, LABEL_STYLE);
+  const countText = textWidth(value, COUNT_STYLE);
+  const labelSegment = round(PAD + ICON + ICON_GAP + labelText + PAD);
+  const countSegment = round(Math.max(PAD + countText + PAD, MIN_COUNT_SEGMENT));
+  const width = round(labelSegment + countSegment);
 
-  const labelTextWidth = LABEL.length * d.charWidth;
-  const countTextWidth = Math.max(safeCount.length * d.countCharWidth, 16);
-
-  const countSectionWidth = countTextWidth + d.countPadX * 2;
-
-  const totalHeight = logoDiameter + 4;
-  const badgeY = (totalHeight - d.badgeHeight) / 2 + 1;
-  const logoY = totalHeight / 2;
-
-  const logoCenterX = logoRadius + logoStrokeHalf;
-  const badgeStartX = logoCenterX + logoRadius - 6;
-
-  const textPadLeft = logoCenterX + logoRadius - badgeStartX + d.countPadX + 1;
-  const labelSectionWidth = textPadLeft + labelTextWidth + d.countPadX;
-  const badgeInnerWidth = textPadLeft + labelTextWidth + d.countPadX + countSectionWidth;
-
-  const viewBoxMinX = -(logoCenterX + logoRadius + logoStrokeHalf + 5);
-  const viewBoxDisplayWidth = badgeStartX + badgeInnerWidth + d.outerPadX - viewBoxMinX;
-
-  const logoIconScale = LOGO_ICON_SIZE / 16;
-  const countLetterSpacing = safeCount.length > 1 ? "2" : "0";
-
-  const labelTextCenterX = textPadLeft + labelTextWidth / 2;
-  const countTextCenterX = textPadLeft + labelTextWidth + d.countPadX + countSectionWidth / 2;
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${viewBoxDisplayWidth * 2}" height="${totalHeight * 2}" viewBox="${viewBoxMinX} 0 ${viewBoxDisplayWidth} ${totalHeight}" preserveAspectRatio="xMinYMid meet" role="img" aria-labelledby="badge-title badge-desc">
-  <title id="badge-title">${LABEL}: ${safeCount}</title>
-  <desc id="badge-desc">${safeCount} profile views on GitHub</desc>
-
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${HEIGHT}" viewBox="0 0 ${width} ${HEIGHT}" role="img" aria-label="${title}">
+  <title>${title}</title>
   <defs>
-    <style>
-      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
-    </style>
-    ${SVG_DEFS}
+    <linearGradient id="pvc-sheen" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".14"/>
+      <stop offset="1" stop-color="#000000" stop-opacity=".12"/>
+    </linearGradient>
   </defs>
-
-  <g transform="translate(${badgeStartX}, ${badgeY})">
-    <path d="M0 0 h${labelSectionWidth} v${d.badgeHeight} h-${labelSectionWidth} v-${d.badgeHeight} z" fill="${THEME.labelBg}"/>
-
-    <path d="M${labelSectionWidth} 0 h${countSectionWidth - d.badgeRadius} a${d.badgeRadius} ${d.badgeRadius} 0 0 1 ${d.badgeRadius} ${d.badgeRadius} v${d.badgeHeight - d.badgeRadius * 2} a${d.badgeRadius} ${d.badgeRadius} 0 0 1 -${d.badgeRadius} ${d.badgeRadius} h-${countSectionWidth - d.badgeRadius} v-${d.badgeHeight} z" fill="${THEME.countBg}"/>
-
-    <text x="${labelTextCenterX}" y="${d.badgeHeight / 2 + 1}" fill="${THEME.textColor}" filter="url(#text-3d)" font-size="${d.fontSize}" text-anchor="middle" dominant-baseline="middle" letter-spacing="0.5" text-rendering="geometricPrecision">${LABEL}</text>
-    <text x="${countTextCenterX}" y="${d.badgeHeight / 2 + 1}" fill="${THEME.textColor}" filter="url(#text-3d)" font-size="${d.fontSize}" font-weight="bold" text-anchor="middle" dominant-baseline="middle" letter-spacing="${countLetterSpacing}" text-rendering="geometricPrecision" font-variant-numeric="tabular-nums">${safeCount}</text>
-  </g>
-
-  <g filter="url(#logo-shadow)" aria-hidden="true">
-    <circle cx="${logoCenterX}" cy="${logoY}" r="${logoRadius}" fill="${THEME.logoBg}" stroke="#fff" stroke-width="${d.logoStrokeWidth}"/>
-    <g transform="translate(${logoCenterX - LOGO_ICON_SIZE / 2}, ${(totalHeight - LOGO_ICON_SIZE) / 2}) scale(${logoIconScale})">
-      <path fill="#fff" d="${GITHUB_ICON_PATH}"/>
-    </g>
+  <rect width="${width}" height="${HEIGHT}" rx="${RADIUS}" fill="${COLORS.count}"/>
+  <path d="M${RADIUS} 0H${labelSegment}V${HEIGHT}H${RADIUS}A${RADIUS} ${RADIUS} 0 0 1 ${RADIUS} 0Z" fill="${COLORS.label}"/>
+  <rect width="${width}" height="${HEIGHT}" rx="${RADIUS}" fill="url(#pvc-sheen)"/>
+  <rect x=".5" y=".5" width="${round(width - 1)}" height="${HEIGHT - 1}" rx="${RADIUS - 0.5}" fill="none" stroke="#ffffff" stroke-opacity=".12"/>
+  <g fill="${COLORS.text}" font-family="${FONT_STACK}" text-rendering="geometricPrecision">
+    <path aria-hidden="true" transform="translate(${PAD} ${(HEIGHT - ICON) / 2}) scale(${ICON / 16})" d="${GITHUB_MARK}"/>
+    <text x="${PAD + ICON + ICON_GAP}" y="${baseline(LABEL_STYLE.size)}" font-size="${LABEL_STYLE.size}" font-weight="${LABEL_STYLE.weight}" textLength="${labelText}" lengthAdjust="spacing">${label}</text>
+    <text x="${round(labelSegment + countSegment / 2)}" y="${baseline(COUNT_STYLE.size)}" font-size="${COUNT_STYLE.size}" font-weight="${COUNT_STYLE.weight}" text-anchor="middle" font-variant-numeric="tabular-nums" textLength="${countText}" lengthAdjust="spacing">${value}</text>
   </g>
 </svg>`;
 }
