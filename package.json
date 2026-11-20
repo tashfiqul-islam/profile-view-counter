@@ -26,8 +26,9 @@
     "lint": "oxlint --deny-warnings",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "test": "bun run test:worker",
+    "test": "bun run test:worker && bun run test:scripts",
     "test:worker": "vitest run --coverage",
+    "test:scripts": "bun test scripts/",
     "cf-typegen": "wrangler types",
     "db:migrate": "wrangler d1 migrations apply DB --local",
     "db:migrate:prod": "wrangler d1 migrations apply DB --remote"
