@@ -15,8 +15,10 @@
   "labels": ["dependencies", "renovate"],
   "assignees": ["tashfiqul-islam"],
   "reviewers": ["tashfiqul-islam"],
-  "dependencyDashboard": true,
-  "dependencyDashboardTitle": "🔄 Dependency Dashboard",
+  "dependencyDashboard": {
+    "enabled": true,
+    "title": "🔄 Dependency Dashboard"
+  },
   "prConcurrentLimit": 10,
   "branchConcurrentLimit": 5,
   "prHourlyLimit": 0,
