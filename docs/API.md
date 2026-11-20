@@ -97,10 +97,10 @@ curl "https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?userna
 
 **Error Responses**
 
-| Status | Body                                 | Description                             |
-| ------ | ------------------------------------ | --------------------------------------- |
-| 400    | `{"error": "..."}`                   | Invalid or missing `username` parameter |
-| 500    | `{"error": "Internal Server Error"}` | Server failure                          |
+| Status | Body                                                                      | Description                             |
+| ------ | ------------------------------------------------------------------------- | --------------------------------------- |
+| 400    | Valibot result: `{"success": false, "issues": [{"message": "...", ...}]}` | Invalid or missing `username` parameter |
+| 500    | `{"error": "Internal Server Error"}`                                      | Server failure                          |
 
 ---
 
@@ -112,7 +112,7 @@ Returns 204 No Content.
 
 ## Error Handling
 
-All errors return JSON with an `error` field:
+404 and 500 errors return JSON with an `error` field:
 
 ```json
 {
@@ -120,11 +120,11 @@ All errors return JSON with an `error` field:
 }
 ```
 
-| Status | Message                  |
-| ------ | ------------------------ |
-| 400    | Validation error details |
-| 404    | `Not Found`              |
-| 500    | `Internal Server Error`  |
+| Status | Message                                |
+| ------ | -------------------------------------- |
+| 400    | Valibot result with `issues[].message` |
+| 404    | `Not Found`                            |
+| 500    | `Internal Server Error`                |
 
 ---
 

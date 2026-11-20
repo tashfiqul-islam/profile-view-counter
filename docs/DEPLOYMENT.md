@@ -6,9 +6,9 @@
 
 ## Prerequisites
 
-- **Bun** installed (see `engines.bun` in `package.json` for minimum version)
-- **Cloudflare Account** (free tier works)
-- **Wrangler CLI** (included in devDependencies)
+- **[mise](https://mise.jdx.dev)**, which installs Bun and the other tools pinned in `mise.toml`
+- **Cloudflare account** (the free plan works)
+- **Wrangler** comes from `devDependencies`; no global install needed
 
 ---
 
@@ -17,11 +17,8 @@
 ```bash
 git clone https://github.com/tashfiqul-islam/profile-view-counter.git
 cd profile-view-counter
-bun install
+mise install && mise run setup
 ```
-
-> [!NOTE]
-> `bunfig.toml` uses `linker = "isolated"` — phantom dependencies fail immediately, ensuring reproducible builds.
 
 ---
 
@@ -126,33 +123,25 @@ This runs a local Cloudflare Workers environment with:
 - KV emulated locally
 - Hot reload on file changes
 
-### Run Tests
+### Check
 
 ```bash
-bun run test              # Run all tests (unit + integration)
-bun run test:unit         # Badge generator tests (bun:test, ~25ms)
-bun run test:integration  # Worker integration tests (vitest + workerd pool)
-```
-
-### Lint, Format & Type Check
-
-```bash
-bun run check         # Lint + format check (ultracite / biome)
-bun run fix           # Auto-fix lint & format
-bun run typecheck     # TypeScript 7 type checking (tsc --noEmit)
+bun run check         # typecheck, type-aware lint, format check, tests at 100 % coverage
+bun run format        # fix formatting
 ```
 
 ---
 
 ## CI/CD
 
-The project includes GitHub Actions workflows for:
+`ci.yml` runs the Quality gate on every PR and push. On `main` it then runs **Deploy**
+(`wrangler d1 migrations apply DB --remote`, then `wrangler deploy`) and **Release** (tag + GitHub
+Release) on the same commit. To deploy a fork from GitHub Actions:
 
-- **CI** (`ci.yml`): Runs on every push/PR — `cf-typegen`, `check`, `typecheck`, `test:unit`, `test:integration`
-- **Deploy** (`deploy.yml`): Deploys to Cloudflare Workers after CI succeeds on `master`/`main`
-- **Release** (`release.yml`): Automated semantic versioning & changelog on push to `master`/`main`
-- **Renovate Validate** (`renovate-validate.yml`): Validates `renovate.json` on changes
-- **Renovate**: Automated dependency updates with auto-merge for minor/patch, dashboard approval for major
+1. Create a Cloudflare API token with the **Edit Cloudflare Workers** template plus **D1: Edit**.
+2. In the repository settings, create an environment named `production` and add the secret
+   `CLOUDFLARE_API_TOKEN` to it.
+3. Add the repository variable `CLOUDFLARE_ACCOUNT_ID` (your account ID is not a secret).
 
 ---
 
@@ -182,9 +171,6 @@ Ensure no stale `workerd` processes are running. Kill them and retry:
 taskkill /f /im workerd.exe  # Windows
 pkill workerd                # macOS/Linux
 ```
-
-> [!CAUTION]
-> Verify `bun = true` is NOT set in `bunfig.toml` `[run]` section — it breaks the workerd pool runner.
 
 ---
 

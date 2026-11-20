@@ -1,253 +1,120 @@
 # AGENTS.md
 
-Universal context for AI agents working with this repository.
-For Claude Code-specific instructions, see [CLAUDE.md](CLAUDE.md).
+Cloudflare Worker that serves the "PROFILE VISITORS" SVG badge for GitHub READMEs and counts a view
+per request. Hono routes, Valibot validates the `username` query, D1 stores the counts, KV caches
+rendered badges for 60 s. Live at `https://profile-view-counter.tashfiq61.workers.dev`.
 
-## Project
+`src/` runs on **workerd**, not Bun or Node: no `Bun.*`, `fs`, `process` or `require()` there. Bun
+is the package manager and runs `scripts/`.
 
-**Profile View Counter** — A Cloudflare Workers API serving SVG badge images that track GitHub profile views. Atomic D1 counting, KV edge caching, Hono routing, Valibot validation.
+## Loop
 
-**Live**: `https://profile-view-counter.tashfiq61.workers.dev`
+| Step  | Command                             | Done when                                                              |
+| ----- | ----------------------------------- | ---------------------------------------------------------------------- |
+| Setup | `mise install && mise run setup`    | deps, `worker-configuration.d.ts`, `hk` hooks                          |
+| Gate  | `bun run check`                     | green: types, lint, format, tests                                      |
+| Try   | `bun run db:migrate && bun run dev` | `curl localhost:8787/api/view-counter?username=octocat` returns an SVG |
 
-## Quick Reference
+The **gate** is the definition of done for every change: typecheck → type-aware lint (zero
+warnings) → format check → Worker tests in workerd at **100 % coverage** (Vitest) → script tests at
+**100 %** (bun test). A change that drops coverage is unfinished; add the test through the
+module's interface. `mise run lint-actions` and `mise run lint-docs` cover workflows and docs.
 
-| Action              | Command                    |
-| ------------------- | -------------------------- |
-| Install             | `bun install`              |
-| Dev server          | `bun run dev`              |
-| All tests           | `bun run test`             |
-| Unit tests          | `bun run test:unit`        |
-| Integration tests   | `bun run test:integration` |
-| Lint + format check | `bun run check`            |
-| Lint + format fix   | `bun run fix`              |
-| Type check          | `bun run typecheck`        |
-| Regen CF types      | `bun run cf-typegen`       |
-| Deploy              | `bun run deploy`           |
-| Commit              | `bun run commit`           |
-| DB migrate (local)  | `bun run db:migrate`       |
-| DB migrate (prod)   | `bun run db:migrate:prod`  |
+Tool versions live in `mise.toml`, deps in `package.json`, scripts in `package.json#scripts`,
+bindings in `wrangler.jsonc`. Read those instead of trusting any copy of them.
 
-## Stack
+## Map
 
-All versions managed in `package.json` — run `bun outdated` to check for updates.
+Read [`src/README.md`](src/README.md) before changing the Worker: request flow, every module's
+role, invariants and recipes. [`scripts/README.md`](scripts/README.md) covers repo tooling.
+[`docs/API.md`](docs/API.md) is the public contract; [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)
+covers self-hosting. Keep them current when routes, modules or contracts change.
 
-| Layer             | Technology                                                                  |
-| ----------------- | --------------------------------------------------------------------------- |
-| Runtime           | Cloudflare Workers (workerd) — see `compatibility_date` in `wrangler.jsonc` |
-| Tooling           | Bun — see `engines.bun` in `package.json`                                   |
-| Language          | TypeScript 7 — `erasableSyntaxOnly`, `libReplacement`, strict               |
-| Router            | Hono                                                                        |
-| Database          | Cloudflare D1 (SQLite)                                                      |
-| Cache             | Cloudflare KV (60s TTL)                                                     |
-| Validation        | Valibot                                                                     |
-| Lint/Format       | Ultracite (Biome preset)                                                    |
-| Unit tests        | bun:test (built-in)                                                         |
-| Integration tests | Vitest + `@cloudflare/vitest-plugin`                                        |
-| Deployment        | Wrangler                                                                    |
-| CI/CD             | GitHub Actions + Semantic Release                                           |
+Tests sit next to their module as `*.test.ts`. `src/index.test.ts` drives the whole app through
+`app.fetch()` against real D1 and KV in workerd; `src/test-setup.ts` applies `migrations/` to each
+test file's isolated database.
 
-## WHERE TO LOOK
+## Working agreement
 
-| Task                    | File(s)                                                                           |
-| ----------------------- | --------------------------------------------------------------------------------- |
-| Add new route           | `src/routes/`, mount in `src/index.ts`                                            |
-| Change badge design     | `src/badge/generator.ts`                                                          |
-| Modify DB schema        | `migrations/`, `src/services/counter.ts`                                          |
-| Change cache behavior   | `src/services/cache.ts`, `src/routes/view-counter.ts`                             |
-| Update validation       | `src/schemas/query.ts`                                                            |
-| Change security headers | `src/index.ts` (secureHeaders config)                                             |
-| Add new test            | `test/badge-generator.test.ts` (unit) or `test/integration.test.ts` (integration) |
-| Change CI pipeline      | `.github/workflows/ci.yml`                                                        |
-| Update wrangler config  | `wrangler.jsonc`, then run `bun run cf-typegen`                                   |
-| Update dependencies     | `renovate.json`, `package.json`                                                   |
+- Run the gate after every source edit; report it red or green, never "should pass".
+- Plan first, then ask, before changing workflows, CI, `wrangler.jsonc` or migrations.
+- Ask before every commit and every push.
 
-## Source Map
+## Conventions
 
-```
-src/
-├── index.ts              # App entry: Hono, typed Variables, secureHeaders(DENY/CSP/HSTS), structured logging
-├── routes/view-counter.ts # GET /api/view-counter — cache-first, SVG CSP header, error-safe waitUntil
-├── badge/generator.ts    # SVG generation: escapeXml(), formatNumber(), responsive, accessible, system fonts
-├── services/counter.ts   # D1 atomic INSERT ON CONFLICT RETURNING, structured error context
-├── services/cache.ts     # KV get/set with TTL
-└── schemas/query.ts      # Valibot: username 1-39 chars, GitHub format, specific error messages
-
-test/
-├── badge-generator.test.ts  # bun:test — pure SVG unit tests (formatNumber, escapeXml, generateModernBadge, querySchema)
-└── integration.test.ts      # vitest — full Hono+D1+KV via workerd pool
-
-Config:
-├── wrangler.jsonc        # Workers config: D1, KV, smart placement, source maps, observability
-├── biome.jsonc           # Extends ultracite/biome/core
-├── vitest.config.ts      # Integration tests only, istanbul coverage, 100% threshold
-├── bunfig.toml           # Bun 1.3+: isolated linker, text lockfile, globalStore, retry, test randomization
-├── tsconfig.json         # TS7: erasableSyntaxOnly, libReplacement, strict, isolatedModules
-├── lefthook.yml          # Pre-commit: format+typecheck+test, pre-push: full gate, post-merge: auto-install
-└── .releaserc.json       # Semantic release: angular preset, release rules, bun.lock in assets
-```
-
-Note: `Env` interface is auto-generated globally by `wrangler types` in `worker-configuration.d.ts`. No manual types directory.
-
-## Request Flow
-
-```
-Client GET /api/view-counter?username=X
-  │
-  ▼
-Hono middleware (requestId → secureHeaders → cors → logger → timing)
-  │
-  ▼
-Valibot validates username (1-39 chars, [a-zA-Z0-9-])
-  │
-  ▼
-KV.get("badge:X") ── HIT ──► Return cached SVG (max-age=60)
-  │
- MISS
-  │
-  ▼
-D1: INSERT ON CONFLICT RETURNING views
-  │
-  ▼
-generateModernBadge(count) → escapeXml() → SVG string
-  │
-  ├──► waitUntil(KV.put("badge:X", svg, ttl=60).catch(...))  [non-blocking, error-safe]
-  │
-  ▼
-Return SVG (Cache-Control: no-cache, no-store, must-revalidate, CSP: default-src 'none')
-```
-
-## Database Schema
-
-```sql
-CREATE TABLE view_counts (
-  username   TEXT PRIMARY KEY NOT NULL,
-  views      INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT NOT NULL DEFAULT (datetime('now')),
-  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-);
-```
-
-Migrations: `migrations/` directory, applied via `bun run db:migrate` (local) or `bun run db:migrate:prod` (remote).
-
-## API Endpoints
-
-| Method | Path                           | Response                      | Notes                         |
-| ------ | ------------------------------ | ----------------------------- | ----------------------------- |
-| GET    | `/`                            | JSON                          | API info, available endpoints |
-| GET    | `/health`                      | `{ status: "ok", timestamp }` | Health check                  |
-| GET    | `/api/view-counter?username=X` | `image/svg+xml`               | Badge with view count         |
-| GET    | `/favicon.ico`                 | 204                           | No content                    |
-| *      | `*`                            | `{ error: "Not Found" }` 404  | Catch-all                     |
-
-## Code Style
-
-- **Formatting**: Double quotes, semicolons (Ultracite / Biome preset)
-- **Imports**: Named exports only; sole exception: `export default app` (Workers entry)
-- **Types**: `readonly` interfaces, `as const satisfies T` for config, strict TypeScript 7, Valibot with `description()` metadata at boundaries
-- **Errors**: Always `{ error: string }` JSON, structured logging with `level`, `requestId`, `error`, `request` context
-- **SVG security**: `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'`, `escapeXml()` for all dynamic content
-- **Commits**: Conventional commits (`feat|fix|docs|refactor|test|ci|chore|perf|build|revert|types|security`)
-- **Coverage**: 100% lines, functions, statements, branches enforced in CI
-
-## Testing Standards
-
-Two runners, split by runtime requirement:
-
-| Runner                               | File                           | Scope                                 | Coverage                      |
-| ------------------------------------ | ------------------------------ | ------------------------------------- | ----------------------------- |
-| `bun:test`                           | `test/badge-generator.test.ts` | Pure SVG generation (no Workers APIs) | `src/badge/**`                |
-| Vitest + `@cloudflare/vitest-plugin` | `test/integration.test.ts`     | Full Hono app against real workerd    | `src/**` minus `src/badge/**` |
-
-- 100% coverage required across all metrics (enforced in `vitest.config.ts`)
-- Integration tests use `createExecutionContext()` / `waitOnExecutionContext()` from `cloudflare:test`
-- Test randomization enabled (`seed=42`) for flaky test detection
-- Mock pattern: Override method on `testEnv.DB` or `testEnv.CACHE`, restore in `finally` block
-
-## Anti-Patterns
-
-These are explicitly forbidden:
-
-- **`cloudflare:test` in bun:test files** → the module doesn't exist in Bun runtime
-- **`bun:test` in vitest files** → the module doesn't exist in workerd runtime
-- **Bun APIs in `src/`** → workerd runtime doesn't have them (`Bun.file`, `Bun.serve`, etc.)
-- **Manual `worker-configuration.d.ts` edits** → auto-generated by `bun run cf-typegen`
-- **Manual `src/types/env.ts`** → `Env` is auto-generated globally by wrangler
-- **`biome-ignore` comments** → override rules in `biome.jsonc` instead
-- **`bun = true` in `[run]`** → breaks workerd pool runner
-- **Hardcoded version numbers** → managed by semantic-release
-- **Enum / namespace / parameter properties** → `erasableSyntaxOnly` bans them
-- **Floating promises** → always `await` or use `waitUntil()`
-- **SQL string concatenation** → use D1 `.bind()` parameterized queries
-- **SVG without `escapeXml()`** → XSS risk if user input ever enters SVG
-
-## Security
-
-### Code-Level Rules
-
-- `secureHeaders()` with explicit DENY + CSP + HSTS on all responses
-- SVG responses get `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'`
-- `escapeXml()` for any dynamic content in SVG generation (defense in depth)
-- Valibot validation at API boundary — reject invalid input before processing
-- Parameterized SQL via D1 `.bind()` — zero string concatenation
-- Structured error logging — generic messages to clients, full details server-side
-
-### AI Agent Rules
-
-- Never print or paste secret values (tokens, API keys) in chat responses, commits, or shared logs
-- Mirror CI env names exactly, but do not inline literal secret values in commands
-- If a required secret is missing locally, stop and ask the user rather than inventing placeholder credentials
-- Never commit local secret files; if documenting env setup, use placeholder-only examples
-- When sharing command output, summarize and redact sensitive-looking values
+- Validate request input with a Valibot schema in `src/schemas/` and `vValidator` at the route.
+- Escape every dynamic value that enters SVG with `escapeXml()`.
+- Bind every SQL value with `.bind()`; never build SQL from strings.
+- Non-blocking work goes through `c.executionCtx.waitUntil()` with a `.catch()` that logs.
+- 404 and 500 reach clients as `{ error: string }` JSON; details go to
+  `console.error(JSON.stringify({ level, requestId, error, request }))`. A 400 from `vValidator` is
+  currently Valibot's raw result (`{ success: false, issues: […] }`).
+- Derive types from data: `as const satisfies T` for config objects, `readonly` interfaces.
+- Mock at the seam with `vi.spyOn()` on the binding (`env.DB`, `env.CACHE`) or `console`; the
+  `afterEach` in `src/index.test.ts` restores them.
+- Document in TSDoc, enforced by oxlint: every export gets a one-line summary, then
+  `@param name - …`, `@returns`, `@throws` where relevant. Types live in TypeScript, never in JSDoc
+  braces.
+- Disable a lint rule only inline, with a `-- reason`.
 
 ## Gotchas
 
-### `worker-configuration.d.ts` is auto-generated
+- **`worker-configuration.d.ts` is generated** by `bun run cf-typegen` (gitignored). Rerun it after
+  any `wrangler.jsonc` change; never edit it.
+- **Worker tests run in workerd.** Import test helpers from `cloudflare:test` and `env`
+  from `cloudflare:workers`; never import `bun:test` under `src/`. `scripts/` tests are the
+  opposite: `bun:test`, run by `bun test`.
+- **`bun run dev` needs `bun run db:migrate` first**, or the first request fails with
+  `no such table: view_counts`.
+- **A cache HIT does not count a view** (`src/routes/view-counter.ts`); counts grow at most once
+  per 60 s per username.
+- **`conventional-changelog-conventionalcommits` stays on v8.** v9+ templates break the writer
+  bundled with semantic-release (empty release notes). Renovate holds it via `allowedVersions`.
+- **Never write `[skip ci]` or `[skip actions]` in a commit message or PR body**, not even quoted:
+  GitHub then skips every push workflow for the squash commit, including the deploy.
+- **`main` is ruleset-protected.** Changes land only through squash-merged PRs with a passing
+  **CI / Quality gate**; nothing (not even CI) commits to `main` directly.
+- **`linker = "isolated"`**: an import missing from `package.json` fails immediately.
+- **`bunfig.toml` enforces a 3-day `minimumReleaseAge`**; pick tool and action versions at least
+  that old as well.
+- **`CLAUDE.md` only imports this file** (`@AGENTS.md`), so it works on every OS without
+  symlinks. Edit `AGENTS.md`.
+- **`TEST_MIGRATIONS` type-checks in Worker code but exists only under Vitest** (`src/test-env.d.ts`
+  augments the shared `Env`). Never read it outside tests.
 
-- **Context**: Declares global `Env` interface via `Cloudflare.Env` namespace
-- **Problem**: Editing it manually gets overwritten by `bun run cf-typegen`
-- **Solution**: Edit `wrangler.jsonc` bindings, then run `bun run cf-typegen`
+## Commits & releases
 
-### Vitest config excludes badge tests
+Conventional commits, enforced by commitlint in the `commit-msg` hook: `type(scope): subject`,
+types and scopes in `commitlint.config.ts`.
 
-- **Context**: `vitest.config.ts` includes only `test/integration.test.ts`
-- **Problem**: Badge tests are run by `bun:test`, not vitest
-- **Solution**: `coverage.exclude: ["src/badge/**"]` in vitest.config.ts — bun:test covers it
+PRs are **squash-merged**, so the PR title becomes the commit semantic-release reads: give it the
+`type(scope): subject` that should drive the version. `feat` → minor; `fix`, `perf`, `revert`,
+`security`, `chore(deps)`, `chore(bun)` → patch; everything else releases nothing (`scripts/pr-labels.ts`
+labels each PR with its release impact).
 
-### KV and D1 bindings in tests
+Each push to `main` runs **Quality gate → Deploy → Release** in one workflow on the same commit.
+Release is tag-only: `semantic-release` creates `vX.Y.Z` and a GitHub Release with generated notes.
+There is no version field and no changelog commit; `CHANGELOG.md` is the archive up to v2.2.2.
 
-- **Context**: Test env bindings come from `cloudflare:test`
-- **Problem**: `env` type is `Cloudflare.Env`, not your project's `Env`
-- **Solution**: Cast via `env as unknown as Env`
+## CI
 
-### `bun run dev` requires local migration
+| Workflow       | Trigger                    | Jobs                                                                             |
+| -------------- | -------------------------- | -------------------------------------------------------------------------------- |
+| `ci.yml`       | PR, push to `main`, manual | **Quality gate**, **Dependency review** (PRs), **Deploy** → **Release** (`main`) |
+| `pr.yml`       | PR opened, edited, updated | **Conventional title** (commitlint, required), **Type and release labels**       |
+| `renovate.yml` | `renovate.json` changes    | strict config validation (pinned Renovate CLI)                                   |
 
-- **Context**: Local D1 database starts empty
-- **Problem**: `no such table: view_counts` error on first request
-- **Solution**: Run `bun run db:migrate` before `bun run dev`
-
-### SVG uses 2x pixel dimensions
-
-- **Context**: `width` and `height` are `viewBox * 2` for retina displays
-- **Problem**: Appears larger than expected if viewBox is misread
-- **Solution**: viewBox defines logical size, `* 2` is physical pixels for DPR
-
-### Smart Placement runs near D1, not nearest edge
-
-- **Context**: `placement.mode: "smart"` in wrangler.jsonc
-- **Problem**: Worker may not be at the geographically nearest edge
-- **Solution**: This is intentional — D1 latency optimization takes priority
-
-## CI Pipeline
-
-```
-checkout → setup-bun → cache → install → cf-typegen → check → typecheck → test:unit → test:integration
-```
-
-Semantic Release runs on push to `master`/`main` (separate workflow).
-
-## Context Efficiency
-
-- Grep first to find relevant line numbers, then read targeted ranges
-- Never re-read the same section of a file without code changes in between
-- Run `bun run check` and `bun run typecheck` together: `bun run check && bun run typecheck`
-- Capture test output once, then analyze — don't re-run without changes
+- **Secrets stay in one job.** Only **Deploy** sees `CLOUDFLARE_API_TOKEN`, inside the
+  `production` environment; it runs `wrangler d1 migrations apply` and `wrangler deploy`, nothing
+  else. Keep new secret use in that shape.
+- **Required checks on `main`:** Quality gate, Conventional title, Dependency review.
+- **PR feedback is native annotations.** The Quality gate runs one step per tool; tsc (via
+  `.github/matchers/tsc.json`), oxlint (`--format github`), Vitest, actionlint and zizmor
+  (`--format github`) annotate the diff with no bot and no write token.
+- **Shared steps live in `.github/actions/setup`** (mise tools via `tools:`, Bun cache,
+  `install: all | none`), loaded with the self-repository syntax `uses: $/…`; actionlint doesn't
+  know that syntax yet, so `.github/actionlint.yaml` ignores that one message.
+- Workflows start from `permissions: {}`; every grant carries a `# why` comment. Actions are pinned
+  to full commit SHAs with a `# vX.Y.Z` comment; tools come from `mise.toml` via `jdx/mise-action`.
+- Renovate automerges non-major updates through PRs once CI is green; the hk version in `hk.pkl` and
+  the Renovate CLI pin follow via regex managers.

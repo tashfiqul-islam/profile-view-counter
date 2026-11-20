@@ -1,53 +1,28 @@
 # Dependencies
 node_modules/
-.bun/
 
-# Cloudflare Workers
+# Cloudflare Workers (local state, secrets, generated types)
 .wrangler/
-.dev.vars
+.dev.vars*
 worker-configuration.d.ts
-dist/
 
-# AI / MCP
-.cursor/
-.claude/
-.claude-flow/
-.mcp.json
-
-# Environment Variables
+# Environment
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
 
-# Testing & Coverage
+# Coverage
 coverage/
-.nyc_output/
-test-results.xml
+
+# Local agent settings
+.claude/
 
 # Logs
-logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-# TypeScript
-*.tsbuildinfo
-
-# OS & Desktop Services
+# OS and editors
 .DS_Store
-.AppleDouble
-.LSOverride
 Thumbs.db
-ehthumbs.db
 Desktop.ini
-
-# IDES / Editors
 .idea/
 .vscode/
 *.swp
-*.swo
-*.sublime-project
-*.sublime-workspace

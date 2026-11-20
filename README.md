@@ -6,7 +6,7 @@
 
 [![License](https://img.shields.io/github/license/tashfiqul-islam/profile-view-counter?style=for-the-badge)](LICENSE)
 [![CI](https://img.shields.io/github/actions/workflow/status/tashfiqul-islam/profile-view-counter/ci.yml?style=for-the-badge&label=CI&logo=github)](https://github.com/tashfiqul-islam/profile-view-counter/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/badge/coverage-100%25-success?style=for-the-badge&logo=vitest&logoColor=white)](#testing)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-success?style=for-the-badge&logo=vitest&logoColor=white)](#tech-stack)
 [![TypeScript](https://img.shields.io/badge/typescript-7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Hono](https://img.shields.io/badge/hono-4-E36002?style=for-the-badge&logo=hono&logoColor=white)](https://hono.dev)
 
@@ -81,7 +81,7 @@ Every visit to a README embedding the badge triggers an edge request. On cache m
 | **Accessible**      | WCAG: `role="img"`, `aria-labelledby`, `<title>`, `<desc>`                                                                                |
 | **Secure**          | `secureHeaders()` (HSTS, CSP, X-Frame-Options) + `nosniff` on SVG                                                                         |
 | **Observable**      | `requestId()` tracing, structured JSON logging, source maps                                                                               |
-| **100% tested**     | `bun:test` units + Vitest workerd integration                                                                                             |
+| **100% tested**     | Vitest in workerd against real D1 and KV, 100 % coverage enforced                                                                         |
 | **Type-safe**       | TypeScript 7 strict + Valibot schema validation                                                                                           |
 
 ---
@@ -90,7 +90,7 @@ Every visit to a README embedding the badge triggers an edge request. On cache m
 
 ```
 src/
-├── index.ts              # Hono app, typed Variables, secureHeaders(DENY/CSP/HSTS), structured logging
+├── index.ts              # Hono app: middleware, /, /health, 404 and error handler
 ├── routes/
 │   └── view-counter.ts   # Cache-first badge endpoint
 ├── badge/
@@ -99,29 +99,29 @@ src/
 │   ├── counter.ts        # D1 atomic increment
 │   └── cache.ts          # KV get/set with TTL
 └── schemas/
-    └── query.ts          # Valibot validation with description metadata
+    └── query.ts          # Valibot validation of the username
 ```
 
 > [!TIP]
-> Full architecture docs with Mermaid diagrams: [ARCHITECTURE.md](src/docs/ARCHITECTURE.md)
+> Request flow, module roles and recipes: [src/README.md](src/README.md)
 
 ---
 
 ## Tech Stack
 
-| Layer           | Technology                                                                                                           | Role                                             |
-| --------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| **Runtime**     | [Bun](https://bun.sh)                                                                                                | Package manager, script runner, unit test runner |
-| **Edge**        | [Cloudflare Workers](https://workers.cloudflare.com)                                                                 | Global deployment with Smart Placement           |
-| **Framework**   | [Hono](https://hono.dev)                                                                                             | Ultra-lightweight routing + middleware           |
-| **Database**    | [Cloudflare D1](https://developers.cloudflare.com/d1/)                                                               | Serverless SQLite with atomic operations         |
-| **Cache**       | [Cloudflare KV](https://developers.cloudflare.com/kv/)                                                               | Distributed key-value store (60s TTL)            |
-| **Validation**  | [Valibot](https://valibot.dev)                                                                                       | Tree-shakeable schema validation                 |
-| **Language**    | [TypeScript](https://www.typescriptlang.org/)                                                                        | Strict mode, `erasableSyntaxOnly`                |
-| **Lint/Format** | [Ultracite](https://github.com/haydenbleasel/ultracite)                                                              | Opinionated Biome preset                         |
-| **Unit Tests**  | [bun:test](https://bun.sh/docs/cli/test)                                                                             | Built-in runner with V8 coverage                 |
-| **Integration** | [Vitest](https://vitest.dev) + [pool-workers](https://developers.cloudflare.com/workers/testing/vitest-integration/) | Workerd runtime testing                          |
-| **CI/CD**       | [GitHub Actions](https://github.com/features/actions) + [Semantic Release](https://semantic-release.gitbook.io/)     | Automated quality gates + versioning             |
+| Layer           | Technology                                                                                                                | Role                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| **Edge**        | [Cloudflare Workers](https://workers.cloudflare.com)                                                                      | Global deployment with Smart Placement      |
+| **Framework**   | [Hono](https://hono.dev)                                                                                                  | Ultra-lightweight routing + middleware      |
+| **Database**    | [Cloudflare D1](https://developers.cloudflare.com/d1/)                                                                    | Serverless SQLite with atomic operations    |
+| **Cache**       | [Cloudflare KV](https://developers.cloudflare.com/kv/)                                                                    | Distributed key-value store (60s TTL)       |
+| **Validation**  | [Valibot](https://valibot.dev)                                                                                            | Tree-shakeable schema validation            |
+| **Language**    | [TypeScript 7](https://www.typescriptlang.org/)                                                                           | Native `tsgo` checker, every strict flag    |
+| **Toolchain**   | [mise](https://mise.jdx.dev) + [Bun](https://bun.sh)                                                                      | Pinned tools; package manager               |
+| **Lint/Format** | [oxlint](https://oxc.rs) (type-aware) + [oxfmt](https://oxc.rs)                                                           | Fast lint with TSDoc rules; formatter       |
+| **Tests**       | [Vitest](https://vitest.dev) + [Cloudflare plugin](https://developers.cloudflare.com/workers/testing/vitest-integration/) | Tests run inside workerd                    |
+| **Git hooks**   | [hk](https://hk.jdx.dev)                                                                                                  | Pre-commit fixes, commitlint, pre-push gate |
+| **CI/CD**       | [GitHub Actions](https://github.com/features/actions) + [semantic-release](https://semantic-release.gitbook.io/)          | Gate → deploy → tag + release notes         |
 
 ---
 
@@ -133,7 +133,7 @@ src/
 | `/health`                              | GET    | Health check (`{ status: "ok" }`)  |
 | `/api/view-counter?username=:username` | GET    | Generate badge and increment count |
 
-> Full API reference: [API.md](src/docs/API.md)
+> Full API reference: [docs/API.md](docs/API.md)
 
 ---
 
@@ -141,7 +141,7 @@ src/
 
 ### Prerequisites
 
-- [Bun](https://bun.sh) — see `engines.bun` in `package.json`
+- [mise](https://mise.jdx.dev) (installs Bun and the lint tools from `mise.toml`)
 - [Cloudflare account](https://dash.cloudflare.com/sign-up) (free tier)
 
 ### Setup
@@ -149,40 +149,26 @@ src/
 ```bash
 git clone https://github.com/tashfiqul-islam/profile-view-counter.git
 cd profile-view-counter
-bun install
+mise install && mise run setup
 ```
 
 ### Commands
 
-| Command                    | Description                                 |
-| -------------------------- | ------------------------------------------- |
-| `bun run dev`              | Start local Workers dev server              |
-| `bun run test`             | Run all tests (unit + integration)          |
-| `bun run test:unit`        | Badge generator tests (`bun:test`)          |
-| `bun run test:integration` | Worker integration tests (Vitest + workerd) |
-| `bun run check`            | Lint + format check (Ultracite)             |
-| `bun run fix`              | Auto-fix lint + format issues               |
-| `bun run typecheck`        | TypeScript strict type checking             |
-| `bun run cf-typegen`       | Regenerate types from `wrangler.jsonc`      |
-| `bun run deploy`           | Deploy to Cloudflare Workers                |
-| `bun run commit`           | Interactive conventional commit wizard      |
-
-### Testing
-
-Tests are split across two runners for optimal performance:
-
-- **`bun:test`** — badge generator unit tests with built-in V8 coverage
-- **Vitest** — integration tests against the workerd runtime via `@cloudflare/vitest-plugin`
-
-```bash
-bun run test   # Runs both — must maintain 100% coverage
-```
+| Command                 | Description                                                      |
+| ----------------------- | ---------------------------------------------------------------- |
+| `bun run dev`           | Start local Workers dev server (run `bun run db:migrate` first)  |
+| `bun run check`         | The gate: typecheck, lint, format check, tests at 100 % coverage |
+| `bun run test`          | Worker tests (Vitest in workerd) and script tests (bun test)     |
+| `bun run format`        | Fix formatting                                                   |
+| `bun run cf-typegen`    | Regenerate types from `wrangler.jsonc`                           |
+| `mise run lint-actions` | Lint and audit the GitHub workflows                              |
+| `mise run lint-docs`    | Check every Markdown link and anchor                             |
 
 ---
 
 ## Deployment
 
-> Full step-by-step guide: [DEPLOYMENT.md](src/docs/DEPLOYMENT.md)
+Merging to `main` deploys automatically. To run your own copy, follow [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md):
 
 ```bash
 bunx wrangler login           # Authenticate with Cloudflare
@@ -194,19 +180,14 @@ bun run deploy                # Ship it
 
 ## Contributing
 
-1. Fork and clone the repo
-2. Create a feature branch: `git checkout -b feat/your-feature`
-3. Make changes and verify:
-   ```bash
-   bun run test        # 100% coverage required
-   bun run fix         # Auto-fix lint/format
-   bun run typecheck   # Must pass
-   ```
-4. Commit: `bun run commit` (conventional commits enforced)
-5. Push and open a PR
+1. Fork and clone the repo, then `mise install && mise run setup`
+2. Create a feature branch: `git switch -c feat/your-feature`
+3. Make changes and run `bun run check`
+4. Commit with a conventional message (`fix(badge): …`); the hk hook checks it
+5. Open a PR with a conventional title; it becomes the squash commit that drives the release
 
 > [!IMPORTANT]
-> All commits must follow [Conventional Commits](https://www.conventionalcommits.org/). See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+> See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for the full workflow and release rules.
 
 ---
 

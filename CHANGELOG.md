@@ -1,6 +1,9 @@
 # Changelog
 
-All notable changes to **Profile View Counter** are documented in this file.
+> [!NOTE]
+> This file is an archive up to v2.2.2. Newer release notes live on
+> [GitHub Releases](https://github.com/tashfiqul-islam/profile-view-counter/releases), generated
+> from the squash-merged PR titles.
 
 ## [2.2.2](https://github.com/tashfiqul-islam/profile-view-counter/compare/v2.2.1...v2.2.2) (2026-11-20)
 
