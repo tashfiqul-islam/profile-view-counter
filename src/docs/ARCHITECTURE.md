@@ -169,7 +169,7 @@ All versions managed in `package.json` — run `bun outdated` to check for updat
 | **Bun** | Package manager (isolated linker), script runner, unit test runner (`bun:test`) |
 | **TypeScript** | Strict type checking with `erasableSyntaxOnly`, `verbatimModuleSyntax`, `noUncheckedSideEffectImports` |
 | **Ultracite** | Opinionated Biome preset layer for linting & formatting (double quotes, semicolons) |
-| **Vitest** | Integration test runner with `@cloudflare/vitest-pool-workers` |
+| **Vitest** | Integration test runner with `@cloudflare/vitest-plugin` |
 | **Wrangler** | Cloudflare Workers CLI, type generation, local dev, source map uploads |
 | **Lefthook** | Git hooks (pre-commit: format+typecheck+test, pre-push: full gate, post-merge: auto-install) |
 | **Semantic Release** | Automated versioning & changelog from conventional commits |
@@ -181,7 +181,7 @@ Tests are split across two runners to maximize performance:
 | Runner | Files | Scope |
 |--------|-------|-------|
 | `bun test` | `test/badge-generator.test.ts` | Unit tests for pure SVG generation and Valibot schemas (no Workers runtime) |
-| `bunx vitest run` | `test/integration.test.ts` | Integration tests via `@cloudflare/vitest-pool-workers` (workerd runtime) |
+| `bunx vitest run` | `test/integration.test.ts` | Integration tests via `@cloudflare/vitest-plugin` (workerd runtime) |
 
 Both runners contribute to 100% code coverage across all `src/` files. Test randomization enabled with `seed=42` in bun:test for flaky test detection.
 

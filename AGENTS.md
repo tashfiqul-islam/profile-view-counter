@@ -42,7 +42,7 @@ All versions managed in `package.json` — run `bun outdated` to check for updat
 | Validation | Valibot |
 | Lint/Format | Ultracite (Biome preset) |
 | Unit tests | bun:test (built-in) |
-| Integration tests | Vitest + `@cloudflare/vitest-pool-workers` |
+| Integration tests | Vitest + `@cloudflare/vitest-plugin` |
 | Deployment | Wrangler |
 | CI/CD | GitHub Actions + Semantic Release |
 
@@ -156,7 +156,7 @@ Two runners, split by runtime requirement:
 | Runner | File | Scope | Coverage |
 |--------|------|-------|----------|
 | `bun:test` | `test/badge-generator.test.ts` | Pure SVG generation (no Workers APIs) | `src/badge/**` |
-| Vitest + `@cloudflare/vitest-pool-workers` | `test/integration.test.ts` | Full Hono app against real workerd | `src/**` minus `src/badge/**` |
+| Vitest + `@cloudflare/vitest-plugin` | `test/integration.test.ts` | Full Hono app against real workerd | `src/**` minus `src/badge/**` |
 
 - 100% coverage required across all metrics (enforced in `vitest.config.ts`)
 - Integration tests use `createExecutionContext()` / `waitOnExecutionContext()` from `cloudflare:test`

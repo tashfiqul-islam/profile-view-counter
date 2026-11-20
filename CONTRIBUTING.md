@@ -79,7 +79,7 @@ docs: update API reference
 Two test runners, split by runtime:
 
 - **`bun:test`** for pure functions (no Workers runtime dependency)
-- **Vitest + `@cloudflare/vitest-pool-workers`** for integration tests against workerd
+- **Vitest + `@cloudflare/vitest-plugin`** for integration tests against workerd
 
 ```bash
 bun run test:unit         # Badge generator (bun:test)
