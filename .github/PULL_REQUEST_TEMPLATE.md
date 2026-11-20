@@ -1,22 +1,16 @@
-# Description
+## Why
 
-[Brief description of the changes]
+<!-- The problem or goal, in a sentence or two. -->
 
-# Type of Change
+## What changed
 
-- [ ] 🚀 New Feature
-- [ ] 🐛 Bug Fix
-- [ ] 🔧 Refactoring
-- [ ] 📝 Documentation
+<!-- The behaviour a reviewer should check. -->
 
-# Checklist
+## Checklist
 
-- [ ] 🧪 100% Coverage (`bun run test --coverage`)
-- [ ] ✅ Linting Passed (`bun run check`)
-- [ ] 📘 Types Verified (`bun run typecheck`)
-- [ ] 📏 Conventional Commits (`feat:`, `fix:`, etc.)
-- [ ] 📚 Docs Updated (if applicable)
-
-# Related Issues
+- [ ] Title is `type(scope): subject`; it becomes the squash commit that decides the release
+- [ ] `bun run check` is green (types, lint, format, 100 % coverage)
+- [ ] Docs updated where behaviour, routes or contracts changed (`docs/API.md`, `src/README.md`)
+- [ ] New migrations are additive (`migrations/000N_*.sql`), never edits to applied ones
 
 Closes #
