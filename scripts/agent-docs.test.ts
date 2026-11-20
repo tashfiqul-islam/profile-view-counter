@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, spyOn, test } from "bun:test";
+import { describe, expect, spyOn, test } from "bun:test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -54,36 +54,47 @@ describe("checkAgentDocs", () => {
 });
 
 describe("cli", () => {
-  let root = "";
-  afterEach(async () => {
-    await rm(root, { force: true, recursive: true });
-  });
-
-  const repo = async (agents: string, guides: Record<string, string>) => {
-    root = await mkdtemp(join(tmpdir(), "agent-docs-"));
-    await mkdir(join(root, "docs", "agents"), { recursive: true });
-    await writeFile(join(root, "AGENTS.md"), agents);
-    await Promise.all(
-      Object.entries(guides).map(([name, content]) =>
-        writeFile(join(root, "docs", "agents", name), content),
-      ),
-    );
-  };
+  /** Runs `body` against a throwaway repo; removes exactly that directory afterwards. */
+  async function withRepo(
+    agents: string,
+    guides: Record<string, string>,
+    body: (root: string) => Promise<void>,
+  ): Promise<void> {
+    const root = await mkdtemp(join(tmpdir(), "agent-docs-"));
+    try {
+      await mkdir(join(root, "docs", "agents"), { recursive: true });
+      await writeFile(join(root, "AGENTS.md"), agents);
+      await Promise.all(
+        Object.entries(guides).map(([name, content]) =>
+          writeFile(join(root, "docs", "agents", name), content),
+        ),
+      );
+      await body(root);
+    } finally {
+      await rm(root, { force: true, recursive: true });
+    }
+  }
 
   test("returns 0 and reports the guide count when the docs hold", async () => {
-    await repo("[t](docs/agents/testing.md)\n", { "testing.md": "# Testing\n\nRead when: x.\n" });
-    const log = spyOn(console, "log").mockImplementation(() => undefined);
-    expect(await cli(root)).toBe(0);
-    expect(log).toHaveBeenCalledWith("agent docs ok: AGENTS.md + 1 guides");
-    log.mockRestore();
+    await withRepo(
+      "[t](docs/agents/testing.md)\n",
+      { "testing.md": "# Testing\n\nRead when: x.\n" },
+      async (root) => {
+        const log = spyOn(console, "log").mockImplementation(() => undefined);
+        expect(await cli(root)).toBe(0);
+        expect(log).toHaveBeenCalledWith("agent docs ok: AGENTS.md + 1 guides");
+        log.mockRestore();
+      },
+    );
   });
 
   test("returns 1 and prints each violation", async () => {
-    await repo("# Repo\n", { "orphan.md": "no opening\n" });
-    const error = spyOn(console, "error").mockImplementation(() => undefined);
-    expect(await cli(root)).toBe(1);
-    expect(error).toHaveBeenCalledTimes(2);
-    error.mockRestore();
+    await withRepo("# Repo\n", { "orphan.md": "no opening\n" }, async (root) => {
+      const error = spyOn(console, "error").mockImplementation(() => undefined);
+      expect(await cli(root)).toBe(1);
+      expect(error).toHaveBeenCalledTimes(2);
+      error.mockRestore();
+    });
   });
 
   test("passes on this repository", async () => {
