@@ -76,4 +76,4 @@ measure it). No rate limiting (accepted risk in the threat model). `eslint-plugi
 
 Update this file or the guide in the same PR that makes it wrong. This file stays at most 8,192
 bytes and each guide at most 6,144 bytes, every guide is linked above and opens with `Read when:`;
-`scripts/agent-docs.ts` enforces all three in `bun run check`. `CLAUDE.md` only imports this file.
+`scripts/agent-docs.ts` enforces all three in `bun run check`. `CLAUDE.md` is a symlink to this file.

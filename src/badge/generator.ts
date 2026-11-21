@@ -121,6 +121,8 @@ const PAD = 11;
 const ICON = 14;
 const ICON_GAP = 6;
 const MIN_COUNT_SEGMENT = 36;
+/** How far the label/count edge leans over the full height, drawn as `/`. */
+const SLANT = 6;
 
 const LABEL = "PROFILE VISITORS";
 const LABEL_STYLE = { size: 10, tracking: 0.9, weight: 600 } as const satisfies TextStyle;
@@ -313,10 +315,14 @@ export function generateModernBadge(count: number, options: BadgeOptions = {}): 
   ]
     .filter(Boolean)
     .join("\n");
-  // Same colour on both segments: a short divider keeps them apart.
+  // The edge between the segments leans like `/`, centred on labelSegment so the layout holds.
+  const edgeTop = round(labelSegment + SLANT / 2);
+  const edgeBottom = round(labelSegment - SLANT / 2);
+  // Same colour on both segments: a short divider on the same slant keeps them apart.
+  const lean = (SLANT * 7) / HEIGHT;
   const divider =
     palette.label === palette.count
-      ? `\n  <rect x="${labelSegment}" y="7" width="1" height="14" fill="${palette.labelText}" fill-opacity=".25"/>`
+      ? `\n  <path d="M${round(labelSegment - lean)} 21L${round(labelSegment + lean)} 7" stroke="${palette.labelText}" stroke-opacity=".3" stroke-width="1.2" stroke-linecap="round"/>`
       : "";
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${HEIGHT}" viewBox="0 0 ${width} ${HEIGHT}" role="img" aria-label="${title}">
@@ -325,7 +331,7 @@ export function generateModernBadge(count: number, options: BadgeOptions = {}): 
 ${defs}
   </defs>
   <rect width="${width}" height="${HEIGHT}" rx="${RADIUS}" fill="${countFill}"/>
-  <path${labelClass} d="M${RADIUS} 0H${labelSegment}V${HEIGHT}H${RADIUS}A${RADIUS} ${RADIUS} 0 0 1 ${RADIUS} 0Z" fill="${palette.label}"/>
+  <path${labelClass} d="M${RADIUS} 0H${edgeTop}L${edgeBottom} ${HEIGHT}H${RADIUS}A${RADIUS} ${RADIUS} 0 0 1 ${RADIUS} 0Z" fill="${palette.label}"/>
   <rect width="${width}" height="${HEIGHT}" rx="${RADIUS}" fill="url(#pvc-sheen)"/>
   <rect x=".5" y=".5" width="${round(width - 1)}" height="${HEIGHT - 1}" rx="${RADIUS - 0.5}" fill="none"${edgeClass} stroke="${edgeColor}" stroke-opacity="${edgeOpacity}"/>${divider}
   <g font-family="${FONT_STACK}" text-rendering="geometricPrecision">
