@@ -1,39 +1,33 @@
 # API Reference
 
-> Complete API documentation for Profile View Counter.
+The public contract of the Profile View Counter Worker.
 
----
+Base URL: `https://profile-view-counter.tashfiq61.workers.dev`
 
-## Base URL
+## Common headers
 
-```
-https://profile-view-counter.tashfiq61.workers.dev
-```
+Every response carries these headers:
 
----
+| Header                              | Value                                                     | Set by            |
+| ----------------------------------- | --------------------------------------------------------- | ----------------- |
+| `X-Request-Id`                      | UUID per request                                          | `requestId()`     |
+| `Access-Control-Allow-Origin`       | `*`                                                       | `cors()`          |
+| `Cross-Origin-Resource-Policy`      | `cross-origin`                                            | `secureHeaders()` |
+| `Strict-Transport-Security`         | `max-age=63072000; includeSubDomains; preload`            | `secureHeaders()` |
+| `X-Frame-Options`                   | `DENY`                                                    | `secureHeaders()` |
+| `X-Content-Type-Options`            | `nosniff`                                                 | `secureHeaders()` |
+| `Referrer-Policy`                   | `no-referrer`                                             | `secureHeaders()` |
+| `Permissions-Policy`                | `camera=(), fullscreen=(), geolocation=(), microphone=()` | `secureHeaders()` |
+| `Cross-Origin-Opener-Policy`        | `same-origin`                                             | `secureHeaders()` |
+| `Origin-Agent-Cluster`              | `?1`                                                      | `secureHeaders()` |
+| `X-DNS-Prefetch-Control`            | `off`                                                     | `secureHeaders()` |
+| `X-Download-Options`                | `noopen`                                                  | `secureHeaders()` |
+| `X-Permitted-Cross-Domain-Policies` | `none`                                                    | `secureHeaders()` |
+| `X-XSS-Protection`                  | `0`                                                       | `secureHeaders()` |
 
-## Common Headers
+## `GET /`
 
-All responses include these headers (`requestId()` and `secureHeaders()` middleware):
-
-| Header                      | Value                                                     | Description                           |
-| --------------------------- | --------------------------------------------------------- | ------------------------------------- |
-| `X-Request-Id`              | UUID                                                      | Unique request identifier for tracing |
-| `X-Content-Type-Options`    | `nosniff`                                                 | MIME sniffing prevention              |
-| `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload`            | HSTS                                  |
-| `X-Frame-Options`           | `DENY`                                                    | Clickjacking prevention               |
-| `Referrer-Policy`           | `no-referrer`                                             | Referrer leakage prevention           |
-| `Permissions-Policy`        | `camera=(), fullscreen=(), geolocation=(), microphone=()` | Feature restrictions                  |
-
----
-
-## Endpoints
-
-### `GET /`
-
-Returns API information and available endpoints.
-
-**Response**
+API information and the available endpoints.
 
 ```json
 {
@@ -46,98 +40,82 @@ Returns API information and available endpoints.
 }
 ```
 
----
+## `GET /health`
 
-### `GET /health`
-
-Health check endpoint for monitoring.
-
-**Response**
+Health check for monitoring.
 
 ```json
-{
-  "status": "ok",
-  "timestamp": 1736405000000
-}
+{ "status": "ok", "timestamp": 1736405000000 }
 ```
 
----
+## `GET /api/view-counter`
 
-### `GET /api/view-counter`
-
-Counts one view for the user and returns the badge with the new count. Usernames are case-insensitive (`Octocat` and `octocat` share one counter). `HEAD` returns the same headers with an empty body and does not count.
-
-**Query Parameters**
+Counts one view and returns the badge with the new count. Usernames are case-insensitive
+(`Octocat` and `octocat` share one counter). `HEAD` returns the same headers with an empty body
+and counts nothing.
 
 | Parameter     | Type   | Required | Description                                                                     |
 | ------------- | ------ | -------- | ------------------------------------------------------------------------------- |
-| `username`    | string | Yes      | GitHub username (1-39 chars, alphanumeric + hyphens), case-insensitive          |
+| `username`    | string | Yes      | GitHub username (1-39 chars, alphanumeric + hyphens), case-insensitive, once    |
 | `theme`       | string | No       | `graphite` (default), `aurora`, `mono`, `paper`, `contribution` or `adaptive`   |
 | `color`       | string | No       | Count background as 6-digit hex without `#`, e.g. `e11d48`; overrides the theme |
 | `label_color` | string | No       | Label background as 6-digit hex without `#`; overrides the theme                |
 
-Styling parameters never affect the count; text colour on a custom background is chosen by
-contrast. Invalid values return 400, e.g. `{"error": "color must be a 6-digit hex colour like 0969da"}`.
+Styling parameters never affect the count. Text on a custom background is white or dark,
+whichever contrasts more.
 
-**Success Response (200)**
+**200**: `Content-Type: image/svg+xml`, `Cache-Control: max-age=0, no-cache, no-store,
+must-revalidate` (so GitHub's image proxy fetches, and counts, every view) and
+`Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'`.
 
-- **Content-Type**: `image/svg+xml`
-- **Additional Headers**:
-  - `Cache-Control`: `max-age=0, no-cache, no-store, must-revalidate`, so GitHub's image proxy fetches (and counts) every view
-  - `Content-Security-Policy`: `default-src 'none'; style-src 'unsafe-inline'`
+| Status | Body                                  | When                                                          |
+| ------ | ------------------------------------- | ------------------------------------------------------------- |
+| 400    | `{"error": "<the rule that failed>"}` | A missing, repeated or invalid `username`, or invalid styling |
+| 500    | `{"error": "Internal Server Error"}`  | Server failure                                                |
 
-**Examples**
+Validation reports the username first. Messages include `Username is required`,
+`Username must be a single value`, `Username must be 1-39 characters`,
+`theme must be one of: graphite, aurora, mono, paper, contribution, adaptive` and
+`color must be a 6-digit hex colour like 0969da`.
+
+### Examples
+
+```markdown
+[![Profile Views](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam&theme=aurora)](https://github.com/tashfiqul-islam/profile-view-counter)
+```
 
 ```sh
-# Markdown badge
-[![Profile Views](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam)](https://github.com/tashfiqul-islam/profile-view-counter)
-
-# curl
-curl "https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam"
-
-# HTML
-<img src="https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam" alt="Profile Views" />
+curl "https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam&color=e11d48"
 ```
 
-**Error Responses**
-
-| Status | Body                                                          | Description                             |
-| ------ | ------------------------------------------------------------- | --------------------------------------- |
-| 400    | `{"error": "Username is required"}` (or the rule that failed) | Invalid or missing `username` parameter |
-| 500    | `{"error": "Internal Server Error"}`                          | Server failure                          |
-
----
-
-### `GET /favicon.ico`
-
-Returns 204 No Content.
-
----
-
-## Error Handling
-
-All errors return JSON with an `error` field:
-
-```json
-{
-  "error": "Not Found"
-}
+```html
+<img
+  src="https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam"
+  alt="Profile Views"
+/>
 ```
 
-| Status | Message                                                             |
-| ------ | ------------------------------------------------------------------- |
-| 400    | The failed validation rule, e.g. `Username must be 1-39 characters` |
-| 404    | `Not Found`                                                         |
-| 500    | `Internal Server Error`                                             |
+## `GET /favicon.ico`
 
----
+`204 No Content`.
 
-## Rate Limiting
+## Errors
 
-No rate limiting is enforced. Counts are vanity metrics and the badge is unauthenticated, so repeated requests do raise the count; see the threat model in [SECURITY.md](../.github/SECURITY.md).
+Every error is JSON with an `error` field, for example `{ "error": "Not Found" }`:
 
----
+| Status | `error`                            |
+| ------ | ---------------------------------- |
+| 400    | The failed validation rule (above) |
+| 404    | `Not Found`                        |
+| 500    | `Internal Server Error`            |
 
-## CORS
+## Rate limiting
 
-CORS is enabled for all origins (`*`), allowing the badge to be embedded anywhere.
+None. Counts are vanity metrics and the badge is unauthenticated, so repeated requests raise the
+count; see the threat model in [SECURITY.md](../.github/SECURITY.md).
+
+## Embedding
+
+The badge loads anywhere: in GitHub READMEs through GitHub's image proxy (camo), and directly on
+any other site, because responses send `Cross-Origin-Resource-Policy: cross-origin` and
+`Access-Control-Allow-Origin: *`.

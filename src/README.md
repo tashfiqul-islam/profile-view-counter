@@ -7,7 +7,7 @@ The Worker. Everything here runs on workerd and is bundled by wrangler from `ind
 ```text
 GET /api/view-counter?username=X
   │
-  ├─ middleware (index.ts): requestId → cors (GET, HEAD) → secureHeaders
+  ├─ middleware (index.ts): requestId → cors (GET, HEAD) → secureHeaders (CORP cross-origin)
   ├─ vValidator("query", querySchema)          400 { error: <first issue> }; lowercases the username
   ├─ HEAD ──► badge headers, empty body, not counted
   └─ GET
@@ -24,15 +24,15 @@ JSON.
 
 ## Modules
 
-| File                     | Role                                                                         |
-| ------------------------ | ---------------------------------------------------------------------------- |
-| `index.ts`               | Hono app: middleware, `/`, `/health`, `/favicon.ico`, 404 and error handler  |
-| `routes/view-counter.ts` | `GET /api/view-counter`: validate, count, render; `HEAD` without counting    |
-| `schemas/query.ts`       | Valibot schema for `username` (GitHub login rules, 1–39 chars), lowercased   |
-| `services/counter.ts`    | `incrementViewCount()`: D1 `INSERT … ON CONFLICT DO UPDATE … RETURNING`      |
-| `badge/generator.ts`     | Pure SVG rendering: `formatNumber()`, `escapeXml()`, `generateModernBadge()` |
-| `test-setup.ts`          | Vitest setup: applies `migrations/` to each test file's isolated D1          |
-| `test-env.d.ts`          | Types for the test-only `TEST_MIGRATIONS` binding                            |
+| File                     | Role                                                                                                                              |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `index.ts`               | Hono app: middleware, `/`, `/health`, `/favicon.ico`, 404 and error handler                                                       |
+| `routes/view-counter.ts` | `GET /api/view-counter`: validate, count, render; `HEAD` without counting                                                         |
+| `schemas/query.ts`       | Valibot schema: `username` (GitHub-style, lowercased), `theme`, `color`, `label_color`                                            |
+| `services/counter.ts`    | `incrementViewCount()`: D1 `INSERT … ON CONFLICT DO UPDATE … RETURNING`                                                           |
+| `badge/generator.ts`     | Pure SVG: `generateModernBadge()`, `THEMES`, `resolvePalette()`, `readableText()`, `textWidth()`, `formatNumber()`, `escapeXml()` |
+| `test-setup.ts`          | Vitest setup: applies `migrations/` to each test file's isolated D1                                                               |
+| `test-env.d.ts`          | Types for the test-only `TEST_MIGRATIONS` binding                                                                                 |
 
 `badge/generator.ts` and `schemas/query.ts` are pure: no bindings, no I/O. Keep new rendering and
 parsing logic there and test it directly; keep bindings in `services/` and wire them in routes.

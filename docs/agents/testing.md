@@ -11,7 +11,8 @@ or coverage setting.
     test APIs from `vitest`.
   - `scripts/**/*.test.ts` run on `bun test` (`bun run test:scripts`), importing from `bun:test`.
 - Coverage is 100 % and stays there: Vitest enforces statements, branches, functions and lines over
-  all of `src/` (istanbul); Bun enforces lines, functions and statements over `scripts/`. A change
+  all of `src/` (istanbul); Bun enforces lines, functions and statements over `scripts/` only (plural `coverageThreshold`
+  keys; Bun ignores singular ones and measures no branches). A change
   that drops coverage is unfinished: add the test through the module's interface.
 - Tests sit next to their module. `src/index.test.ts` drives the whole app through `app.fetch()`
   with `createExecutionContext()` / `waitOnExecutionContext()`; `fetchApp()`, `viewsOf()` and
@@ -34,4 +35,4 @@ or coverage setting.
 
 - `vitest.config.ts` (`thresholds: { 100: true }`, `include`, `setupFiles`) and `bunfig.toml`
   (`[test] root = "scripts"`, `coverageThreshold`).
-- oxlint's `vitest` plugin (for example no conditional `expect`).
+- oxlint's `vitest` plugin with `vitest/no-conditional-expect`: every `expect` runs on every path.

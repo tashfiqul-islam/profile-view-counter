@@ -6,17 +6,18 @@ Read when: committing, naming a branch or PR, reviewing a diff, or predicting wh
 
 - Branch from `main` as `<type>/<topic>`, for example `feat/badge-themes`.
 - Commit messages are conventional: `type(scope): subject`, types and scopes in
-  `commitlint.config.ts`, header and body lines at most 100 characters. The hk `commit-msg` hook
-  checks them; commits are signed.
-- PRs are **squash-merged** and the squash commit takes the PR title, so the title is the release
-  decision:
+  `commitlint.config.ts`, header and body lines at most 100 characters (config-conventional). The
+  hk `commit-msg` hook checks them; commits are signed.
+- PRs are **squash-merged**; the squash commit takes the PR title as its header and the PR body as
+  its message (repository settings), so the title is the release decision:
 
-  | Title type                                                       | Release |
-  | ---------------------------------------------------------------- | ------- |
-  | `feat`                                                           | minor   |
-  | `fix`, `perf`, `revert`, `security`, `chore(deps)`, `chore(bun)` | patch   |
-  | `!` after the type, or a `BREAKING CHANGE:` footer in the body   | major   |
-  | everything else (`docs`, `ci`, `build`, `test`, `refactor`, …)   | none    |
+  | Title                                                               | Release    |
+  | ------------------------------------------------------------------- | ---------- |
+  | `!` after the type, or a `BREAKING CHANGE:` note in the body        | major      |
+  | `feat`                                                              | minor      |
+  | `fix`, `perf`, `revert`, `security`, `chore(deps)` (runtime deps)   | patch      |
+  | everything else: `docs`, `ci`, `chore(tooling)`, `chore(bun)`, …    | none       |
+  | GitHub's `Revert "…"`: patch only with a `This reverts commit` line | patch/none |
 
   The `release:` label that `pr.yml` sets shows the outcome before merge.
 

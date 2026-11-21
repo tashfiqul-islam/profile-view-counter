@@ -5,13 +5,14 @@ failed run.
 
 ## Rules
 
-- **Pipeline**: `ci.yml` runs **Quality gate** on every PR and push; on `main` it then runs
-  **Deploy** (`production` environment: `wrangler d1 migrations apply DB --remote`, then
-  `wrangler deploy`) and **Release** (semantic-release, tag + GitHub Release, nothing committed to
-  `main`) on the same commit. `pr.yml` checks the title and labels the release; `renovate.yml`
+- **Pipeline**: `ci.yml` runs **Quality gate** on every PR, every push to `main` and manual runs; on
+  `main` it then runs **Deploy** (`production` environment: `bun run db:migrate:prod`, then
+  `bun run deploy`) and **Release** (semantic-release, tag + GitHub Release, nothing committed to
+  `main`) on the same commit. A manual run on `main` redeploys. Runs queue per ref and event, so a
+  manual run never replaces a pending push run. `pr.yml` checks the title and labels the release; `renovate.yml`
   validates `renovate.json` with a pinned Renovate CLI.
-- **One step per tool** in the Quality gate, each speaking GitHub annotations (tsc via
-  `.github/matchers/tsc.json`, `oxlint --format github`, actionlint's template, `zizmor --format
+- **One step per tool** in the Quality gate, each speaking GitHub annotations (tsc on both
+  programs via `.github/matchers/tsc.json`, `oxlint --format github`, actionlint's template, `zizmor --format
   github`), each guarded by `if: ${{ !cancelled() && steps.setup.outcome == 'success' }}`. Keep the
   gate and `bun run check` in step.
 - **Shared setup** is `.github/actions/setup` (mise tools via `tools:`, Bun cache, frozen install),
@@ -23,11 +24,19 @@ failed run.
   move together; so do `wrangler` and the plugin (one miniflare build).
 - **Renovate** automerges non-major updates through PRs once CI is green; majors wait on the
   dependency dashboard; the hk version in `hk.pkl` and the Renovate CLI pin follow via regex
-  managers. `conventional-changelog-conventionalcommits` stays below v9 (v9+ renders empty notes).
+  managers. Runtime dependencies commit as `chore(deps)` (patch release); dev dependencies as
+  `chore(tooling)` and Bun as `chore(bun)` (no release). `conventional-changelog-conventionalcommits`
+  stays below v9: v10 renders empty notes and v9 is unproven.
+- **Security updates younger than 3 days** can fail Renovate's lockfile step, because `bun install`
+  honours `minimumReleaseAge`; the PR then shows an artifact error, so merge it by hand once the
+  release is 3 days old.
+- **Repository settings** (ruleset, squash title and body, `production` environment, secret
+  scanning) are owner-applied; the list is under operating requirements in
+  [`.github/SECURITY.md`](../../.github/SECURITY.md).
 - **Debugging a failed run**: `gh run view <id> --log-failed`, reproduce locally with the same
   command, fix the cause.
 
 ## Enforced by
 
 - `mise run lint-actions` (actionlint + zizmor) in the hk pre-commit hook and the Quality gate.
-- Required checks on `main`: Quality gate, Conventional title, Dependency review.
+- Required checks on `main` (ruleset): Quality gate, Conventional title, Dependency review.

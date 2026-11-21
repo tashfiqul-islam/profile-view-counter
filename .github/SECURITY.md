@@ -17,17 +17,17 @@ a patch release.
 The Worker is a public, unauthenticated endpoint that renders an SVG and increments a counter. It
 stores GitHub usernames (public) and view counts, nothing else.
 
-| Asset or entry point     | Threat                                       | Control                                                                                            |
-| ------------------------ | -------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `username` query         | Injection into SQL or SVG                    | Valibot schema (GitHub-style login rules), `.bind()` parameters, `escapeXml()` on every SVG value  |
-| SVG response             | Script execution where the badge is embedded | `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'`, `nosniff`                |
-| All responses            | Clickjacking, referrer leaks, downgrade      | `secureHeaders()`: `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, HSTS                   |
-| Errors                   | Internal detail disclosure                   | Clients get `{ error }` only; details go to structured logs                                        |
-| Counter                  | Inflation by repeated requests               | Accepted risk: counts are vanity metrics; no auth exists to tie a view to a person                 |
-| `CLOUDFLARE_API_TOKEN`   | Theft via a compromised workflow step        | Lives in the `production` environment; only the **Deploy** job reads it, running wrangler only     |
-| `main` branch            | Unreviewed or untested code reaching prod    | Ruleset: PR, required checks, squash only, no force push; deploy runs on the tested commit         |
-| Dependencies and actions | Supply-chain compromise                      | Frozen lockfile, 3-day minimum release age, SHA-pinned actions, Renovate, dependency review on PRs |
-| Workflows                | Template injection, excessive permissions    | `permissions: {}` by default, zizmor (strictest persona) and actionlint in the gate                |
+| Asset or entry point     | Threat                                       | Control                                                                                                                            |
+| ------------------------ | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Query string             | Injection into SQL or SVG                    | Valibot schema (username, theme picklist, hex colours), `.bind()`, `escapeXml()` on SVG text, colours re-validated by the renderer |
+| SVG response             | Script execution where the badge is embedded | `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'`, `nosniff`                                                |
+| All responses            | Clickjacking, referrer leaks, downgrade      | `secureHeaders()`: `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, HSTS; CORP `cross-origin` on purpose (a public badge)  |
+| Errors                   | Internal detail disclosure                   | Clients get `{ error }` only; details go to structured logs                                                                        |
+| Counter                  | Inflation by repeated requests               | Accepted risk: counts are vanity metrics; no auth exists to tie a view to a person                                                 |
+| `CLOUDFLARE_API_TOKEN`   | Theft via a compromised workflow step        | Lives in the `production` environment; only the **Deploy** job reads it, running wrangler only                                     |
+| `main` branch            | Unreviewed or untested code reaching prod    | Ruleset: PR, required checks, squash only, no force push; deploy runs on the tested commit                                         |
+| Dependencies and actions | Supply-chain compromise                      | Frozen lockfile, 3-day minimum release age, SHA-pinned actions, Renovate, dependency review on PRs                                 |
+| Workflows                | Template injection, excessive permissions    | `permissions: {}` by default, zizmor (strictest persona) and actionlint in the gate                                                |
 
 ## Operating requirements
 
