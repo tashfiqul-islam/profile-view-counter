@@ -7,6 +7,7 @@ Repository tooling that runs on Bun, outside the Worker.
 | [`pr-labels.ts`](pr-labels.ts)         | `pr.yml` → **labels** job        | [`pr-labels.test.ts`](pr-labels.test.ts)         |
 | [`agent-docs.ts`](agent-docs.ts)       | `bun run check`, Quality gate    | [`agent-docs.test.ts`](agent-docs.test.ts)       |
 | [`badge-gallery.ts`](badge-gallery.ts) | `bun run badge:gallery`, by hand | [`badge-gallery.test.ts`](badge-gallery.test.ts) |
+| [`readme-art.ts`](readme-art.ts)       | `bun run readme:art`, by hand    | [`readme-art.test.ts`](readme-art.test.ts)       |
 
 ## `pr-labels.ts`
 
@@ -36,6 +37,14 @@ Renders `assets/badge-themes.svg`, the README theme gallery: every theme plus tw
 examples, each on GitHub's light and dark backgrounds with the query that produces it. A test
 fails when the committed asset drifts from the generator, so run `bun run badge:gallery` after any
 theme or layout change.
+
+## `readme-art.ts`
+
+Renders the README cover and request path diagram as light and dark SVG pairs
+(`assets/cover-*.svg`, `assets/architecture-*.svg`) in the mdxcn figure style: dashed frame,
+corner marks, a `[ TITLE ]` label, monospace text, one accent per mode. The README picks the pair
+with `<picture>`, which follows the viewer's GitHub theme. The cover embeds real badges, and a test
+fails when any committed SVG drifts, so run `bun run readme:art` after a theme or layout change.
 
 ```sh
 bun test scripts/
