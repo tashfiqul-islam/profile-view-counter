@@ -35,9 +35,9 @@ describe("coverSvg", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  test("shows the stat row: pill height, themes, coverage", () => {
+  test("shows the stat row: badge height, themes, coverage", () => {
     const svg = coverSvg("light");
-    for (const value of [">28 px<", ">6<", ">100 %<", ">pill height<", ">test coverage<"]) {
+    for (const value of [">28 px<", ">6<", ">100 %<", ">badge height<", ">test coverage<"]) {
       expect(svg).toContain(value);
     }
   });

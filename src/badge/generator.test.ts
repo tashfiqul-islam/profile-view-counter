@@ -169,7 +169,7 @@ describe("generateModernBadge", () => {
 
 /** Fill colours of the four themed parts, read back from the SVG. */
 const fills = (svg: string) => ({
-  count: /<rect width="[\d.]+" height="28" rx="14" fill="([^"]+)"\/>/.exec(svg)?.[1],
+  count: /<rect width="[\d.]+" height="28" rx="7" fill="([^"]+)"\/>/.exec(svg)?.[1],
   countText: /<text x="[\d.]+" y="[\d.]+" fill="([^"]+)"[^>]*text-anchor="middle"/.exec(svg)?.[1],
   label: /<path(?: class="pvc-label")? d="M[^"]+" fill="([^"]+)"/.exec(svg)?.[1],
   labelText: /<text(?: class="pvc-label-text")? x="31" y="[\d.]+" fill="([^"]+)"/.exec(svg)?.[1],
@@ -211,6 +211,14 @@ describe("themes and custom colours", () => {
       / 21L[\d.]+ 7" stroke="#1f2328"/,
     );
     expect(generateModernBadge(7)).not.toContain(" 21L");
+  });
+
+  it("curves its corners like the GitHub mark", () => {
+    const svg = generateModernBadge(32_700);
+    const mark = Number(/scale\(([\d.]+)\)"/.exec(svg)?.[1]) * 16;
+    const radius = Number(/<rect width="[\d.]+" height="28" rx="([\d.]+)"/.exec(svg)?.[1]);
+    expect(radius).toBe(mark / 2);
+    expect(svg).toContain(`A${radius} ${radius} 0 0 1 0 ${28 - radius}V${radius}`);
   });
 
   it("leans the segment edge and the divider like a slash", () => {

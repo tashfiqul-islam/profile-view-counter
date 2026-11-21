@@ -184,7 +184,7 @@ const COVER_BADGES: readonly { count: number; options: BadgeOptions; name: strin
 
 /** The cover's stat row: value and caption, mdxcn Stat style. */
 const COVER_STATS: readonly [string, string][] = [
-  ["28 px", "pill height"],
+  ["28 px", "badge height"],
   ["6", "themes + any hex"],
   ["100 %", "test coverage"],
 ];
