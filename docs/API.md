@@ -64,8 +64,8 @@ and counts nothing.
 
 Styling parameters never affect the count. Text on a custom background is white or dark,
 whichever contrasts more. `base` changes only what the badge shows: the badge reads stored views
-plus `base`, and the database keeps the real views alone. It matches the `base` parameter of
-komarev's GitHub Profile Views Counter, so switching keeps the same query.
+plus `base`, and the database keeps the real views alone. Use it when switching from another
+GitHub Profile View Counter, so the badge keeps the views counted there.
 
 **200**: `Content-Type: image/svg+xml`, `Cache-Control: max-age=0, no-cache, no-store,
 must-revalidate` (so GitHub's image proxy fetches, and counts, every view) and
