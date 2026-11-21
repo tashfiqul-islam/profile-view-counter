@@ -32,9 +32,9 @@ format.
 - **Safety**: every dynamic value passes through `escapeXml()`.
 - **Look before shipping**: render the changed badge to PNG at several counts (for example
   `0`, `999`, `32.7K`, `1.2M`, `1.5B`) on light `#ffffff` and dark `#0d1117` backgrounds, and in a
-  wide (Verdana) and a serif font, then view the images. Regenerate `assets/badge-32.7k.svg` with
-  `generateModernBadge(32_700)` the gallery with `bun run badge:gallery` and the README art with `bun run readme:art` when the
-  design changes.
+  wide (Verdana) and a serif font, then view the images. When the design changes, regenerate
+  `assets/badge-32.7k.svg` with `generateModernBadge(32_700)`, the gallery with
+  `bun run badge:gallery` and the README art with `bun run readme:art`.
 
 ## Enforced by
 
