@@ -28,7 +28,7 @@ thrown errors return `500 { error: "Internal Server Error" }` and log structured
 | ------------------------ | ---------------------------------------------------------------------------- |
 | `index.ts`               | Hono app: middleware, `/`, `/health`, `/favicon.ico`, 404 and error handler  |
 | `routes/view-counter.ts` | `GET /api/view-counter`: cache check, count, render, cache write             |
-| `schemas/query.ts`       | Valibot schema for the `username` query (GitHub login rules, 1–39 chars)     |
+| `schemas/query.ts`       | Valibot schema for the `username` query (GitHub-style logins, 1–39 chars)    |
 | `services/counter.ts`    | `incrementViewCount()`: D1 `INSERT … ON CONFLICT DO UPDATE … RETURNING`      |
 | `services/cache.ts`      | `getCachedBadge()` / `setCachedBadge()`: KV text get/put with TTL            |
 | `badge/generator.ts`     | Pure SVG rendering: `formatNumber()`, `escapeXml()`, `generateModernBadge()` |

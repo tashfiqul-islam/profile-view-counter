@@ -1,40 +1,34 @@
 # API Reference
 
-> Complete API documentation for Profile View Counter.
+The public contract of the Profile View Counter Worker.
 
----
+Base URL: `https://profile-view-counter.tashfiq61.workers.dev`
 
-## Base URL
+## Common headers
 
-```
-https://profile-view-counter.tashfiq61.workers.dev
-```
+Every response carries these headers:
 
----
+| Header                              | Value                                                     | Set by            |
+| ----------------------------------- | --------------------------------------------------------- | ----------------- |
+| `X-Request-Id`                      | UUID per request                                          | `requestId()`     |
+| `Server-Timing`                     | request timing metrics                                    | `timing()`        |
+| `Access-Control-Allow-Origin`       | `*`                                                       | `cors()`          |
+| `Strict-Transport-Security`         | `max-age=63072000; includeSubDomains; preload`            | `secureHeaders()` |
+| `X-Frame-Options`                   | `DENY`                                                    | `secureHeaders()` |
+| `X-Content-Type-Options`            | `nosniff`                                                 | `secureHeaders()` |
+| `Referrer-Policy`                   | `no-referrer`                                             | `secureHeaders()` |
+| `Permissions-Policy`                | `camera=(), fullscreen=(), geolocation=(), microphone=()` | `secureHeaders()` |
+| `Cross-Origin-Resource-Policy`      | `same-origin`                                             | `secureHeaders()` |
+| `Cross-Origin-Opener-Policy`        | `same-origin`                                             | `secureHeaders()` |
+| `Origin-Agent-Cluster`              | `?1`                                                      | `secureHeaders()` |
+| `X-DNS-Prefetch-Control`            | `off`                                                     | `secureHeaders()` |
+| `X-Download-Options`                | `noopen`                                                  | `secureHeaders()` |
+| `X-Permitted-Cross-Domain-Policies` | `none`                                                    | `secureHeaders()` |
+| `X-XSS-Protection`                  | `0`                                                       | `secureHeaders()` |
 
-## Common Headers
+## `GET /`
 
-All responses include these security and observability headers (via `secureHeaders()` middleware):
-
-| Header                      | Value                                                     | Description                           |
-| --------------------------- | --------------------------------------------------------- | ------------------------------------- |
-| `X-Request-Id`              | UUID                                                      | Unique request identifier for tracing |
-| `X-Content-Type-Options`    | `nosniff`                                                 | MIME sniffing prevention              |
-| `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload`            | HSTS                                  |
-| `X-Frame-Options`           | `DENY`                                                    | Clickjacking prevention               |
-| `Referrer-Policy`           | `no-referrer`                                             | Referrer leakage prevention           |
-| `Permissions-Policy`        | `camera=(), fullscreen=(), geolocation=(), microphone=()` | Feature restrictions                  |
-| `Server-Timing`             | varies                                                    | Request timing metrics                |
-
----
-
-## Endpoints
-
-### `GET /`
-
-Returns API information and available endpoints.
-
-**Response**
+API information and the available endpoints.
 
 ```json
 {
@@ -47,93 +41,66 @@ Returns API information and available endpoints.
 }
 ```
 
----
+## `GET /health`
 
-### `GET /health`
-
-Health check endpoint for monitoring.
-
-**Response**
+Health check for monitoring.
 
 ```json
-{
-  "status": "ok",
-  "timestamp": 1736405000000
-}
+{ "status": "ok", "timestamp": 1736405000000 }
 ```
 
----
+## `GET /api/view-counter`
 
-### `GET /api/view-counter`
-
-Generates an SVG badge and increments the view count for the specified user.
-
-**Query Parameters**
+Returns the badge. On a cache miss it counts one view and renders a fresh SVG; repeat requests for
+the same username within 60 seconds get the cached badge and are not counted.
 
 | Parameter  | Type   | Required | Description                                          |
 | ---------- | ------ | -------- | ---------------------------------------------------- |
 | `username` | string | Yes      | GitHub username (1-39 chars, alphanumeric + hyphens) |
 
-**Success Response (200)**
+**200**: `Content-Type: image/svg+xml` with `Content-Security-Policy: default-src 'none';
+style-src 'unsafe-inline'`, and
 
-- **Content-Type**: `image/svg+xml`
-- **Additional Headers**:
-  - `X-Cache`: `HIT` (served from cache) or `MISS` (freshly generated)
-  - `Cache-Control`: `public, max-age=60` (cache hit) or `no-cache, no-store, must-revalidate` (cache miss)
-  - `Content-Security-Policy`: `default-src 'none'; style-src 'unsafe-inline'`
+- `X-Cache: MISS` with `Cache-Control: no-cache, no-store, must-revalidate`, or
+- `X-Cache: HIT` with `Cache-Control: public, max-age=60`.
 
-**Examples**
-
-```sh
-# Markdown badge
-[![Profile Views](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam)](https://github.com/tashfiqul-islam/profile-view-counter)
-
-# curl
-curl "https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam"
-
-# HTML
-<img src="https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam" alt="Profile Views" />
-```
-
-**Error Responses**
-
-| Status | Body                                                                      | Description                             |
+| Status | Body                                                                      | When                                    |
 | ------ | ------------------------------------------------------------------------- | --------------------------------------- |
 | 400    | Valibot result: `{"success": false, "issues": [{"message": "...", ...}]}` | Invalid or missing `username` parameter |
 | 500    | `{"error": "Internal Server Error"}`                                      | Server failure                          |
 
----
+### Examples
 
-### `GET /favicon.ico`
-
-Returns 204 No Content.
-
----
-
-## Error Handling
-
-404 and 500 errors return JSON with an `error` field:
-
-```json
-{
-  "error": "Not Found"
-}
+```markdown
+[![Profile Views](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam)](https://github.com/tashfiqul-islam/profile-view-counter)
 ```
 
-| Status | Message                                |
-| ------ | -------------------------------------- |
-| 400    | Valibot result with `issues[].message` |
-| 404    | `Not Found`                            |
-| 500    | `Internal Server Error`                |
+```sh
+curl "https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam"
+```
 
----
+```html
+<img
+  src="https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=tashfiqul-islam"
+  alt="Profile Views"
+/>
+```
 
-## Rate Limiting
+## `GET /favicon.ico`
 
-No rate limiting is enforced. The KV cache provides natural protection by serving cached badges for 60 seconds.
+`204 No Content`.
 
----
+## Errors
 
-## CORS
+404 and 500 return JSON with an `error` field, for example `{ "error": "Not Found" }`. A 400 from
+validation currently returns Valibot's result (above).
 
-CORS is enabled for all origins (`*`), allowing the badge to be embedded anywhere.
+## Rate limiting
+
+None. Counts are vanity metrics; see the threat model in [SECURITY.md](../.github/SECURITY.md).
+
+## Embedding
+
+`Access-Control-Allow-Origin: *` allows reading the badge from scripts on any origin. In GitHub
+READMEs the badge loads through GitHub's image proxy (camo). Elsewhere, browsers apply
+`Cross-Origin-Resource-Policy: same-origin` and block a direct cross-origin `<img>`.

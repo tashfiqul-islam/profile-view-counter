@@ -9,13 +9,14 @@ is the package manager and runs `scripts/`.
 
 ## Loop
 
-| Step  | Command                             | Done when                                                              |
-| ----- | ----------------------------------- | ---------------------------------------------------------------------- |
-| Setup | `mise install && mise run setup`    | deps, `worker-configuration.d.ts`, `hk` hooks                          |
-| Gate  | `bun run check`                     | green: types, lint, format, tests                                      |
-| Try   | `bun run db:migrate && bun run dev` | `curl localhost:8787/api/view-counter?username=octocat` returns an SVG |
+| Step  | Command                             | Done when                                                                |
+| ----- | ----------------------------------- | ------------------------------------------------------------------------ |
+| Setup | `mise install && mise run setup`    | deps, `worker-configuration.d.ts`, `hk` hooks                            |
+| Gate  | `bun run check`                     | green: types, lint, format, tests                                        |
+| Try   | `bun run db:migrate && bun run dev` | `curl "localhost:8787/api/view-counter?username=octocat"` returns an SVG |
 
-The **gate** is the definition of done for every change: typecheck → type-aware lint (zero
+The **gate** is the definition of done for every change: typecheck (Worker and tooling as two
+programs) → type-aware lint (zero
 warnings) → format check → Worker tests in workerd at **100 % coverage** (Vitest) → script tests at
 **100 %** (bun test). A change that drops coverage is unfinished; add the test through the
 module's interface. `mise run lint-actions` and `mise run lint-docs` cover workflows and docs.
@@ -52,9 +53,9 @@ test file's isolated database.
 - Derive types from data: `as const satisfies T` for config objects, `readonly` interfaces.
 - Mock at the seam with `vi.spyOn()` on the binding (`env.DB`, `env.CACHE`) or `console`; the
   `afterEach` in `src/index.test.ts` restores them.
-- Document in TSDoc, enforced by oxlint: every export gets a one-line summary, then
-  `@param name - …`, `@returns`, `@throws` where relevant. Types live in TypeScript, never in JSDoc
-  braces.
+- Document in TSDoc: oxlint requires a doc comment on every export and checks tags when present.
+  Write a one-line summary, then `@param name - …`, `@returns`, `@throws` where relevant. Types
+  live in TypeScript, never in JSDoc braces.
 - Disable a lint rule only inline, with a `-- reason`.
 
 ## Gotchas
@@ -68,12 +69,14 @@ test file's isolated database.
   `no such table: view_counts`.
 - **A cache HIT does not count a view** (`src/routes/view-counter.ts`); counts grow at most once
   per 60 s per username.
-- **`conventional-changelog-conventionalcommits` stays on v8.** v9+ templates break the writer
-  bundled with semantic-release (empty release notes). Renovate holds it via `allowedVersions`.
+- **`conventional-changelog-conventionalcommits` stays on v8.** v10 rendered empty release notes
+  with the writer bundled in semantic-release, and v9 is unproven with `presetConfig`. Renovate
+  holds it below v9 via `allowedVersions`.
 - **Never write `[skip ci]` or `[skip actions]` in a commit message or PR body**, not even quoted:
   GitHub then skips every push workflow for the squash commit, including the deploy.
-- **`main` is ruleset-protected.** Changes land only through squash-merged PRs with a passing
-  **CI / Quality gate**; nothing (not even CI) commits to `main` directly.
+- **`main` is protected by a repository ruleset** (an owner-applied setting, listed under
+  operating requirements in [`.github/SECURITY.md`](.github/SECURITY.md)): changes land only
+  through squash-merged PRs with passing required checks; nothing (not even CI) commits to `main`.
 - **`linker = "isolated"`**: an import missing from `package.json` fails immediately.
 - **`bunfig.toml` enforces a 3-day `minimumReleaseAge`**; pick tool and action versions at least
   that old as well.
@@ -87,10 +90,11 @@ test file's isolated database.
 Conventional commits, enforced by commitlint in the `commit-msg` hook: `type(scope): subject`,
 types and scopes in `commitlint.config.ts`.
 
-PRs are **squash-merged**, so the PR title becomes the commit semantic-release reads: give it the
-`type(scope): subject` that should drive the version. `feat` → minor; `fix`, `perf`, `revert`,
-`security`, `chore(deps)`, `chore(bun)` → patch; everything else releases nothing (`scripts/pr-labels.ts`
-labels each PR with its release impact).
+PRs are **squash-merged** with the PR title as the commit header and the PR body as its message
+(repository settings), so the title is what semantic-release reads. `!` or a `BREAKING CHANGE:`
+note → major; `feat` → minor; `fix`, `perf`, `revert`, `security`, `chore(deps)` (runtime
+dependencies) → patch; everything else, including dev-dependency and Bun bumps, releases nothing.
+`scripts/pr-labels.ts` labels each PR with its release impact.
 
 Each push to `main` runs **Quality gate → Deploy → Release** in one workflow on the same commit.
 Release is tag-only: `semantic-release` creates `vX.Y.Z` and a GitHub Release with generated notes.
@@ -98,16 +102,16 @@ There is no version field and no changelog commit; `CHANGELOG.md` is the archive
 
 ## CI
 
-| Workflow       | Trigger                    | Jobs                                                                             |
-| -------------- | -------------------------- | -------------------------------------------------------------------------------- |
-| `ci.yml`       | PR, push to `main`, manual | **Quality gate**, **Dependency review** (PRs), **Deploy** → **Release** (`main`) |
-| `pr.yml`       | PR opened, edited, updated | **Conventional title** (commitlint, required), **Type and release labels**       |
-| `renovate.yml` | `renovate.json` changes    | strict config validation (pinned Renovate CLI)                                   |
+| Workflow       | Trigger                                                                   | Jobs                                                                             |
+| -------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `ci.yml`       | PR, push to `main`, manual                                                | **Quality gate**, **Dependency review** (PRs), **Deploy** → **Release** (`main`) |
+| `pr.yml`       | PR opened, edited, reopened, updated                                      | **Conventional title** (commitlint, required), **Type and release labels**       |
+| `renovate.yml` | changes to `renovate.json`, the workflow, the setup action or `mise.toml` | strict config validation (pinned Renovate CLI)                                   |
 
-- **Secrets stay in one job.** Only **Deploy** sees `CLOUDFLARE_API_TOKEN`, inside the
-  `production` environment; it runs `wrangler d1 migrations apply` and `wrangler deploy`, nothing
-  else. Keep new secret use in that shape.
-- **Required checks on `main`:** Quality gate, Conventional title, Dependency review.
+- **Secrets stay in one job.** Only **Deploy** reads `CLOUDFLARE_API_TOKEN`, which belongs in the
+  `production` environment (an owner-applied setting); it runs `bun run db:migrate:prod` and
+  `bun run deploy`, nothing else. Keep new secret use in that shape.
+- **Required checks on `main`** (ruleset): Quality gate, Conventional title, Dependency review.
 - **PR feedback is native annotations.** The Quality gate runs one step per tool; tsc (via
   `.github/matchers/tsc.json`), oxlint (`--format github`), Vitest, actionlint and zizmor
   (`--format github`) annotate the diff with no bot and no write token.

@@ -19,7 +19,10 @@ const SVG_HEADERS = {
   "X-Content-Type-Options": "nosniff",
 } as const satisfies SvgHeaders;
 
-/** `GET /view-counter`: counts a view and returns the badge (mounted under `/api`). */
+/**
+ * `GET /view-counter` (mounted under `/api`): on a cache miss, counts a view and renders the badge;
+ * repeat requests within 60 s get the cached badge and are not counted.
+ */
 export const viewCounterRoute = new Hono<{ Bindings: Env }>();
 
 viewCounterRoute.get("/view-counter", vValidator("query", querySchema), async (c) => {

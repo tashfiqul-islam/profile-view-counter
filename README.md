@@ -81,7 +81,7 @@ Every visit to a README embedding the badge triggers an edge request. On cache m
 | **Accessible**      | WCAG: `role="img"`, `aria-labelledby`, `<title>`, `<desc>`                                                                                |
 | **Secure**          | `secureHeaders()` (HSTS, CSP, X-Frame-Options) + `nosniff` on SVG                                                                         |
 | **Observable**      | `requestId()` tracing, structured JSON logging, source maps                                                                               |
-| **100% tested**     | Vitest in workerd against real D1 and KV, 100 % coverage enforced                                                                         |
+| **Fully tested**    | Vitest in workerd against real D1 and KV, 100 % coverage enforced                                                                         |
 | **Type-safe**       | TypeScript 7 strict + Valibot schema validation                                                                                           |
 
 ---
@@ -141,7 +141,7 @@ src/
 
 ### Prerequisites
 
-- [mise](https://mise.jdx.dev) (installs Bun and the lint tools from `mise.toml`)
+- [mise](https://mise.jdx.dev) (installs Bun, Node and the lint tools from `mise.toml`)
 - [Cloudflare account](https://dash.cloudflare.com/sign-up) (free tier)
 
 ### Setup

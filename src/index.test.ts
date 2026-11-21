@@ -47,6 +47,7 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
       await waitOnExecutionContext(ctx);
 
       expect(res.status).toBe(204);
+      expect(await res.text()).toBe("");
       expect(res.headers.get("X-Content-Type-Options")).toBe("nosniff");
     });
   });
@@ -284,8 +285,8 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
   });
 
   describe("CORS", () => {
-    it("returns Access-Control-Allow-Origin on API endpoints", async () => {
-      const req = new Request("http://localhost/health");
+    it("returns Access-Control-Allow-Origin on the badge endpoint", async () => {
+      const req = new Request("http://localhost/api/view-counter?username=cors-test");
       const ctx = createExecutionContext();
       const res = await app.fetch(req, testEnv, ctx);
       await waitOnExecutionContext(ctx);
@@ -332,7 +333,7 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
       expect(body).toEqual({ error: expect.any(String) });
     });
 
-    it("SVG response is valid XML", async () => {
+    it("SVG response is a standalone SVG document", async () => {
       const req = new Request("http://localhost/api/view-counter?username=xml-test");
       const ctx = createExecutionContext();
       const res = await app.fetch(req, testEnv, ctx);
