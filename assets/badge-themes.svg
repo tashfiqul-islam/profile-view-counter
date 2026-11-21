@@ -7,7 +7,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#0969da"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-0l)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -24,7 +24,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#0969da"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-0d)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -41,7 +41,7 @@
     </linearGradient>
   </defs>
   <rect width="184.3" height="28" rx="14" fill="#0969da"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="184.3" height="28" rx="14" fill="url(#pvc-sheen-0c7)"/>
   <rect x=".5" y=".5" width="183.3" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -58,7 +58,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#0969da"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-0c32700)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -75,7 +75,7 @@
     </linearGradient>
   </defs>
   <rect width="198.2" height="28" rx="14" fill="#0969da"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="198.2" height="28" rx="14" fill="url(#pvc-sheen-0c1234567)"/>
   <rect x=".5" y=".5" width="197.2" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -96,7 +96,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-accent-1l)"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#0d1117"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#0d1117"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-1l)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -117,7 +117,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-accent-1d)"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#0d1117"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#0d1117"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-1d)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -138,7 +138,7 @@
     </linearGradient>
   </defs>
   <rect width="184.3" height="28" rx="14" fill="url(#pvc-accent-1c7)"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#0d1117"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#0d1117"/>
   <rect width="184.3" height="28" rx="14" fill="url(#pvc-sheen-1c7)"/>
   <rect x=".5" y=".5" width="183.3" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -159,7 +159,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-accent-1c32700)"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#0d1117"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#0d1117"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-1c32700)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -180,7 +180,7 @@
     </linearGradient>
   </defs>
   <rect width="198.2" height="28" rx="14" fill="url(#pvc-accent-1c1234567)"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#0d1117"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#0d1117"/>
   <rect width="198.2" height="28" rx="14" fill="url(#pvc-sheen-1c1234567)"/>
   <rect x=".5" y=".5" width="197.2" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -197,10 +197,10 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#24292f"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#24292f"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#24292f"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-2l)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
-  <rect x="148.3" y="7" width="1" height="14" fill="#ffffff" fill-opacity=".25"/>
+  <path d="M146.8 21L149.8 7" stroke="#ffffff" stroke-opacity=".3" stroke-width="1.2" stroke-linecap="round"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
     <path aria-hidden="true" fill="#ffffff" transform="translate(11 7) scale(0.875)" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
     <text x="31" y="17.5" fill="#ffffff" font-size="10" font-weight="600" textLength="106.3" lengthAdjust="spacing">PROFILE VISITORS</text>
@@ -215,10 +215,10 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#24292f"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#24292f"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#24292f"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-2d)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
-  <rect x="148.3" y="7" width="1" height="14" fill="#ffffff" fill-opacity=".25"/>
+  <path d="M146.8 21L149.8 7" stroke="#ffffff" stroke-opacity=".3" stroke-width="1.2" stroke-linecap="round"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
     <path aria-hidden="true" fill="#ffffff" transform="translate(11 7) scale(0.875)" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
     <text x="31" y="17.5" fill="#ffffff" font-size="10" font-weight="600" textLength="106.3" lengthAdjust="spacing">PROFILE VISITORS</text>
@@ -233,10 +233,10 @@
     </linearGradient>
   </defs>
   <rect width="184.3" height="28" rx="14" fill="#24292f"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#24292f"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#24292f"/>
   <rect width="184.3" height="28" rx="14" fill="url(#pvc-sheen-2c7)"/>
   <rect x=".5" y=".5" width="183.3" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
-  <rect x="148.3" y="7" width="1" height="14" fill="#ffffff" fill-opacity=".25"/>
+  <path d="M146.8 21L149.8 7" stroke="#ffffff" stroke-opacity=".3" stroke-width="1.2" stroke-linecap="round"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
     <path aria-hidden="true" fill="#ffffff" transform="translate(11 7) scale(0.875)" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
     <text x="31" y="17.5" fill="#ffffff" font-size="10" font-weight="600" textLength="106.3" lengthAdjust="spacing">PROFILE VISITORS</text>
@@ -251,10 +251,10 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#24292f"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#24292f"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#24292f"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-2c32700)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
-  <rect x="148.3" y="7" width="1" height="14" fill="#ffffff" fill-opacity=".25"/>
+  <path d="M146.8 21L149.8 7" stroke="#ffffff" stroke-opacity=".3" stroke-width="1.2" stroke-linecap="round"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
     <path aria-hidden="true" fill="#ffffff" transform="translate(11 7) scale(0.875)" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
     <text x="31" y="17.5" fill="#ffffff" font-size="10" font-weight="600" textLength="106.3" lengthAdjust="spacing">PROFILE VISITORS</text>
@@ -269,10 +269,10 @@
     </linearGradient>
   </defs>
   <rect width="198.2" height="28" rx="14" fill="#24292f"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#24292f"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#24292f"/>
   <rect width="198.2" height="28" rx="14" fill="url(#pvc-sheen-2c1234567)"/>
   <rect x=".5" y=".5" width="197.2" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
-  <rect x="148.3" y="7" width="1" height="14" fill="#ffffff" fill-opacity=".25"/>
+  <path d="M146.8 21L149.8 7" stroke="#ffffff" stroke-opacity=".3" stroke-width="1.2" stroke-linecap="round"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
     <path aria-hidden="true" fill="#ffffff" transform="translate(11 7) scale(0.875)" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
     <text x="31" y="17.5" fill="#ffffff" font-size="10" font-weight="600" textLength="106.3" lengthAdjust="spacing">PROFILE VISITORS</text>
@@ -287,7 +287,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#0969da"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#ffffff"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#ffffff"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-3l)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#d0d7de" stroke-opacity="1"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -304,7 +304,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#0969da"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#ffffff"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#ffffff"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-3d)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#d0d7de" stroke-opacity="1"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -321,7 +321,7 @@
     </linearGradient>
   </defs>
   <rect width="184.3" height="28" rx="14" fill="#0969da"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#ffffff"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#ffffff"/>
   <rect width="184.3" height="28" rx="14" fill="url(#pvc-sheen-3c7)"/>
   <rect x=".5" y=".5" width="183.3" height="27" rx="13.5" fill="none" stroke="#d0d7de" stroke-opacity="1"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -338,7 +338,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#0969da"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#ffffff"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#ffffff"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-3c32700)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#d0d7de" stroke-opacity="1"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -355,7 +355,7 @@
     </linearGradient>
   </defs>
   <rect width="198.2" height="28" rx="14" fill="#0969da"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#ffffff"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#ffffff"/>
   <rect width="198.2" height="28" rx="14" fill="url(#pvc-sheen-3c1234567)"/>
   <rect x=".5" y=".5" width="197.2" height="27" rx="13.5" fill="none" stroke="#d0d7de" stroke-opacity="1"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -372,7 +372,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#1a7f37"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-4l)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -389,7 +389,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#1a7f37"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-4d)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -406,7 +406,7 @@
     </linearGradient>
   </defs>
   <rect width="184.3" height="28" rx="14" fill="#1a7f37"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="184.3" height="28" rx="14" fill="url(#pvc-sheen-4c7)"/>
   <rect x=".5" y=".5" width="183.3" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -423,7 +423,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#1a7f37"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-4c32700)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -440,7 +440,7 @@
     </linearGradient>
   </defs>
   <rect width="198.2" height="28" rx="14" fill="#1a7f37"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="198.2" height="28" rx="14" fill="url(#pvc-sheen-4c1234567)"/>
   <rect x=".5" y=".5" width="197.2" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -458,7 +458,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#0969da"/>
-  <path class="pvc-label" d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path class="pvc-label" d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-5l)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" class="pvc-edge" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -476,7 +476,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#0969da"/>
-  <path class="pvc-label" d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path class="pvc-label" d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-5d)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" class="pvc-edge" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -494,7 +494,7 @@
     </linearGradient>
   </defs>
   <rect width="184.3" height="28" rx="14" fill="#0969da"/>
-  <path class="pvc-label" d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path class="pvc-label" d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="184.3" height="28" rx="14" fill="url(#pvc-sheen-5c7)"/>
   <rect x=".5" y=".5" width="183.3" height="27" rx="13.5" fill="none" class="pvc-edge" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -512,7 +512,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#0969da"/>
-  <path class="pvc-label" d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path class="pvc-label" d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-5c32700)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" class="pvc-edge" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -530,7 +530,7 @@
     </linearGradient>
   </defs>
   <rect width="198.2" height="28" rx="14" fill="#0969da"/>
-  <path class="pvc-label" d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path class="pvc-label" d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="198.2" height="28" rx="14" fill="url(#pvc-sheen-5c1234567)"/>
   <rect x=".5" y=".5" width="197.2" height="27" rx="13.5" fill="none" class="pvc-edge" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -547,7 +547,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#e11d48"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#0f172a"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#0f172a"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-6l)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -564,7 +564,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#e11d48"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#0f172a"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#0f172a"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-6d)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -581,7 +581,7 @@
     </linearGradient>
   </defs>
   <rect width="184.3" height="28" rx="14" fill="#e11d48"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#0f172a"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#0f172a"/>
   <rect width="184.3" height="28" rx="14" fill="url(#pvc-sheen-6c7)"/>
   <rect x=".5" y=".5" width="183.3" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -598,7 +598,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#e11d48"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#0f172a"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#0f172a"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-6c32700)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -615,7 +615,7 @@
     </linearGradient>
   </defs>
   <rect width="198.2" height="28" rx="14" fill="#e11d48"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#0f172a"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#0f172a"/>
   <rect width="198.2" height="28" rx="14" fill="url(#pvc-sheen-6c1234567)"/>
   <rect x=".5" y=".5" width="197.2" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -632,7 +632,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#fde047"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-7l)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -649,7 +649,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#fde047"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-7d)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -666,7 +666,7 @@
     </linearGradient>
   </defs>
   <rect width="184.3" height="28" rx="14" fill="#fde047"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="184.3" height="28" rx="14" fill="url(#pvc-sheen-7c7)"/>
   <rect x=".5" y=".5" width="183.3" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -683,7 +683,7 @@
     </linearGradient>
   </defs>
   <rect width="203.9" height="28" rx="14" fill="#fde047"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-7c32700)"/>
   <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
@@ -700,7 +700,7 @@
     </linearGradient>
   </defs>
   <rect width="198.2" height="28" rx="14" fill="#fde047"/>
-  <path d="M14 0H148.3V28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
+  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
   <rect width="198.2" height="28" rx="14" fill="url(#pvc-sheen-7c1234567)"/>
   <rect x=".5" y=".5" width="197.2" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">

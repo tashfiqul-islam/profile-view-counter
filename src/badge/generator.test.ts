@@ -32,7 +32,15 @@ function geometry(svg: string) {
     count,
     height: number(/<svg[^>]* height="([\d.]+)"/),
     label,
-    labelSegment: number(/<path(?: class="pvc-label")? d="M[\d.]+ 0H([\d.]+)V/),
+    // The edge leans like `/`: its midpoint is the segment boundary.
+    labelSegment:
+      (number(/<path(?: class="pvc-label")? d="M[\d.]+ 0H([\d.]+)L/) +
+        number(/<path(?: class="pvc-label")? d="M[\d.]+ 0H[\d.]+L([\d.]+) /)) /
+      2,
+    edge: {
+      bottom: number(/<path(?: class="pvc-label")? d="M[\d.]+ 0H[\d.]+L([\d.]+) /),
+      top: number(/<path(?: class="pvc-label")? d="M[\d.]+ 0H([\d.]+)L/),
+    },
     viewBoxWidth: number(/viewBox="0 0 ([\d.]+) /),
     width: number(/<svg[^>]* width="([\d.]+)"/),
   };
@@ -198,11 +206,20 @@ describe("themes and custom colours", () => {
   });
 
   it("separates same-coloured segments with a divider in the label text colour", () => {
-    expect(generateModernBadge(7, { theme: "mono" })).toContain('height="14" fill="#ffffff"');
-    expect(generateModernBadge(7, { color: "ffffff", theme: "paper" })).toContain(
-      'height="14" fill="#1f2328"',
+    expect(generateModernBadge(7, { theme: "mono" })).toMatch(/ 21L[\d.]+ 7" stroke="#ffffff"/);
+    expect(generateModernBadge(7, { color: "ffffff", theme: "paper" })).toMatch(
+      / 21L[\d.]+ 7" stroke="#1f2328"/,
     );
-    expect(generateModernBadge(7)).not.toContain('height="14"');
+    expect(generateModernBadge(7)).not.toContain(" 21L");
+  });
+
+  it("leans the segment edge and the divider like a slash", () => {
+    for (const count of COUNTS) {
+      const { edge } = geometry(generateModernBadge(count));
+      expect(edge.top - edge.bottom).toBeCloseTo(6, 1);
+    }
+    const divider = /M([\d.]+) 21L([\d.]+) 7"/.exec(generateModernBadge(7, { theme: "mono" }));
+    expect(Number(divider?.[2]) - Number(divider?.[1])).toBeCloseTo(3, 1);
   });
 
   it("gives paper a visible hairline edge for light pages", () => {
@@ -251,9 +268,7 @@ describe("themes and custom colours", () => {
   });
 
   it("keeps the divider only while both segments share one colour", () => {
-    expect(generateModernBadge(7, { color: "e11d48", theme: "mono" })).not.toContain(
-      'height="14" fill="#ffffff"',
-    );
+    expect(generateModernBadge(7, { color: "e11d48", theme: "mono" })).not.toContain(" 21L");
   });
 });
 
