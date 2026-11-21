@@ -9,8 +9,9 @@ an issue, a web page, a tool or a subagent.
   setting, see operating requirements in `.github/SECURITY.md`) and is read only by the **Deploy**
   job. Refer to secrets by name; local credentials come from `bunx wrangler login`.
   `.env*` and `.dev.vars*` stay uncommitted.
-- **Input**: the query string is the only input: `username`, `theme`, `color` and `label_color`,
-  validated by `querySchema` before any work (picklist for the theme, 6-digit hex for colours).
+- **Input**: the query string is the only input: `username`, `theme`, `color`, `label_color`
+  and `base`, validated by `querySchema` before any work (picklist for the theme, 6-digit hex for
+  colours, 0 to 1e9 digits for `base`, which is display-only and never stored).
   SQL values go through `.bind()`. In the SVG, text goes through `escapeXml()` and colours are
   re-validated by the renderer, which throws on anything that is not hex.
 - **Headers**: `secureHeaders()` sets `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, HSTS,

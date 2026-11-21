@@ -2,6 +2,10 @@ import { safeParse } from "valibot";
 import { describe, expect, it } from "vitest";
 import { querySchema } from "./query";
 
+/** Parses a query with username `a` and, when given, `base`. */
+const parse = (base?: string) =>
+  safeParse(querySchema, base === undefined ? { username: "a" } : { base, username: "a" });
+
 describe("querySchema", () => {
   it("accepts valid GitHub usernames", () => {
     expect(safeParse(querySchema, { username: "tashfiq61" }).success).toBe(true);
@@ -34,6 +38,18 @@ describe("querySchema", () => {
   it("rejects username ending with dash", () => {
     const result = safeParse(querySchema, { username: "invalid-" });
     expect(result.success).toBe(false);
+  });
+
+  it("parses base as a number from 0 to a billion, and leaves it out when absent", () => {
+    expect(parse("0").output).toMatchObject({ base: 0 });
+    expect(parse("3000").output).toMatchObject({ base: 3000 });
+    expect(parse("1000000000").output).toMatchObject({ base: 1_000_000_000 });
+    expect(parse().output).not.toHaveProperty("base");
+    for (const bad of ["-1", "1.5", " 1", "1e3", "0x10", "1000000001", "12345678901"]) {
+      expect(parse(bad).issues?.[0]?.message).toBe(
+        "base must be a whole number from 0 to 1000000000",
+      );
+    }
   });
 
   it("rejects username with special characters", () => {

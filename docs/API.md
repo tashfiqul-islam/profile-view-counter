@@ -60,23 +60,27 @@ and counts nothing.
 | `theme`       | string | No       | `graphite` (default), `aurora`, `mono`, `paper`, `contribution` or `adaptive`   |
 | `color`       | string | No       | Count background as 6-digit hex without `#`, e.g. `e11d48`; overrides the theme |
 | `label_color` | string | No       | Label background as 6-digit hex without `#`; overrides the theme                |
+| `base`        | number | No       | Views carried over from another counter, 0 to 1000000000; added to the badge    |
 
 Styling parameters never affect the count. Text on a custom background is white or dark,
-whichever contrasts more.
+whichever contrasts more. `base` changes only what the badge shows: the badge reads stored views
+plus `base`, and the database keeps the real views alone. It matches the `base` parameter of
+komarev's GitHub Profile Views Counter, so switching keeps the same query.
 
 **200**: `Content-Type: image/svg+xml`, `Cache-Control: max-age=0, no-cache, no-store,
 must-revalidate` (so GitHub's image proxy fetches, and counts, every view) and
 `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'`.
 
-| Status | Body                                  | When                                                          |
-| ------ | ------------------------------------- | ------------------------------------------------------------- |
-| 400    | `{"error": "<the rule that failed>"}` | A missing, repeated or invalid `username`, or invalid styling |
-| 500    | `{"error": "Internal Server Error"}`  | Server failure                                                |
+| Status | Body                                  | When                                                         |
+| ------ | ------------------------------------- | ------------------------------------------------------------ |
+| 400    | `{"error": "<the rule that failed>"}` | A missing, repeated or invalid `username`, styling or `base` |
+| 500    | `{"error": "Internal Server Error"}`  | Server failure                                               |
 
 Validation reports the username first. Messages include `Username is required`,
 `Username must be a single value`, `Username must be 1-39 characters`,
 `theme must be one of: graphite, aurora, mono, paper, contribution, adaptive` and
-`color must be a 6-digit hex colour like 0969da`.
+`color must be a 6-digit hex colour like 0969da` and
+`base must be a whole number from 0 to 1000000000`.
 
 ### Examples
 
