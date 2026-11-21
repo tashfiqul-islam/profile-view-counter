@@ -138,8 +138,8 @@ number instead of zero:
 ```
 
 `base` is added to what the badge shows (0 to 1,000,000,000); new views count on top, and the
-stored count stays your real views here. Coming from another GitHub profile view counter that
-already uses `base`? Change the domain and keep the rest.
+stored count stays your real views here. Coming from another GitHub Profile View Counter?
+Put its current count in `base` and swap your old badge for this one.
 
 ## Themes and colours
 
