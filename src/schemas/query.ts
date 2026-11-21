@@ -11,6 +11,7 @@ import {
 
 const GITHUB_USERNAME_REGEX = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$/;
 
+/** Query string of `GET /api/view-counter`: a GitHub username. */
 export const querySchema = object({
   username: pipe(
     string("Username must be a string"),
@@ -18,10 +19,11 @@ export const querySchema = object({
     maxLength(39, "Username must be 1-39 characters"),
     regex(
       GITHUB_USERNAME_REGEX,
-      "Username must be alphanumeric with hyphens, starting and ending with a letter or number"
+      "Username must be alphanumeric with hyphens, starting and ending with a letter or number",
     ),
-    description("GitHub username (1-39 alphanumeric chars, hyphens allowed)")
+    description("GitHub username (1-39 alphanumeric chars, hyphens allowed)"),
   ),
 });
 
+/** Validated query parameters of `GET /api/view-counter`. */
 export type QueryParams = InferOutput<typeof querySchema>;

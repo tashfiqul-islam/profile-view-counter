@@ -11,3 +11,4 @@
 *.ico binary
 *.woff binary
 *.woff2 binary
+bun.lock linguist-generated=true

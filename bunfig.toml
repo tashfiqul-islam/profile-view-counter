@@ -1,54 +1,16 @@
-# Bun Configuration File
-# https://bun.sh/docs/runtime/bunfig
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# Runtime Configuration
-# ═══════════════════════════════════════════════════════════════════════════════
-
-logLevel = "warn"
 telemetry = false
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# Test Configuration
-# ═══════════════════════════════════════════════════════════════════════════════
-
-[test]
-
-# Reduced memory for CI
-smol = true
-
-# V8 coverage (built-in, no istanbul)
-# Note: coverageThreshold omitted — broken in Bun 1.3.14 (exit code 1 even when met)
-# 100% coverage enforced via vitest.config.ts thresholds for integration tests
-coverage = true
-coverageSkipTestFiles = true
-coverageReporter = ["text", "lcov"]
-coverageDir = "coverage"
-coveragePathIgnorePatterns = ["**/*.config.*"]
-
-# Execution
-randomize = true
-seed = 42
-retry = 1
-
-# Bun 1.3+ reporters
-[test.reporter]
-junit = "test-results.xml"
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# Package Manager Configuration
-# ═══════════════════════════════════════════════════════════════════════════════
 
 [install]
 exact = true
-saveTextLockfile = true
-linker = "isolated"
-auto = "fallback"
-globalStore = true
+linker = "isolated" # phantom deps fail loudly
+minimumReleaseAge = 259200 # 3 days: supply-chain buffer
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# Run Configuration
-# ═══════════════════════════════════════════════════════════════════════════════
-
-[run]
-shell = "bun"
+# Only scripts/ runs on bun test; the Worker's tests run on Vitest in workerd (vitest.config.ts).
+[test]
+root = "scripts"
+randomize = true
+coverage = true
+coverageSkipTestFiles = true
+# Plural keys: Bun silently ignores singular ones. Bun measures no branches.
+coverageThreshold = { lines = 1.0, functions = 1.0, statements = 1.0 }
+coverageReporter = ["text"]

@@ -1,28 +1,48 @@
-import type { UserConfig } from "@commitlint/types";
+import { RuleConfigSeverity, type UserConfig } from "@commitlint/types";
 
-const Configuration: UserConfig = {
+const ERROR = RuleConfigSeverity.Error;
+
+// Checks PR titles in CI (squash title = commit semantic-release reads) and local commit messages.
+export default {
   extends: ["@commitlint/config-conventional"],
   rules: {
     "type-enum": [
-      2,
+      ERROR,
       "always",
       [
         "feat",
         "fix",
+        "perf",
+        "refactor",
+        "test",
         "docs",
         "style",
-        "refactor",
-        "perf",
-        "test",
         "build",
         "ci",
         "chore",
         "revert",
-        "types",
         "security",
       ],
     ],
+    "scope-enum": [
+      ERROR,
+      "always",
+      [
+        "api",
+        "badge",
+        "counter",
+        "db",
+        "deps",
+        "actions",
+        "bun",
+        "ci",
+        "config",
+        "docs",
+        "release",
+        "renovate",
+        "test",
+        "tooling",
+      ],
+    ],
   },
-};
-
-export default Configuration;
+} satisfies UserConfig;

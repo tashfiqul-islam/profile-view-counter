@@ -1,0 +1,123 @@
+name: PR
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+# Concurrency is per job (below). A newer event for the same PR replaces a running title check;
+# the replacement re-checks the same head commit, so the required check always ends with a result.
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # The squash commit takes the PR title, so the title is what semantic-release reads.
+  # Required checks are recorded per commit and never carried forward, so every push needs a fresh
+  # result here or the PR blocks on "Expected". No job-level `if`: a skipped run counts as passing
+  # and the latest run wins, so a body-only edit would turn a failed title green.
+  # Kept lean: only the files commitlint and the install need are checked out.
+  title:
+    name: Conventional title
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    concurrency:
+      group: pr-title-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    permissions:
+      contents: read # check out the commitlint config
+    steps:
+      - name: Check out commitlint config and lockfile
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            /commitlint.config.ts
+            /package.json
+            /bun.lock
+            /bunfig.toml
+            /mise.toml
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Bun, Node and dependencies
+        uses: $/.github/actions/setup
+        with:
+          tools: bun node
+
+      - name: Lint the title with commitlint (same rules as the commit-msg hook)
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: printf '%s\n' "$TITLE" | bunx commitlint --verbose
+
+  # Labels depend only on the title and body, so pushes never relabel. Runs after a title check that
+  # did not fail. Fork PRs get a read-only token, so they are not labelled.
+  labels:
+    name: Type and release labels
+    needs: title
+    if: >-
+      ${{ !cancelled() && needs.title.result != 'failure' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      (github.event.action == 'opened' || github.event.action == 'reopened' ||
+      (github.event.action == 'edited' &&
+      (github.event.changes.title != null || github.event.changes.body != null))) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    concurrency:
+      group: pr-labels-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    permissions:
+      contents: read # check out the label script and release rules
+      pull-requests: write # set labels on this PR
+    steps:
+      - name: Check out label script and release rules
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            /scripts/pr-labels.ts
+            /.releaserc.json
+            /mise.toml
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Bun (no dependencies needed)
+        uses: $/.github/actions/setup
+        with:
+          install: none
+
+      - name: Work out labels from the title and .releaserc.json
+        id: labels
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: bun scripts/pr-labels.ts >> "$GITHUB_OUTPUT"
+
+      - name: Apply labels, replacing stale ones
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          TYPE: ${{ steps.labels.outputs.type }}
+          RELEASE: ${{ steps.labels.outputs.release }}
+        run: |
+          declare -A colors=([major]=b60205 [minor]=bf4520 [patch]=2e5aa8 [none]=bfc0c0)
+          type_label="type: $TYPE"
+          release_label="release: $RELEASE"
+
+          gh label create "$type_label" --color 2d3142 \
+            --description "Conventional commit type: $TYPE" --force >/dev/null
+          gh label create "$release_label" --color "${colors[$RELEASE]}" \
+            --description "Merging releases: $RELEASE" --force >/dev/null
+
+          # Read first so a failed lookup fails the step instead of silently keeping stale labels.
+          current=$(gh pr view "$PR" --json labels \
+            --jq '.labels[].name | select(startswith("type: ") or startswith("release: "))')
+          remove=()
+          while IFS= read -r label; do
+            [[ -z "$label" || "$label" == "$type_label" || "$label" == "$release_label" ]] ||
+              remove+=(--remove-label "$label")
+          done <<< "$current"
+
+          gh pr edit "$PR" --add-label "$type_label" --add-label "$release_label" "${remove[@]}"
+          echo "Labelled #$PR: \`$type_label\`, \`$release_label\`" >> "$GITHUB_STEP_SUMMARY"

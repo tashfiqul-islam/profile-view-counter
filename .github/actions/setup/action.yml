@@ -1,0 +1,44 @@
+name: Set up toolchain
+description: >-
+  Install tools pinned in mise.toml and, optionally, Bun dependencies from the frozen lockfile with
+  a shared package cache. Expects the repository (or the files the job needs) checked out. Load it
+  with `uses: $/.github/actions/setup`.
+
+inputs:
+  tools:
+    description: Space-separated mise tools to install, e.g. "bun node".
+    required: false
+    default: bun
+  install:
+    description: "Dependencies to install: 'all' or 'none'."
+    required: false
+    default: all
+
+runs:
+  using: composite
+  steps:
+    - name: Check inputs
+      shell: bash
+      env:
+        INSTALL: ${{ inputs.install }}
+      run: |
+        [[ "$INSTALL" == all || "$INSTALL" == none ]] ||
+          { echo "::error title=setup::install must be 'all' or 'none', got '$INSTALL'"; exit 1; }
+
+    - name: Install toolchain (${{ inputs.tools }} via mise)
+      uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
+      with:
+        install_args: ${{ inputs.tools }}
+
+    - name: Restore Bun package cache
+      if: inputs.install != 'none'
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.bun/install/cache
+        key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+        restore-keys: bun-${{ runner.os }}-
+
+    - name: Install dependencies (frozen lockfile)
+      if: inputs.install != 'none'
+      shell: bash
+      run: bun install --frozen-lockfile

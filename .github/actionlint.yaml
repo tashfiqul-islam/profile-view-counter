@@ -1,0 +1,7 @@
+# actionlint configuration (read automatically by `actionlint`).
+paths:
+  .github/workflows/**/*.{yml,yaml}:
+    ignore:
+      # GitHub's self-repository syntax (`uses: $/...`, July 2026) is newer than actionlint 1.7.12.
+      # Remove once https://github.com/rhysd/actionlint/issues/711 ships.
+      - 'specifying action "\$/[^"]+" in invalid format'

@@ -1,0 +1,23 @@
+# Single source of truth for tool versions: local dev, CI (jdx/mise-action) and Renovate.
+[tools]
+bun = "1.4.4"
+node = "26.13.1" # semantic-release and the Renovate validator run on Node
+hk = "2.13.0"
+pkl = "0.33.0"
+actionlint = "1.7.12" # workflow syntax, expressions, shellcheck of run: blocks
+zizmor = "1.32.0" # workflow security audit
+shellcheck = "0.11.0" # used by actionlint on every `run:` block
+lychee = "0.24.2" # Markdown link and anchor check
+
+[tasks.setup]
+description = "Install deps and git hooks"
+run = ["bun install --frozen-lockfile", "bun run cf-typegen", "hk install --mise"]
+
+[tasks.lint-actions]
+description = "Lint and audit GitHub Actions workflows and the composite action"
+run = ["actionlint", "zizmor --offline --persona auditor .github"]
+
+[tasks.lint-docs]
+shell = "bash -c"
+description = "Check every relative link and #anchor in tracked Markdown (offline, deterministic)"
+run = "git ls-files -z '*.md' ':!:CHANGELOG.md' | xargs -0 lychee --offline --include-fragments --no-progress"
