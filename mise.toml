@@ -19,5 +19,5 @@ run = ["actionlint", "zizmor --offline --persona auditor .github"]
 
 [tasks.lint-docs]
 shell = "bash -c"
-description = "Check every relative link and #anchor in the Markdown docs (offline, deterministic)"
-run = "lychee --offline --include-fragments --no-progress README.md AGENTS.md docs/*.md src/README.md scripts/README.md '.github/**/*.md'"
+description = "Check every relative link and #anchor in tracked Markdown (offline, deterministic)"
+run = "git ls-files -z '*.md' ':!:CHANGELOG.md' | xargs -0 lychee --offline --include-fragments --no-progress"

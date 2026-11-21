@@ -44,7 +44,5 @@ export default {
         "tooling",
       ],
     ],
-    "header-max-length": [ERROR, "always", 100],
-    "body-max-line-length": [ERROR, "always", 100],
   },
 } satisfies UserConfig;

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { cli, labelsFor, RELEASE_RULES } from "./pr-labels";
+import { cli, labelsFor, RELEASE_RULES, releaseRulesFrom } from "./pr-labels";
 
 describe("labelsFor (against the real .releaserc.json rules)", () => {
   test.each([
@@ -8,9 +8,10 @@ describe("labelsFor (against the real .releaserc.json rules)", () => {
     ["perf(badge): faster render", "perf", "patch"],
     ["security: rotate key handling", "security", "patch"],
     ["revert: undo the thing", "revert", "patch"],
-    ["chore(deps): update zod", "chore", "patch"],
-    ["chore(bun): update bun", "chore", "patch"],
+    ["chore(deps): update hono", "chore", "patch"],
+    ["chore(bun): update bun", "chore", "none"],
     ["chore(tooling): bump hk", "chore", "none"],
+    ["chore(actions): update checkout", "chore", "none"],
     ["docs: rewrite readme", "docs", "none"],
     ["ci(actions): tweak workflow", "ci", "none"],
     ["refactor: tidy", "refactor", "none"],
@@ -25,10 +26,31 @@ describe("labelsFor (against the real .releaserc.json rules)", () => {
     });
   });
 
-  test("a BREAKING CHANGE footer in the body is a major release", () => {
-    expect(labelsFor("fix: rename env var", "Details.\n\nBREAKING CHANGE: renamed X")).toEqual({
+  test.each([
+    "Details.\n\nBREAKING CHANGE: renamed X",
+    "BREAKING-CHANGE: renamed X",
+    "BREAKING CHANGE renamed X",
+    "* BREAKING CHANGE: renamed X",
+    "breaking change: renamed X",
+  ])("a breaking-change note in the body is a major release: %p", (body) => {
+    expect(labelsFor("fix: rename env var", body)).toEqual({ type: "fix", release: "major" });
+  });
+
+  test("mentioning breaking changes in prose is not a note", () => {
+    expect(labelsFor("fix: x", "No BREAKING CHANGE here.")).toEqual({
       type: "fix",
-      release: "major",
+      release: "patch",
+    });
+  });
+
+  test("a GitHub revert PR releases a patch only with the parser's revert line", () => {
+    expect(labelsFor('Revert "feat: x"', "This reverts commit abc1234.")).toEqual({
+      type: "revert",
+      release: "patch",
+    });
+    expect(labelsFor('Revert "feat: x"', "Reverts owner/repo#55")).toEqual({
+      type: "revert",
+      release: "none",
     });
   });
 
@@ -93,6 +115,31 @@ describe("labelsFor (commit-analyzer semantics)", () => {
 
   test("a custom `false` match does not fall back to the defaults", () => {
     expect(release("feat: x", [{ type: "feat", release: false }])).toBe("none");
+  });
+});
+
+/** A semantic-release config whose commit-analyzer has the given rules. */
+const analyzer = (releaseRules: unknown) => ({
+  plugins: ["@semantic-release/github", ["@semantic-release/commit-analyzer", { releaseRules }]],
+});
+
+describe("releaseRulesFrom", () => {
+  test("keeps rules in order and skips entries without a release", () => {
+    expect(
+      releaseRulesFrom(analyzer([{ type: "fix", release: "patch" }, { note: 1 }, null])),
+    ).toEqual([{ type: "fix", release: "patch" }]);
+  });
+
+  test("is empty without the analyzer plugin or its rules", () => {
+    expect(releaseRulesFrom({ plugins: ["@semantic-release/github"] })).toEqual([]);
+    expect(releaseRulesFrom({ plugins: [["@semantic-release/commit-analyzer"]] })).toEqual([]);
+    expect(releaseRulesFrom(analyzer("not a list"))).toEqual([]);
+  });
+
+  test("throws on a release commit-analyzer does not know", () => {
+    expect(() => releaseRulesFrom(analyzer([{ type: "fix", release: "Patch" }]))).toThrow(
+      'Unknown release "Patch" in .releaserc.json',
+    );
   });
 });
 

@@ -1,7 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/semantic-release.json",
   "branches": ["main"],
-  "tagFormat": "v${version}",
   "plugins": [
     [
       "@semantic-release/commit-analyzer",
@@ -14,8 +13,7 @@
           { "type": "perf", "release": "patch" },
           { "type": "revert", "release": "patch" },
           { "type": "security", "release": "patch" },
-          { "type": "chore", "scope": "deps", "release": "patch" },
-          { "type": "chore", "scope": "bun", "release": "patch" }
+          { "type": "chore", "scope": "deps", "release": "patch" }
         ]
       }
     ],
@@ -31,7 +29,6 @@
             { "type": "security", "section": "Security" },
             { "type": "revert", "section": "Reverts" },
             { "type": "chore", "scope": "deps", "section": "Dependencies" },
-            { "type": "chore", "scope": "bun", "section": "Dependencies" },
             { "type": "refactor", "hidden": true },
             { "type": "docs", "hidden": true },
             { "type": "test", "hidden": true },

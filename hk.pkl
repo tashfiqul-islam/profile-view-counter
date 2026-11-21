@@ -4,21 +4,21 @@ local typescript = List("*.ts")
 
 local oxfmt = new Step {
   glob = List("*.{ts,json,jsonc,md,yml,yaml,toml}")
-  exclude = List("CHANGELOG.md", "bun.lock", "worker-configuration.d.ts")
+  exclude = List("CHANGELOG.md", "bun.lock")
   check = "bunx oxfmt --check {{files}}"
   fix = "bunx oxfmt {{files}}"
 }
 
 local oxlint = new Step {
   glob = typescript
-  exclude = List("worker-configuration.d.ts")
   check = "bunx oxlint --deny-warnings {{files}}"
   fix = "bunx oxlint --fix {{files}}"
 }
 
 local typecheck = new Step {
-  glob = typescript
-  check = "bunx tsc"
+  // tsconfig and package changes can break types without touching a .ts file.
+  glob = List("*.ts", "tsconfig*.json", "scripts/tsconfig.json", "package.json")
+  check = "bun run typecheck"
 }
 
 local actionlint = new Step {

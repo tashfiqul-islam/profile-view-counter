@@ -4,7 +4,6 @@ telemetry = false
 exact = true
 linker = "isolated" # phantom deps fail loudly
 minimumReleaseAge = 259200 # 3 days: supply-chain buffer
-minimumReleaseAgeExcludes = ["@types/bun", "typescript"]
 
 # Only scripts/ runs on bun test; the Worker's tests run on Vitest in workerd (vitest.config.ts).
 [test]
@@ -12,5 +11,6 @@ root = "scripts"
 randomize = true
 coverage = true
 coverageSkipTestFiles = true
-coverageThreshold = { line = 1.0, function = 1.0, statement = 1.0 }
+# Plural keys: Bun silently ignores singular ones. Bun measures no branches.
+coverageThreshold = { lines = 1.0, functions = 1.0, statements = 1.0 }
 coverageReporter = ["text"]

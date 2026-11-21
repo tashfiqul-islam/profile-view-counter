@@ -2,10 +2,10 @@ name: Renovate config
 
 on:
   pull_request:
-    paths: [renovate.json, .github/workflows/renovate.yml]
+    paths: [renovate.json, .github/workflows/renovate.yml, .github/actions/setup/**, mise.toml]
   push:
     branches: [main]
-    paths: [renovate.json, .github/workflows/renovate.yml]
+    paths: [renovate.json, .github/workflows/renovate.yml, .github/actions/setup/**, mise.toml]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -36,5 +36,6 @@ jobs:
           tools: bun node
           install: none
 
+      # The pin covers the Renovate CLI only (no lockfile for its dependencies); Renovate bumps it.
       - name: Validate config (strict)
         run: bunx --package renovate@44.251.0 renovate-config-validator --strict

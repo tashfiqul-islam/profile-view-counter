@@ -17,6 +17,14 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Check inputs
+      shell: bash
+      env:
+        INSTALL: ${{ inputs.install }}
+      run: |
+        [[ "$INSTALL" == all || "$INSTALL" == none ]] ||
+          { echo "::error title=setup::install must be 'all' or 'none', got '$INSTALL'"; exit 1; }
+
     - name: Install toolchain (${{ inputs.tools }} via mise)
       uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
       with:

@@ -1,39 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
+  // The Worker and its tests: workerd bindings from `wrangler types` plus the Vitest plugin types.
+  // No Bun or Node globals here, so runtime-only APIs cannot slip into src/.
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    // TypeScript 7 (native tsgo) type-checks only; wrangler bundles src/ and Bun runs scripts/.
-    "noEmit": true,
-    "incremental": true,
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo",
-
-    // Runtimes: workerd for src/ (types from `wrangler types`), Bun for scripts/, Vitest for tests.
-    "target": "ESNext",
-    "lib": ["ESNext"],
-    "types": ["@types/bun", "@cloudflare/vitest-plugin/types"],
-
-    // Modules: bundler-style resolution, imports kept verbatim, only erasable TS syntax.
-    "module": "Preserve",
-    "moduleResolution": "bundler",
-    "moduleDetection": "force",
-    "resolveJsonModule": true,
-    "verbatimModuleSyntax": true,
-    "erasableSyntaxOnly": true,
-    "noUncheckedSideEffectImports": true,
-
-    // Strictness: everything on.
-    "strict": true,
-    "exactOptionalPropertyTypes": true,
-    "noUncheckedIndexedAccess": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-
-    "skipLibCheck": true
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo-worker",
+    "types": ["@cloudflare/vitest-plugin/types"]
   },
-  "include": ["src/**/*.ts", "scripts/**/*.ts", "*.config.ts", "worker-configuration.d.ts"]
+  "include": ["src/**/*.ts", "worker-configuration.d.ts"]
 }
