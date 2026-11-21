@@ -56,16 +56,26 @@ const PAD = 24;
 const HALF = 330;
 const ROW = 130;
 
-const widthOf = (svg: string): number => Number(/width="([\d.]+)"/.exec(svg)?.[1]);
+/** Width attribute of an SVG document. */
+export const widthOf = (svg: string): number => Number(/width="([\d.]+)"/.exec(svg)?.[1]);
 
-/** Places a badge inside the sheet, renaming its ids so badges cannot share gradients. */
-function place(svg: string, x: number, y: number, id: string): string {
+/**
+ * Places a badge inside a larger SVG, renaming its ids so nested badges cannot share gradients.
+ *
+ * @param svg - A badge from `generateModernBadge()`.
+ * @param x - Left edge in the host SVG.
+ * @param y - Top edge in the host SVG.
+ * @param id - Suffix that makes this copy's ids unique.
+ * @param scale - Size multiplier; 1 keeps the badge at 28 px.
+ * @returns A nested `<svg>` element.
+ */
+export function place(svg: string, x: number, y: number, id: string, scale = 1): string {
   const own = svg
     .replaceAll("pvc-sheen", `pvc-sheen-${id}`)
     .replaceAll("pvc-accent", `pvc-accent-${id}`);
   const open = own.slice(0, own.indexOf(">"));
   const body = own.slice(own.indexOf(">") + 1, own.lastIndexOf("</svg>"));
-  return `<svg x="${x}" y="${y}" width="${widthOf(own)}" height="28" ${open.slice(open.indexOf("viewBox"))}>${body}</svg>`;
+  return `<svg x="${x}" y="${y}" width="${widthOf(own) * scale}" height="${28 * scale}" ${open.slice(open.indexOf("viewBox"))}>${body}</svg>`;
 }
 
 /**
