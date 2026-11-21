@@ -38,11 +38,7 @@ viewCounterRoute.get(
 
     const { color, label_color: labelColor, theme, username } = c.req.valid("query");
     const count = await incrementViewCount(c.env.DB, username);
-    const svg = generateModernBadge(count, {
-      ...(theme === undefined ? {} : { theme }),
-      ...(color === undefined ? {} : { color }),
-      ...(labelColor === undefined ? {} : { labelColor }),
-    });
+    const svg = generateModernBadge(count, { color, labelColor, theme });
     return c.body(svg, 200, SVG_HEADERS);
   },
 );

@@ -82,6 +82,10 @@ describe("textWidth", () => {
     expect(textWidth("1K", style)).toBe(13.8);
   });
 
+  it("counts gaps between code points, not UTF-16 units", () => {
+    expect(textWidth("😀😀", style)).toBe(textWidth("PP", style));
+  });
+
   it("falls back to an average capital width for glyphs it has no metrics for", () => {
     expect(textWidth("é", style)).toBe(textWidth("P", style));
   });
@@ -187,15 +191,18 @@ describe("themes and custom colours", () => {
   it("draws aurora's count as a left-to-right gradient", () => {
     const svg = generateModernBadge(7, { theme: "aurora" });
     expect(fills(svg).count).toBe("url(#pvc-accent)");
-    expect(svg).toContain('<linearGradient id="pvc-accent" x2="1">');
+    expect(svg).toContain('<linearGradient id="pvc-accent">');
     expect(svg).toContain('stop-color="#2f81f7"');
     expect(svg).toContain('stop-color="#a371f7"');
     expect(generateModernBadge(7)).not.toContain("pvc-accent");
   });
 
-  it("separates mono's same-coloured segments with a divider", () => {
+  it("separates same-coloured segments with a divider in the label text colour", () => {
     expect(generateModernBadge(7, { theme: "mono" })).toContain('height="14" fill="#ffffff"');
-    expect(generateModernBadge(7)).not.toContain('height="14" fill="#ffffff"');
+    expect(generateModernBadge(7, { color: "ffffff", theme: "paper" })).toContain(
+      'height="14" fill="#1f2328"',
+    );
+    expect(generateModernBadge(7)).not.toContain('height="14"');
   });
 
   it("gives paper a visible hairline edge for light pages", () => {
@@ -209,6 +216,8 @@ describe("themes and custom colours", () => {
     expect(svg).toContain("@media (prefers-color-scheme: light)");
     expect(svg).toContain('<path class="pvc-label" d=');
     expect(svg).toContain('<text class="pvc-label-text" x="31"');
+    expect(svg).toContain(".pvc-edge{stroke:#d0d7de;stroke-opacity:1}");
+    expect(svg).toContain('fill="none" class="pvc-edge"');
   });
 
   it("drops the adaptive switch when the caller sets the label colour", () => {
@@ -229,6 +238,18 @@ describe("themes and custom colours", () => {
     );
   });
 
+  it.each(['"/><script>', "0969d", "0969dag", "#0969da"])(
+    "rejects the colour %j before it reaches the SVG",
+    (color) => {
+      expect(() => generateModernBadge(7, { color })).toThrow("color must be a 6-digit hex colour");
+      expect(() => generateModernBadge(7, { labelColor: color })).toThrow("labelColor must be");
+    },
+  );
+
+  it("lowercases custom colours", () => {
+    expect(fills(generateModernBadge(7, { color: "E11D48" })).count).toBe("#e11d48");
+  });
+
   it("keeps the divider only while both segments share one colour", () => {
     expect(generateModernBadge(7, { color: "e11d48", theme: "mono" })).not.toContain(
       'height="14" fill="#ffffff"',
@@ -243,7 +264,7 @@ describe("readableText", () => {
     ["#ffffff", "#1f2328"],
     ["#fde047", "#1f2328"],
     ["#1a7f37", "#ffffff"],
-  ])("puts %s text on a %s background", (background, text) => {
+  ])("puts %s under %s text", (background, text) => {
     expect(readableText(background)).toBe(text);
   });
 });

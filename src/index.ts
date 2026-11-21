@@ -15,6 +15,8 @@ app.use("*", cors({ allowMethods: ["GET", "HEAD"] }));
 app.use(
   "*",
   secureHeaders({
+    // A public badge: browsers may load it from any site, not only through GitHub's image proxy.
+    crossOriginResourcePolicy: "cross-origin",
     permissionsPolicy: {
       camera: false,
       fullscreen: false,

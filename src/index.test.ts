@@ -96,6 +96,24 @@ describe("Integration Tests (Hono + D1)", () => {
       expect(res.headers.get("X-Content-Type-Options")).toBe("nosniff");
     });
 
+    it("lets any site embed the badge, not only GitHub's image proxy", async () => {
+      const res = await fetchApp("/api/view-counter?username=embed");
+
+      expect(res.headers.get("Cross-Origin-Resource-Policy")).toBe("cross-origin");
+      expect(res.headers.get("Access-Control-Allow-Origin")).toBe("*");
+    });
+
+    it("reports a repeated username, and the username before a styling error", async () => {
+      const repeated = await fetchApp("/api/view-counter?username=a&username=b");
+      const both = await fetchApp("/api/view-counter?username=-bad&theme=neon");
+
+      expect(await repeated.json()).toEqual({ error: "Username must be a single value" });
+      expect(await both.json()).toEqual({
+        error:
+          "Username must be alphanumeric with hyphens, starting and ending with a letter or number",
+      });
+    });
+
     it("treats usernames case-insensitively, like GitHub", async () => {
       await fetchApp("/api/view-counter?username=MixedCase");
       await fetchApp("/api/view-counter?username=mixedcase");

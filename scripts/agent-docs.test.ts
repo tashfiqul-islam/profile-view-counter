@@ -1,4 +1,4 @@
-import { describe, expect, spyOn, test } from "bun:test";
+import { afterEach, describe, expect, mock, spyOn, test } from "bun:test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -75,6 +75,11 @@ async function withRepo(
 }
 
 describe("cli", () => {
+  // Restores console even when an assertion fails, so no mock leaks into a shuffled later test.
+  afterEach(() => {
+    mock.restore();
+  });
+
   test("returns 0 and reports the guide count when the docs hold", async () => {
     await withRepo(
       "[t](docs/agents/testing.md)\n",
@@ -83,7 +88,6 @@ describe("cli", () => {
         const log = spyOn(console, "log").mockImplementation(() => undefined);
         expect(await cli(root)).toBe(0);
         expect(log).toHaveBeenCalledWith("agent docs ok: AGENTS.md + 1 guides");
-        log.mockRestore();
       },
     );
   });
@@ -93,13 +97,11 @@ describe("cli", () => {
       const error = spyOn(console, "error").mockImplementation(() => undefined);
       expect(await cli(root)).toBe(1);
       expect(error).toHaveBeenCalledTimes(2);
-      error.mockRestore();
     });
   });
 
   test("passes on this repository", async () => {
-    const log = spyOn(console, "log").mockImplementation(() => undefined);
+    spyOn(console, "log").mockImplementation(() => undefined);
     expect(await cli()).toBe(0);
-    log.mockRestore();
   });
 });

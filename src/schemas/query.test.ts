@@ -94,3 +94,17 @@ describe("querySchema styling", () => {
     );
   });
 });
+
+describe("querySchema input shape", () => {
+  it("names a repeated username instead of calling it missing", () => {
+    expect(safeParse(querySchema, { username: ["a", "b"] }).issues?.[0]?.message).toBe(
+      "Username must be a single value",
+    );
+  });
+
+  it("reports the username issue before a styling issue", () => {
+    expect(safeParse(querySchema, { theme: "neon", username: "-bad" }).issues?.[0]?.message).toBe(
+      "Username must be alphanumeric with hyphens, starting and ending with a letter or number",
+    );
+  });
+});

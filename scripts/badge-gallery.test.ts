@@ -6,10 +6,11 @@ describe("gallerySvg", () => {
   const svg = gallerySvg();
 
   test("shows every built-in theme with the query that selects it", () => {
-    for (const theme of THEME_NAMES) {
-      expect(svg).toContain(`>${theme}</text>`);
-      if (theme !== "graphite") expect(svg).toContain(`&amp;theme=${theme}`);
+    for (const theme of THEME_NAMES) expect(svg).toContain(`>${theme}</text>`);
+    for (const theme of THEME_NAMES.filter((name) => name !== "graphite")) {
+      expect(svg).toContain(`&amp;theme=${theme}`);
     }
+    // graphite is the default, so its row shows no query at all.
     expect(svg).toContain(">(no parameters)</text>");
   });
 

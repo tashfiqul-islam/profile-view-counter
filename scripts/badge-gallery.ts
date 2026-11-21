@@ -6,7 +6,12 @@
  * @module
  */
 
-import { type BadgeOptions, generateModernBadge, THEME_NAMES } from "../src/badge/generator";
+import {
+  type BadgeOptions,
+  generateModernBadge,
+  THEME_NAMES,
+  type ThemeName,
+} from "../src/badge/generator";
 
 /** One gallery row. */
 export interface GalleryRow {
@@ -20,7 +25,7 @@ export interface GalleryRow {
   readonly options: BadgeOptions;
 }
 
-const NOTES: Readonly<Record<(typeof THEME_NAMES)[number], string>> = {
+const NOTES: Readonly<Record<ThemeName, string>> = {
   adaptive: "light label when the viewer prefers light",
   aurora: "near-black + blue→violet gradient",
   contribution: "GitHub ink + contribution green",
@@ -56,8 +61,11 @@ const PAD = 24;
 const HALF = 330;
 const ROW = 130;
 
+/** Rounds to 0.1 px, as the badge generator does, so no float noise reaches the SVG. */
+const round = (value: number): number => Math.round(value * 10) / 10;
+
 /** Width attribute of an SVG document. */
-export const widthOf = (svg: string): number => Number(/width="([\d.]+)"/.exec(svg)?.[1]);
+const widthOf = (svg: string): number => Number(/width="([\d.]+)"/.exec(svg)?.[1]);
 
 /**
  * Places a badge inside a larger SVG, renaming its ids so nested badges cannot share gradients.
@@ -75,7 +83,7 @@ export function place(svg: string, x: number, y: number, id: string, scale = 1):
     .replaceAll("pvc-accent", `pvc-accent-${id}`);
   const open = own.slice(0, own.indexOf(">"));
   const body = own.slice(own.indexOf(">") + 1, own.lastIndexOf("</svg>"));
-  return `<svg x="${x}" y="${y}" width="${widthOf(own) * scale}" height="${28 * scale}" ${open.slice(open.indexOf("viewBox"))}>${body}</svg>`;
+  return `<svg x="${x}" y="${y}" width="${round(widthOf(own) * scale)}" height="${28 * scale}" ${open.slice(open.indexOf("viewBox"))}>${body}</svg>`;
 }
 
 /**
@@ -105,7 +113,7 @@ export function gallerySvg(rows: readonly GalleryRow[] = GALLERY_ROWS): string {
     for (const count of COUNTS) {
       const badge = generateModernBadge(count, row.options);
       parts.push(place(badge, x, y + 88, `${index}c${count}`));
-      x += widthOf(badge) + 12;
+      x = round(x + widthOf(badge) + 12);
     }
     y += ROW;
   }

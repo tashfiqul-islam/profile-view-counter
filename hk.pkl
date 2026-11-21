@@ -39,7 +39,7 @@ local lychee = new Step {
 }
 
 local agentDocs = new Step {
-  glob = List("AGENTS.md", "docs/agents/*.md")
+  glob = List("AGENTS.md", "docs/agents/*.md", "scripts/agent-docs.ts")
   check = "bun scripts/agent-docs.ts"
 }
 

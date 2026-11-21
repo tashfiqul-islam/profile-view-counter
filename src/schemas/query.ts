@@ -33,11 +33,9 @@ const hexColor = (name: string) =>
  */
 export const querySchema = object(
   {
-    color: hexColor("color"),
-    label_color: hexColor("label_color"),
-    theme: optional(picklist(THEME_NAMES, `theme must be one of: ${THEME_NAMES.join(", ")}`)),
+    // username first: Valibot reports issues in entry order, and it is the one that matters most.
     username: pipe(
-      string("Username is required"),
+      string("Username must be a single value"),
       minLength(1, "Username is required"),
       maxLength(39, "Username must be 1-39 characters"),
       regex(
@@ -47,6 +45,9 @@ export const querySchema = object(
       toLowerCase(),
       description("GitHub username (1-39 alphanumeric chars, hyphens allowed), case-insensitive"),
     ),
+    color: hexColor("color"),
+    label_color: hexColor("label_color"),
+    theme: optional(picklist(THEME_NAMES, `theme must be one of: ${THEME_NAMES.join(", ")}`)),
   },
   "Username is required",
 );

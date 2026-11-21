@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 const db: D1Database = env.DB;
 
-/** Runs every statement of one migration file, as wrangler does. */
+/** Runs every statement of one migration file in a single batch. */
 async function apply(name: string): Promise<void> {
   const migration = env.TEST_MIGRATIONS.find((m) => m.name === name);
   if (migration === undefined) throw new Error(`missing migration ${name}`);
@@ -58,9 +58,11 @@ describe("0002_case_insensitive_usernames", () => {
     expect(indexes.results).toEqual([]);
   });
 
-  it("rejects a mixed-case key afterwards", async () => {
-    await expect(
-      db.prepare("INSERT INTO view_counts (username, views) VALUES ('Upper', 1)").run(),
-    ).rejects.toThrow(/CHECK constraint failed/);
+  it("still accepts a mixed-case key, so an older Worker version keeps working during a deploy", async () => {
+    await db.prepare("INSERT INTO view_counts (username, views) VALUES ('Upper', 1)").run();
+    const row = await db
+      .prepare("SELECT views FROM view_counts WHERE username = 'Upper'")
+      .first<{ views: number }>();
+    expect(row?.views).toBe(1);
   });
 });

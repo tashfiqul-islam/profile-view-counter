@@ -51,11 +51,11 @@ export type ThemeName = (typeof THEME_NAMES)[number];
 /** Optional styling for {@link generateModernBadge}. */
 export interface BadgeOptions {
   /** Built-in theme; defaults to `graphite`. */
-  readonly theme?: ThemeName;
+  readonly theme?: ThemeName | undefined;
   /** Count segment background as 6-digit hex without `#`, e.g. `e11d48`. Overrides the theme. */
-  readonly color?: string;
+  readonly color?: string | undefined;
   /** Label segment background as 6-digit hex without `#`. Overrides the theme. */
-  readonly labelColor?: string;
+  readonly labelColor?: string | undefined;
 }
 
 const WHITE = "#ffffff";
@@ -63,16 +63,18 @@ const INK = "#1f2328";
 const DARK_EDGE = [WHITE, 0.12] as const;
 const DARK_SHEEN = [0.14, 0.12] as const;
 
+const GRAPHITE: Palette = {
+  count: "#0969da",
+  countText: WHITE,
+  edge: DARK_EDGE,
+  label: INK,
+  labelText: WHITE,
+  sheen: DARK_SHEEN,
+};
+
 /** The built-in palettes. `adaptive` is `graphite` plus a light-mode override (see `ADAPTIVE_CSS`). */
 export const THEMES: Readonly<Record<ThemeName, Palette>> = {
-  adaptive: {
-    count: "#0969da",
-    countText: WHITE,
-    edge: DARK_EDGE,
-    label: INK,
-    labelText: WHITE,
-    sheen: DARK_SHEEN,
-  },
+  adaptive: GRAPHITE,
   aurora: {
     count: ["#2f81f7", "#a371f7"],
     countText: WHITE,
@@ -89,14 +91,7 @@ export const THEMES: Readonly<Record<ThemeName, Palette>> = {
     labelText: WHITE,
     sheen: DARK_SHEEN,
   },
-  graphite: {
-    count: "#0969da",
-    countText: WHITE,
-    edge: DARK_EDGE,
-    label: INK,
-    labelText: WHITE,
-    sheen: DARK_SHEEN,
-  },
+  graphite: GRAPHITE,
   mono: {
     count: "#24292f",
     countText: "#58a6ff",
@@ -117,7 +112,8 @@ export const THEMES: Readonly<Record<ThemeName, Palette>> = {
 
 // Switches the label segment to light when the viewer prefers a light colour scheme.
 const ADAPTIVE_CSS =
-  "@media (prefers-color-scheme: light){.pvc-label{fill:#f6f8fa}.pvc-label-text{fill:#1f2328}}";
+  "@media (prefers-color-scheme: light){.pvc-label{fill:#f6f8fa}.pvc-label-text{fill:#1f2328}" +
+  ".pvc-edge{stroke:#d0d7de;stroke-opacity:1}}";
 
 const HEIGHT = 28;
 const RADIUS = HEIGHT / 2;
@@ -208,8 +204,12 @@ export function formatNumber(num: number): string {
  */
 export function textWidth(text: string, style: TextStyle): number {
   let units = 0;
-  for (const glyph of text) units += ADVANCE[glyph] ?? FALLBACK_ADVANCE;
-  return round((units / 1000) * style.size + style.tracking * Math.max(text.length - 1, 0));
+  let glyphs = 0;
+  for (const glyph of text) {
+    units += ADVANCE[glyph] ?? FALLBACK_ADVANCE;
+    glyphs += 1;
+  }
+  return round((units / 1000) * style.size + style.tracking * Math.max(glyphs - 1, 0));
 }
 
 const LUMINANCE_WEIGHTS = [0.2126, 0.7152, 0.0722] as const;
@@ -243,16 +243,27 @@ export function readableText(background: string): string {
  *
  * @param options - Theme and custom colours.
  * @returns The palette to draw with.
+ * @throws Error when a custom colour is not 6-digit hex.
  */
 export function resolvePalette(options: BadgeOptions = {}): Palette {
   const base = THEMES[options.theme ?? "graphite"];
-  const label = options.labelColor === undefined ? undefined : `#${options.labelColor}`;
-  const count = options.color === undefined ? undefined : `#${options.color}`;
+  const label = parseHex(options.labelColor, "labelColor");
+  const count = parseHex(options.color, "color");
   return {
     ...base,
     ...(label === undefined ? {} : { label, labelText: readableText(label) }),
     ...(count === undefined ? {} : { count, countText: readableText(count) }),
   };
+}
+
+const HEX = /^[0-9a-f]{6}$/i;
+
+/** `#rrggbb` from a validated 6-digit hex; anything else never reaches the SVG. */
+function parseHex(value: string | undefined, name: string): string | undefined {
+  if (value === undefined) return undefined;
+  if (!HEX.test(value))
+    throw new Error(`${name} must be a 6-digit hex colour, got ${JSON.stringify(value)}`);
+  return `#${value.toLowerCase()}`;
 }
 
 /** Baseline that centres capitals of `size` vertically in the badge. */
@@ -283,6 +294,7 @@ export function generateModernBadge(count: number, options: BadgeOptions = {}): 
   const countFill = typeof palette.count === "string" ? palette.count : "url(#pvc-accent)";
   const labelClass = adaptive ? ' class="pvc-label"' : "";
   const labelTextClass = adaptive ? ' class="pvc-label-text"' : "";
+  const edgeClass = adaptive ? ' class="pvc-edge"' : "";
   const [edgeColor, edgeOpacity] = palette.edge;
   const [sheenTop, sheenBottom] = palette.sheen;
 
@@ -294,7 +306,7 @@ export function generateModernBadge(count: number, options: BadgeOptions = {}): 
     </linearGradient>`,
     gradient === undefined
       ? ""
-      : `    <linearGradient id="pvc-accent" x2="1">
+      : `    <linearGradient id="pvc-accent">
       <stop offset="0" stop-color="${gradient[0]}"/>
       <stop offset="1" stop-color="${gradient[1]}"/>
     </linearGradient>`,
@@ -304,7 +316,7 @@ export function generateModernBadge(count: number, options: BadgeOptions = {}): 
   // Same colour on both segments: a short divider keeps them apart.
   const divider =
     palette.label === palette.count
-      ? `\n  <rect x="${labelSegment}" y="7" width="1" height="14" fill="${WHITE}" fill-opacity=".18"/>`
+      ? `\n  <rect x="${labelSegment}" y="7" width="1" height="14" fill="${palette.labelText}" fill-opacity=".25"/>`
       : "";
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${HEIGHT}" viewBox="0 0 ${width} ${HEIGHT}" role="img" aria-label="${title}">
@@ -315,11 +327,11 @@ ${defs}
   <rect width="${width}" height="${HEIGHT}" rx="${RADIUS}" fill="${countFill}"/>
   <path${labelClass} d="M${RADIUS} 0H${labelSegment}V${HEIGHT}H${RADIUS}A${RADIUS} ${RADIUS} 0 0 1 ${RADIUS} 0Z" fill="${palette.label}"/>
   <rect width="${width}" height="${HEIGHT}" rx="${RADIUS}" fill="url(#pvc-sheen)"/>
-  <rect x=".5" y=".5" width="${round(width - 1)}" height="${HEIGHT - 1}" rx="${RADIUS - 0.5}" fill="none" stroke="${edgeColor}" stroke-opacity="${edgeOpacity}"/>${divider}
+  <rect x=".5" y=".5" width="${round(width - 1)}" height="${HEIGHT - 1}" rx="${RADIUS - 0.5}" fill="none"${edgeClass} stroke="${edgeColor}" stroke-opacity="${edgeOpacity}"/>${divider}
   <g font-family="${FONT_STACK}" text-rendering="geometricPrecision">
     <path${labelTextClass} aria-hidden="true" fill="${palette.labelText}" transform="translate(${PAD} ${(HEIGHT - ICON) / 2}) scale(${ICON / 16})" d="${GITHUB_MARK}"/>
     <text${labelTextClass} x="${PAD + ICON + ICON_GAP}" y="${baseline(LABEL_STYLE.size)}" fill="${palette.labelText}" font-size="${LABEL_STYLE.size}" font-weight="${LABEL_STYLE.weight}" textLength="${labelText}" lengthAdjust="spacing">${label}</text>
-    <text x="${round(labelSegment + countSegment / 2)}" y="${baseline(COUNT_STYLE.size)}" fill="${palette.countText}" font-size="${COUNT_STYLE.size}" font-weight="${COUNT_STYLE.weight}" text-anchor="middle" font-variant-numeric="tabular-nums" textLength="${countText}" lengthAdjust="spacing">${value}</text>
+    <text x="${round(labelSegment + countSegment / 2)}" y="${baseline(COUNT_STYLE.size)}" fill="${palette.countText}" font-size="${COUNT_STYLE.size}" font-weight="${COUNT_STYLE.weight}" text-anchor="middle" textLength="${countText}" lengthAdjust="spacing">${value}</text>
   </g>
 </svg>`;
 }

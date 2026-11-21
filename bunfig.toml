@@ -14,3 +14,5 @@ coverageSkipTestFiles = true
 # Plural keys: Bun silently ignores singular ones. Bun measures no branches.
 coverageThreshold = { lines = 1.0, functions = 1.0, statements = 1.0 }
 coverageReporter = ["text"]
+# src/ is covered by Vitest in workerd; Bun measures only the scripts.
+coveragePathIgnorePatterns = ["src/**"]
