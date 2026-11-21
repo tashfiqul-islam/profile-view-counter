@@ -39,12 +39,4 @@ export default defineConfig({
     "jsdoc/require-param-name": "error",
     "jsdoc/require-returns-description": "error",
   },
-  overrides: [
-    {
-      // bun:test types `expect(p).rejects.*` as void although it returns a promise.
-      files: ["**/*.test.ts"],
-      rules: { "typescript/await-thenable": "off" },
-    },
-  ],
-  ignorePatterns: ["node_modules/", "coverage/", ".wrangler/", "worker-configuration.d.ts"],
 });

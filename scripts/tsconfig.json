@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  // Repository tooling run by Bun: scripts/ and the root config files.
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "../node_modules/.cache/tsbuildinfo-tools",
+    "types": ["@types/bun"]
+  },
+  "include": ["./**/*.ts", "../*.config.ts"]
+}

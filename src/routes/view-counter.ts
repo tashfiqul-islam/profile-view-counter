@@ -20,7 +20,10 @@ const SVG_HEADERS = {
   "X-Content-Type-Options": "nosniff",
 } as const satisfies SvgHeaders;
 
-/** `GET /view-counter`: counts a view and returns the badge (mounted under `/api`). */
+/**
+ * `GET /view-counter` (mounted under `/api`): counts one view per `GET` and returns the badge in the
+ * requested theme or colours; `HEAD` gets the same headers without counting.
+ */
 export const viewCounterRoute = new Hono<{ Bindings: Env }>();
 
 viewCounterRoute.get(

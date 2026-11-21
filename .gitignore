@@ -4,11 +4,13 @@ node_modules/
 # Cloudflare Workers (local state, secrets, generated types)
 .wrangler/
 .dev.vars*
+!.dev.vars.example
 worker-configuration.d.ts
 
 # Environment
 .env
 .env.*
+!.env.example
 
 # Coverage
 coverage/

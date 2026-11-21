@@ -31,8 +31,12 @@ export interface ReleaseRule {
 
 /** `type(scope)!: subject`, the conventional commit header. */
 const HEADER = /^(?<type>[a-z]+)(?:\((?<scope>[^)]*)\))?(?<bang>!)?: \S/;
-/** A breaking-change footer anywhere in the squash message (the PR body). */
-const BREAKING_FOOTER = /^BREAKING[ -]CHANGE: /m;
+/** A breaking-change note anywhere in the squash message, as conventional-commits-parser reads it. */
+const BREAKING_FOOTER = /^[\s|*]*BREAKING[ -]CHANGE[:\s]+/im;
+/** GitHub's default revert PR title, `Revert "…"`. */
+const REVERT_TITLE = /^Revert "/;
+/** The parser's revert pattern needs this line in the message to mark a revert. */
+const REVERT_BODY = /This reverts commit \w+/;
 
 /** commit-analyzer's `RELEASE_TYPES` precedence: a lower index is a bigger release. */
 const PRECEDENCE: readonly (ReleaseRule["release"] & string)[] = ["major", "minor", "patch"];
@@ -77,17 +81,36 @@ function analyze(
   return release;
 }
 
-const isReleaseRule = (value: unknown): value is ReleaseRule =>
-  typeof value === "object" && value !== null && "release" in value;
+const RELEASES: ReadonlySet<unknown> = new Set([...PRECEDENCE, false]);
 
-/** The commit-analyzer `releaseRules` from `.releaserc.json` (empty if the plugin is absent). */
-export const RELEASE_RULES: readonly ReleaseRule[] = releaserc.plugins.flatMap((plugin) => {
-  if (!Array.isArray(plugin) || plugin[0] !== "@semantic-release/commit-analyzer") return [];
-  const options: unknown = plugin[1];
-  if (typeof options !== "object" || options === null || !("releaseRules" in options)) return [];
-  const rules: unknown = options.releaseRules;
-  return Array.isArray(rules) ? rules.filter(isReleaseRule) : [];
-});
+/** Accepts a rule only with a release commit-analyzer knows; a typo would silently outrank all. */
+function isReleaseRule(value: unknown): value is ReleaseRule {
+  if (typeof value !== "object" || value === null || !("release" in value)) return false;
+  if (!RELEASES.has(value.release)) {
+    throw new Error(`Unknown release ${JSON.stringify(value.release)} in .releaserc.json`);
+  }
+  return true;
+}
+
+/**
+ * The commit-analyzer `releaseRules` of a semantic-release config.
+ *
+ * @param config - The parsed `.releaserc.json`.
+ * @returns The rules in order; empty when the plugin or its rules are absent.
+ * @throws Error when a rule names a release commit-analyzer does not know.
+ */
+export function releaseRulesFrom(config: { readonly plugins: readonly unknown[] }): ReleaseRule[] {
+  return config.plugins.flatMap((plugin) => {
+    if (!Array.isArray(plugin) || plugin[0] !== "@semantic-release/commit-analyzer") return [];
+    const options: unknown = plugin[1];
+    if (typeof options !== "object" || options === null || !("releaseRules" in options)) return [];
+    const rules: unknown = options.releaseRules;
+    return Array.isArray(rules) ? rules.filter(isReleaseRule) : [];
+  });
+}
+
+/** The commit-analyzer `releaseRules` from this repo's `.releaserc.json`. */
+export const RELEASE_RULES: readonly ReleaseRule[] = releaseRulesFrom(releaserc);
 
 /**
  * Works out the labels for a PR exactly as commit-analyzer will judge its squash commit: the custom
@@ -100,7 +123,7 @@ export const RELEASE_RULES: readonly ReleaseRule[] = releaserc.plugins.flatMap((
  * @example
  * ```ts
  * labelsFor('feat(badge): retina scaling', ''); // { type: 'feat', release: 'minor' }
- * labelsFor('chore(deps): update zod', '');      // { type: 'chore', release: 'patch' }
+ * labelsFor('chore(deps): update hono', '');     // { type: 'chore', release: 'patch' }
  * ```
  */
 export function labelsFor(
@@ -108,6 +131,11 @@ export function labelsFor(
   body: string,
   rules: readonly ReleaseRule[] = RELEASE_RULES,
 ): PrLabels | undefined {
+  // GitHub's revert PRs: commit-analyzer patches them only when the message carries the
+  // "This reverts commit" line its revert pattern needs; otherwise the commit releases nothing.
+  if (REVERT_TITLE.test(title.trim())) {
+    return { release: REVERT_BODY.test(body) ? "patch" : "none", type: "revert" };
+  }
   const header = HEADER.exec(title.trim())?.groups;
   if (header?.["type"] === undefined) return undefined;
   const { type, scope, bang } = header;

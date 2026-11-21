@@ -4,8 +4,8 @@ on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
 
-# Concurrency is per job (below): a body-only edit must never cancel a title check that a push
-# started, or the required check would be left cancelled.
+# Concurrency is per job (below). A newer event for the same PR replaces a running title check;
+# the replacement re-checks the same head commit, so the required check always ends with a result.
 
 permissions: {}
 
@@ -51,8 +51,8 @@ jobs:
           TITLE: ${{ github.event.pull_request.title }}
         run: printf '%s\n' "$TITLE" | bunx commitlint --verbose
 
-  # Labels depend only on the title and body, so pushes never relabel. Runs after a passing (or
-  # skipped, i.e. unchanged) title check. Fork PRs get a read-only token, so they are not labelled.
+  # Labels depend only on the title and body, so pushes never relabel. Runs after a title check that
+  # did not fail. Fork PRs get a read-only token, so they are not labelled.
   labels:
     name: Type and release labels
     needs: title
@@ -110,10 +110,14 @@ jobs:
           gh label create "$release_label" --color "${colors[$RELEASE]}" \
             --description "Merging releases: $RELEASE" --force >/dev/null
 
+          # Read first so a failed lookup fails the step instead of silently keeping stale labels.
+          current=$(gh pr view "$PR" --json labels \
+            --jq '.labels[].name | select(startswith("type: ") or startswith("release: "))')
           remove=()
           while IFS= read -r label; do
-            [[ "$label" == "$type_label" || "$label" == "$release_label" ]] || remove+=(--remove-label "$label")
-          done < <(gh pr view "$PR" --json labels --jq '.labels[].name | select(startswith("type: ") or startswith("release: "))')
+            [[ -z "$label" || "$label" == "$type_label" || "$label" == "$release_label" ]] ||
+              remove+=(--remove-label "$label")
+          done <<< "$current"
 
           gh pr edit "$PR" --add-label "$type_label" --add-label "$release_label" "${remove[@]}"
           echo "Labelled #$PR: \`$type_label\`, \`$release_label\`" >> "$GITHUB_STEP_SUMMARY"

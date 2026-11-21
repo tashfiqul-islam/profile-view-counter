@@ -12,7 +12,6 @@
   "assignees": ["tashfiqul-islam"],
   "dependencyDashboard": { "enabled": true, "title": "🔄 Dependency Dashboard" },
   "minimumReleaseAge": "3 days",
-  "minimumReleaseAgeBehaviour": "timestamp-required",
   "automergeType": "pr",
   "platformAutomerge": true,
   "prHourlyLimit": 0,
@@ -91,6 +90,11 @@
     {
       "matchPackageNames": ["/^@commitlint//"],
       "groupName": "commitlint"
+    },
+    {
+      "description": "Dev dependencies never change the deployed Worker, so they release nothing",
+      "matchDepTypes": ["devDependencies"],
+      "semanticCommitScope": "tooling"
     },
     {
       "matchManagers": ["github-actions"],

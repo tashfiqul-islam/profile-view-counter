@@ -6,8 +6,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+# One queue per ref and event: a manual run on main never replaces a pending push run (and its
+# deploy); runs on main are never cancelled.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions: {}
@@ -42,11 +44,13 @@ jobs:
         run: |
           bun run cf-typegen
           echo "::add-matcher::.github/matchers/tsc.json"
-          bun run typecheck --pretty false
+          # Same two programs as `bun run typecheck`; plain output so the matcher can annotate it.
+          bunx tsc -p tsconfig.json --pretty false
+          bunx tsc -p scripts/tsconfig.json --pretty false
 
       - name: Lint, type-aware (oxlint)
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
-        run: bunx oxlint --deny-warnings --format github
+        run: bun run lint --format github
 
       - name: Format check (oxfmt)
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
@@ -90,15 +94,18 @@ jobs:
       contents: read # read the dependency diff
     steps:
       - name: Review dependency changes for vulnerabilities
-        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        uses: actions/dependency-review-action@bbc44d14a204704ccc493733616cd1e93a0321ec # v5.0.1
         with:
           fail-on-severity: moderate
 
   # Deploys exactly the commit the gate just tested: same workflow run, same SHA, no workflow_run.
+  # A manual run on main redeploys (recovery when a push run was skipped or failed).
   deploy:
     name: Deploy
     needs: check
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     concurrency:
@@ -125,8 +132,8 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          bunx wrangler d1 migrations apply DB --remote
-          bunx wrangler deploy
+          bun run db:migrate:prod
+          bun run deploy
 
   release:
     name: Release

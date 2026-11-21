@@ -27,8 +27,9 @@ mise run setup       # bun install, worker types from wrangler.jsonc, hk git hoo
 ## Releases
 
 Merging to `main` deploys the Worker and, when the title calls for it, tags `vX.Y.Z` with a GitHub
-Release. `feat` releases a minor version; `fix`, `perf`, `revert`, `security`, `chore(deps)` and
-`chore(bun)` a patch; other types release nothing. The PR's `release:` label shows the outcome
+Release. A `!` after the type or a `BREAKING CHANGE:` note in the PR body releases a major version;
+`feat` a minor; `fix`, `perf`, `revert`, `security` and `chore(deps)` (runtime dependencies) a
+patch; other types, including dev-dependency bumps, release nothing. The PR's `release:` label shows the outcome
 before you merge. Never write `[skip ci]` or `[skip actions]` in a commit message or PR body.
 
 ## Reporting issues
