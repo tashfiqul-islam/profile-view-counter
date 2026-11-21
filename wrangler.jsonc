@@ -2,8 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "profile-view-counter",
   "main": "src/index.ts",
-  "compatibility_date": "2026-07-24",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_date": "2026-11-17",
   "placement": { "mode": "smart" },
   "upload_source_maps": true,
   "d1_databases": [
@@ -12,12 +11,6 @@
       "database_name": "profile-views",
       "database_id": "9d6c774f-2160-47fc-84fb-ab3cc831e133",
       "migrations_dir": "migrations",
-    },
-  ],
-  "kv_namespaces": [
-    {
-      "binding": "CACHE",
-      "id": "8959c1ef82fe471aa40f3d501edddeb2",
     },
   ],
   "observability": {

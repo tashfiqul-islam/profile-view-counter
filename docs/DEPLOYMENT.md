@@ -32,9 +32,7 @@ This opens a browser window for OAuth authentication.
 
 ---
 
-## 3. Create Resources
-
-### Create D1 Database
+## 3. Create the D1 Database
 
 ```bash
 bunx wrangler d1 create profile-views
@@ -42,19 +40,11 @@ bunx wrangler d1 create profile-views
 
 Copy the `database_id` from the output.
 
-### Create KV Namespace
-
-```bash
-bunx wrangler kv namespace create CACHE
-```
-
-Copy the `id` from the output.
-
 ---
 
 ## 4. Configure Wrangler
 
-Update `wrangler.jsonc` with your resource IDs:
+Update `wrangler.jsonc` with your database ID:
 
 ```jsonc
 {
@@ -63,12 +53,6 @@ Update `wrangler.jsonc` with your resource IDs:
       "binding": "DB",
       "database_name": "profile-views",
       "database_id": "YOUR_DATABASE_ID",
-    },
-  ],
-  "kv_namespaces": [
-    {
-      "binding": "CACHE",
-      "id": "YOUR_KV_ID",
     },
   ],
 }
@@ -121,7 +105,6 @@ bun run dev
 This runs a local Cloudflare Workers environment with:
 
 - D1 emulated locally
-- KV emulated locally
 - Hot reload on file changes
 
 ### Check
@@ -154,10 +137,6 @@ GitHub Actions:
 ### "DB not found" Error
 
 Ensure `database_id` in `wrangler.jsonc` matches the output from `wrangler d1 create`.
-
-### "KV not found" Error
-
-Ensure `id` in `kv_namespaces` matches the output from `wrangler kv namespace create`.
 
 ### Migrations Fail
 

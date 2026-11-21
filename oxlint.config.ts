@@ -38,5 +38,8 @@ export default defineConfig({
     "jsdoc/require-param-description": "error",
     "jsdoc/require-param-name": "error",
     "jsdoc/require-returns-description": "error",
+
+    // Tests: every expect runs on every path.
+    "vitest/no-conditional-expect": "error",
   },
 });

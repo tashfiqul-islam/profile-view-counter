@@ -9,7 +9,31 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("Integration Tests (Hono + D1 + KV)", () => {
+/** Sends one request through the whole app and waits for its background work. */
+async function fetchApp(path: string, method = "GET"): Promise<Response> {
+  const ctx = createExecutionContext();
+  const res = await app.fetch(new Request(`http://localhost${path}`, { method }), testEnv, ctx);
+  await waitOnExecutionContext(ctx);
+  return res;
+}
+
+/** Stored views for an exact username key, or `undefined` when no row exists. */
+async function viewsOf(username: string): Promise<number | undefined> {
+  const row = await testEnv.DB.prepare("SELECT views FROM view_counts WHERE username = ?")
+    .bind(username)
+    .first<{ views: number }>();
+  return row?.views;
+}
+
+/** Sum of all stored views. */
+async function totalViews(): Promise<number> {
+  const row = await testEnv.DB.prepare(
+    "SELECT COALESCE(SUM(views), 0) AS total FROM view_counts",
+  ).first<{ total: number }>();
+  return row?.total ?? Number.NaN;
+}
+
+describe("Integration Tests (Hono + D1)", () => {
   describe("GET /", () => {
     it("returns API info with all required fields", async () => {
       const req = new Request("http://localhost/");
@@ -53,32 +77,97 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
   });
 
   describe("GET /api/view-counter", () => {
-    it("increments count, generates badge, and caches result", async () => {
-      const username = "integration-test";
+    it("counts every view and shows the new count", async () => {
+      const first = await fetchApp("/api/view-counter?username=every-view");
+      const second = await fetchApp("/api/view-counter?username=every-view");
 
-      const req1 = new Request(`http://localhost/api/view-counter?username=${username}`);
-      const ctx1 = createExecutionContext();
-      const res1 = await app.fetch(req1, testEnv, ctx1);
-      await waitOnExecutionContext(ctx1);
+      expect(first.status).toBe(200);
+      expect(await first.text()).toContain("<title>Profile visitors: 1</title>");
+      expect(await second.text()).toContain("<title>Profile visitors: 2</title>");
+      expect(await viewsOf("every-view")).toBe(2);
+    });
 
-      expect(res1.status).toBe(200);
-      expect(res1.headers.get("X-Cache")).toBe("MISS");
-      expect(res1.headers.get("X-Content-Type-Options")).toBe("nosniff");
-      expect(await res1.text()).toContain("PROFILE VISITORS");
+    it("tells caches and GitHub's image proxy not to store the badge", async () => {
+      const res = await fetchApp("/api/view-counter?username=no-store");
 
-      const dbResult = await testEnv.DB.prepare("SELECT views FROM view_counts WHERE username = ?")
-        .bind(username)
-        .first<{ views: number }>();
-      expect(dbResult?.views).toBe(1);
+      expect(res.headers.get("Cache-Control")).toBe(
+        "max-age=0, no-cache, no-store, must-revalidate",
+      );
+      expect(res.headers.get("X-Content-Type-Options")).toBe("nosniff");
+    });
 
-      const req2 = new Request(`http://localhost/api/view-counter?username=${username}`);
-      const ctx2 = createExecutionContext();
-      const res2 = await app.fetch(req2, testEnv, ctx2);
-      await waitOnExecutionContext(ctx2);
+    it("lets any site embed the badge, not only GitHub's image proxy", async () => {
+      const res = await fetchApp("/api/view-counter?username=embed");
 
-      expect(res2.status).toBe(200);
-      expect(res2.headers.get("X-Cache")).toBe("HIT");
-      expect(res2.headers.get("X-Content-Type-Options")).toBe("nosniff");
+      expect(res.headers.get("Cross-Origin-Resource-Policy")).toBe("cross-origin");
+      expect(res.headers.get("Access-Control-Allow-Origin")).toBe("*");
+    });
+
+    it("reports a repeated username, and the username before a styling error", async () => {
+      const repeated = await fetchApp("/api/view-counter?username=a&username=b");
+      const both = await fetchApp("/api/view-counter?username=-bad&theme=neon");
+
+      expect(await repeated.json()).toEqual({ error: "Username must be a single value" });
+      expect(await both.json()).toEqual({
+        error:
+          "Username must be alphanumeric with hyphens, starting and ending with a letter or number",
+      });
+    });
+
+    it("treats usernames case-insensitively, like GitHub", async () => {
+      await fetchApp("/api/view-counter?username=MixedCase");
+      await fetchApp("/api/view-counter?username=mixedcase");
+      const res = await fetchApp("/api/view-counter?username=MIXEDCASE");
+
+      expect(await res.text()).toContain("<title>Profile visitors: 3</title>");
+      expect(await viewsOf("mixedcase")).toBe(3);
+      expect(await viewsOf("MixedCase")).toBeUndefined();
+    });
+
+    it("applies the theme and custom colours from the query", async () => {
+      const res = await fetchApp(
+        "/api/view-counter?username=styled&theme=aurora&color=E11D48&label_color=0F172A",
+      );
+      const svg = await res.text();
+
+      expect(res.status).toBe(200);
+      expect(svg).toContain('rx="14" fill="#e11d48"');
+      expect(svg).toContain('fill="#0f172a"');
+      expect(svg).not.toContain("pvc-accent");
+    });
+
+    it("uses the theme alone when no custom colour is given", async () => {
+      const svg = await (await fetchApp("/api/view-counter?username=themed&theme=aurora")).text();
+      expect(svg).toContain('fill="url(#pvc-accent)"');
+    });
+
+    it("keeps one counter per username whatever the styling", async () => {
+      await fetchApp("/api/view-counter?username=one-counter&theme=paper");
+      await fetchApp("/api/view-counter?username=one-counter&color=1a7f37");
+      await fetchApp("/api/view-counter?username=one-counter");
+
+      expect(await viewsOf("one-counter")).toBe(3);
+    });
+
+    it.each([
+      ["theme=neon", "theme must be one of: graphite, aurora, mono, paper, contribution, adaptive"],
+      ["color=red", "color must be a 6-digit hex colour like 0969da"],
+      ["label_color=12345", "label_color must be a 6-digit hex colour like 0969da"],
+    ])("rejects %s with 400 { error } and counts nothing", async (style, error) => {
+      const res = await fetchApp(`/api/view-counter?username=bad-style&${style}`);
+
+      expect(res.status).toBe(400);
+      expect(await res.json()).toEqual({ error });
+      expect(await viewsOf("bad-style")).toBeUndefined();
+    });
+
+    it("answers HEAD with the badge headers without counting a view", async () => {
+      const res = await fetchApp("/api/view-counter?username=head-check", "HEAD");
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get("Content-Type")).toBe("image/svg+xml");
+      expect(await res.text()).toBe("");
+      expect(await viewsOf("head-check")).toBeUndefined();
     });
 
     it("returns SVG with Content-Security-Policy header", async () => {
@@ -103,32 +192,21 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
       expect(res.headers.get("X-Request-Id")).toBeTruthy();
     });
 
-    it("validates missing username returns 400", async () => {
-      const req = new Request("http://localhost/api/view-counter");
-      const ctx = createExecutionContext();
-      const res = await app.fetch(req, testEnv, ctx);
-      await waitOnExecutionContext(ctx);
+    it.each([
+      ["", "Username is required"],
+      ["?username=", "Username is required"],
+      [
+        "?username=-starts-with-dash",
+        "Username must be alphanumeric with hyphens, starting and ending with a letter or number",
+      ],
+      [`?username=${"a".repeat(40)}`, "Username must be 1-39 characters"],
+    ])("rejects %j with 400 { error } and counts nothing", async (query, error) => {
+      const before = await totalViews();
+      const res = await fetchApp(`/api/view-counter${query}`);
 
       expect(res.status).toBe(400);
-    });
-
-    it("validates invalid username format returns 400", async () => {
-      const req = new Request("http://localhost/api/view-counter?username=-starts-with-dash");
-      const ctx = createExecutionContext();
-      const res = await app.fetch(req, testEnv, ctx);
-      await waitOnExecutionContext(ctx);
-
-      expect(res.status).toBe(400);
-    });
-
-    it("validates too-long username returns 400", async () => {
-      const longUsername = "a".repeat(40);
-      const req = new Request(`http://localhost/api/view-counter?username=${longUsername}`);
-      const ctx = createExecutionContext();
-      const res = await app.fetch(req, testEnv, ctx);
-      await waitOnExecutionContext(ctx);
-
-      expect(res.status).toBe(400);
+      expect(await res.json()).toEqual({ error });
+      expect(await totalViews()).toBe(before);
     });
 
     it("increments multiple rapid requests correctly", async () => {
@@ -163,22 +241,6 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
 
       expect(res.headers.get("Content-Type")).toBe("image/svg+xml");
     });
-
-    it("returns X-Cache HIT on second request for same user", async () => {
-      const username = "cache-hit-test";
-
-      const req1 = new Request(`http://localhost/api/view-counter?username=${username}`);
-      const ctx1 = createExecutionContext();
-      await app.fetch(req1, testEnv, ctx1);
-      await waitOnExecutionContext(ctx1);
-
-      const req2 = new Request(`http://localhost/api/view-counter?username=${username}`);
-      const ctx2 = createExecutionContext();
-      const res2 = await app.fetch(req2, testEnv, ctx2);
-      await waitOnExecutionContext(ctx2);
-
-      expect(res2.headers.get("X-Cache")).toBe("HIT");
-    });
   });
 
   describe("Error handling", () => {
@@ -207,20 +269,6 @@ describe("Integration Tests (Hono + D1 + KV)", () => {
       expect(res.status).toBe(500);
       expect(await res.json()).toEqual({ error: "Internal Server Error" });
       expect(log).toHaveBeenCalledWith(expect.stringContaining('"message":"Database failure"'));
-    });
-
-    it("handles KV cache write failure gracefully", async () => {
-      vi.spyOn(testEnv.CACHE, "put").mockRejectedValue(new Error("KV write failed"));
-      const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
-
-      const req = new Request("http://localhost/api/view-counter?username=cache-fail-test");
-      const ctx = createExecutionContext();
-      const res = await app.fetch(req, testEnv, ctx);
-      await waitOnExecutionContext(ctx);
-
-      expect(res.status).toBe(200);
-      expect(res.headers.get("X-Cache")).toBe("MISS");
-      expect(log).toHaveBeenCalledWith(expect.stringContaining('"error":"cache-write-failed"'));
     });
 
     it("counter service throws on null D1 result", async () => {

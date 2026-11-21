@@ -1,9 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { logger } from "hono/logger";
 import { requestId } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
-import { timing } from "hono/timing";
 import { viewCounterRoute } from "./routes/view-counter";
 
 interface Variables {
@@ -13,12 +11,12 @@ interface Variables {
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 app.use("*", requestId());
-app.use("*", logger());
-app.use("*", timing());
 app.use("*", cors({ allowMethods: ["GET", "HEAD"] }));
 app.use(
   "*",
   secureHeaders({
+    // A public badge: browsers may load it from any site, not only through GitHub's image proxy.
+    crossOriginResourcePolicy: "cross-origin",
     permissionsPolicy: {
       camera: false,
       fullscreen: false,

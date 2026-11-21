@@ -38,6 +38,11 @@ local lychee = new Step {
   check = "lychee --offline --include-fragments --no-progress {{files}}"
 }
 
+local agentDocs = new Step {
+  glob = List("AGENTS.md", "docs/agents/*.md", "scripts/agent-docs.ts")
+  check = "bun scripts/agent-docs.ts"
+}
+
 local linters = new Mapping<String, Step> {
   ["oxlint"] = oxlint
   ["oxfmt"] = (oxfmt) { depends = "oxlint" }
@@ -45,6 +50,7 @@ local linters = new Mapping<String, Step> {
   ["actionlint"] = actionlint
   ["zizmor"] = zizmor
   ["lychee"] = lychee
+  ["agent-docs"] = agentDocs
 }
 
 hooks {

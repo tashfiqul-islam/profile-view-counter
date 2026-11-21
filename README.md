@@ -1,207 +1,200 @@
 <div align="center">
 
-![Profile View Counter Banner](assets/readme-banner.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/cover-dark.svg" />
+  <img src="assets/cover-light.svg" alt="Profile View Counter: every view, counted. Five example badges in different themes." width="100%" />
+</picture>
 
-<br>
+### A view counter badge for your GitHub profile, crisp at any size, in any colour
 
-[![License](https://img.shields.io/github/license/tashfiqul-islam/profile-view-counter?style=for-the-badge)](LICENSE)
-[![CI](https://img.shields.io/github/actions/workflow/status/tashfiqul-islam/profile-view-counter/ci.yml?style=for-the-badge&label=CI&logo=github)](https://github.com/tashfiqul-islam/profile-view-counter/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/badge/coverage-100%25-success?style=for-the-badge&logo=vitest&logoColor=white)](#tech-stack)
-[![TypeScript](https://img.shields.io/badge/typescript-7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Hono](https://img.shields.io/badge/hono-4-E36002?style=for-the-badge&logo=hono&logoColor=white)](https://hono.dev)
+One Cloudflare Worker counts every view of your README and draws a 28 px badge that fits any font.
 
-<br>
+[![CI](https://img.shields.io/github/actions/workflow/status/tashfiqul-islam/profile-view-counter/ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/tashfiqul-islam/profile-view-counter/actions/workflows/ci.yml)&nbsp;
+[![Release](https://img.shields.io/github/v/release/tashfiqul-islam/profile-view-counter?style=flat-square&color=0969da)](https://github.com/tashfiqul-islam/profile-view-counter/releases)&nbsp;
+[![Coverage](https://img.shields.io/badge/coverage-100%25-1f2328?style=flat-square)](#development)&nbsp;
+[![Renovate](https://img.shields.io/badge/renovate-enabled-1f2328?style=flat-square&logo=renovatebot)](renovate.json)&nbsp;
+[![License](https://img.shields.io/badge/license-MIT-1f2328?style=flat-square)](LICENSE)
 
-A **blazing-fast, edge-deployed** profile view counter for GitHub READMEs.
-
-Built on **Cloudflare Workers** with **D1** for persistence, **KV** for caching, and **Hono** for routing.
-
-<br>
-
-[![Profile Views](assets/badge-32.7k.svg)](https://github.com/tashfiqul-islam/profile-view-counter)
-
-_Click the badge above to see it in action_
+**[Quick start](#quick-start) · [Themes](#themes-and-colours) · [How it works](#how-it-works) · [API](#api) · [Self-host](#self-host) · [Development](#development) · [Security](.github/SECURITY.md)**
 
 </div>
 
 ---
 
-## Quick Start
+## Quick start
 
-Add this to your GitHub profile `README.md`:
+Paste this into your profile `README.md` and replace `YOUR_USERNAME`:
 
 ```markdown
 [![Profile Views](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=YOUR_USERNAME)](https://github.com/tashfiqul-islam/profile-view-counter)
 ```
 
-<details>
-<summary>HTML alternative</summary>
+<p align="center"><img src="assets/badge-32.7k.svg" alt="Profile visitors: 32.7K" /></p>
 
-```html
-<a href="https://github.com/tashfiqul-islam/profile-view-counter">
-  <img
-    src="https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=YOUR_USERNAME"
-    alt="Profile Views"
-  />
-</a>
+Every page view counts once, usernames are case-insensitive, and nothing caches the badge, so the
+number is always current.
+
+## Themes and colours
+
+Add `&theme=` for a built-in look, or `&color=` / `&label_color=` for your own (6-digit hex, no
+`#`). Text switches between white and dark by contrast, so any colour stays readable.
+
+```markdown
+![Profile Views](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=YOUR_USERNAME&theme=aurora)
+![Profile Views](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=YOUR_USERNAME&color=e11d48&label_color=0f172a)
 ```
 
-</details>
+| Parameter     | Values                                                            | Default    |
+| ------------- | ----------------------------------------------------------------- | ---------- |
+| `theme`       | `graphite`, `aurora`, `mono`, `paper`, `contribution`, `adaptive` | `graphite` |
+| `color`       | count background, hex like `0969da`                               | theme's    |
+| `label_color` | label background, hex like `1f2328`                               | theme's    |
 
-> [!NOTE]
-> Replace `YOUR_USERNAME` with your GitHub username.
+![Every badge theme and two custom-colour examples, on light and dark backgrounds](assets/badge-themes.svg)
 
----
+`adaptive` turns its label light when the viewer's system prefers a light scheme. Styling never
+changes the count.
 
-## How It Works
+## How it works
 
-```mermaid
-flowchart LR
-    A[README badge] --> B[Cloudflare Edge]
-    B --> C{KV cache}
-    C -->|HIT| D[Return cached SVG]
-    C -->|MISS| E[D1 atomic increment]
-    E --> F[Generate SVG]
-    F --> G[waitUntil KV store]
-    G --> D
-```
+GitHub serves README images through its image proxy, camo. Each view fetches the badge from the
+Worker, which validates the query, counts the view in D1 and renders a fresh SVG.
 
-Every visit to a README embedding the badge triggers an edge request. On cache miss, the view count is atomically incremented in D1, a fresh SVG is generated, and the result is cached in KV for 60 seconds. Cache writes are non-blocking and error-safe via `waitUntil()`.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/architecture-dark.svg" />
+  <img src="assets/architecture-light.svg" alt="Request path: your README, GitHub's image proxy, then the Worker validates, counts in D1 and renders the SVG." width="100%" />
+</picture>
 
----
-
-## Features
-
-| Feature             | Detail                                                                                                                                    |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Edge-first**      | Global deployment with [Smart Placement](https://developers.cloudflare.com/workers/configuration/smart-placement/) for optimal D1 latency |
-| **Atomic counting** | `INSERT ON CONFLICT ... RETURNING` — zero race conditions                                                                                 |
-| **Sub-10ms cache**  | KV-backed edge cache, 60s TTL                                                                                                             |
-| **Responsive SVG**  | `viewBox` + `preserveAspectRatio` — crisp at any size                                                                                     |
-| **Accessible**      | WCAG: `role="img"`, `aria-labelledby`, `<title>`, `<desc>`                                                                                |
-| **Secure**          | `secureHeaders()` (HSTS, CSP, X-Frame-Options) + `nosniff` on SVG                                                                         |
-| **Observable**      | `requestId()` tracing, structured JSON logging, source maps                                                                               |
-| **Fully tested**    | Vitest in workerd against real D1 and KV, 100 % coverage enforced                                                                         |
-| **Type-safe**       | TypeScript 7 strict + Valibot schema validation                                                                                           |
-
----
-
-## Architecture
+Inside the Worker, one request is four steps:
 
 ```
-src/
-├── index.ts              # Hono app: middleware, /, /health, 404 and error handler
-├── routes/
-│   └── view-counter.ts   # Cache-first badge endpoint
-├── badge/
-│   └── generator.ts      # Responsive SVG with a11y
-├── services/
-│   ├── counter.ts        # D1 atomic increment
-│   └── cache.ts          # KV get/set with TTL
-└── schemas/
-    └── query.ts          # Valibot validation of the username
++------------------ [ REQUEST ] -------------------+
+|                                                  |
+| 1  validate                                      |
+|    username, theme and colours; 400 { error }    |
+| │                                                |
+| 2  count                                         |
+|    one atomic upsert in d1; HEAD skips this      |
+| │                                                |
+| 3  render                                        |
+|    pure svg, text pinned to fit, any theme       |
+| │                                                |
+| 4  respond                                       |
+|    image/svg+xml, no-store, so every view counts |
+|                                                  |
++--------------------------------------------------+
 ```
 
-> [!TIP]
-> Request flow, module roles and recipes: [src/README.md](src/README.md)
-
----
-
-## Tech Stack
-
-| Layer           | Technology                                                                                                                | Role                                        |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| **Edge**        | [Cloudflare Workers](https://workers.cloudflare.com)                                                                      | Global deployment with Smart Placement      |
-| **Framework**   | [Hono](https://hono.dev)                                                                                                  | Ultra-lightweight routing + middleware      |
-| **Database**    | [Cloudflare D1](https://developers.cloudflare.com/d1/)                                                                    | Serverless SQLite with atomic operations    |
-| **Cache**       | [Cloudflare KV](https://developers.cloudflare.com/kv/)                                                                    | Distributed key-value store (60s TTL)       |
-| **Validation**  | [Valibot](https://valibot.dev)                                                                                            | Tree-shakeable schema validation            |
-| **Language**    | [TypeScript 7](https://www.typescriptlang.org/)                                                                           | Native `tsgo` checker, every strict flag    |
-| **Toolchain**   | [mise](https://mise.jdx.dev) + [Bun](https://bun.sh)                                                                      | Pinned tools; package manager               |
-| **Lint/Format** | [oxlint](https://oxc.rs) (type-aware) + [oxfmt](https://oxc.rs)                                                           | Fast lint with TSDoc rules; formatter       |
-| **Tests**       | [Vitest](https://vitest.dev) + [Cloudflare plugin](https://developers.cloudflare.com/workers/testing/vitest-integration/) | Tests run inside workerd                    |
-| **Git hooks**   | [hk](https://hk.jdx.dev)                                                                                                  | Pre-commit fixes, commitlint, pre-push gate |
-| **CI/CD**       | [GitHub Actions](https://github.com/features/actions) + [semantic-release](https://semantic-release.gitbook.io/)          | Gate → deploy → tag + release notes         |
-
----
+The count is a single `INSERT … ON CONFLICT DO UPDATE … RETURNING`, so concurrent views never race.
+Request flow and module roles: [`src/README.md`](src/README.md).
 
 ## API
 
-| Endpoint                               | Method | Description                        |
-| -------------------------------------- | ------ | ---------------------------------- |
-| `/`                                    | GET    | API info and available endpoints   |
-| `/health`                              | GET    | Health check (`{ status: "ok" }`)  |
-| `/api/view-counter?username=:username` | GET    | Generate badge and increment count |
+```
++------------------ [ ENDPOINT ] ------------------+
+|                                                  |
+| GET  /api/view-counter                           |
+| Counts one view and returns the badge.           |
+|                                                  |
+| *  username     string  GitHub login, any case   |
+|    theme        string  one of six looks         |
+|    color        hex     count background         |
+|    label_color  hex     label background         |
+|                                                  |
++--------------------------------------------------+
+```
 
-> Full API reference: [docs/API.md](docs/API.md)
+Bad input returns `400 { "error": "…" }` with the rule that failed, and counts nothing. Full
+reference, headers and errors: [`docs/API.md`](docs/API.md).
 
----
+## Self-host
+
+Run your own copy on the Cloudflare free plan:
+
+```
++----------------- [ SELF HOST ] ------------------+
+|                                                  |
+| 1  Install                                       |
+|    mise install && mise run setup                |
+| │                                                |
+| 2  Create the database                           |
+|    bunx wrangler d1 create profile-views         |
+| │                                                |
+| 3  Migrate                                       |
+|    bun run db:migrate:prod                       |
+| │                                                |
+| 4  Deploy                                        |
+|    bun run deploy                                |
+|                                                  |
++--------------------------------------------------+
+```
+
+Merging to `main` then deploys automatically. Step-by-step guide, including the GitHub
+environment for the deploy token: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ## Development
 
-### Prerequisites
+Every tool version is pinned in `mise.toml`. The gate is the same command locally and in CI, with
+100 % coverage enforced on the Worker and on the scripts.
 
-- [mise](https://mise.jdx.dev) (installs Bun, Node and the lint tools from `mise.toml`)
-- [Cloudflare account](https://dash.cloudflare.com/sign-up) (free tier)
-
-### Setup
-
-```bash
-git clone https://github.com/tashfiqul-islam/profile-view-counter.git
-cd profile-view-counter
-mise install && mise run setup
+```
++------------------ [ COMMANDS ] ------------------+
+|                                                  |
+| Setup    mise install && mise run setup          |
+| Gate     bun run check                           |
+| Dev      bun run db:migrate && bun run dev       |
+| Format   bun run format                          |
+| Art      bun run readme:art                      |
+| Gallery  bun run badge:gallery                   |
+|                                                  |
++--------------------------------------------------+
 ```
 
-### Commands
-
-| Command                 | Description                                                      |
-| ----------------------- | ---------------------------------------------------------------- |
-| `bun run dev`           | Start local Workers dev server (run `bun run db:migrate` first)  |
-| `bun run check`         | The gate: typecheck, lint, format check, tests at 100 % coverage |
-| `bun run test`          | Worker tests (Vitest in workerd) and script tests (bun test)     |
-| `bun run format`        | Fix formatting                                                   |
-| `bun run cf-typegen`    | Regenerate types from `wrangler.jsonc`                           |
-| `mise run lint-actions` | Lint and audit the GitHub workflows                              |
-| `mise run lint-docs`    | Check every Markdown link and anchor                             |
-
----
-
-## Deployment
-
-Merging to `main` deploys automatically. To run your own copy, follow [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md):
-
-```bash
-bunx wrangler login           # Authenticate with Cloudflare
-bun run db:migrate:prod       # Apply D1 schema
-bun run deploy                # Ship it
+```
++------------------- [ LAYOUT ] -------------------+
+|                                                  |
+| src                                              |
+| ├─ index.ts              app, middleware, errors |
+| ├─ routes/view-counter   validate, count, render |
+| ├─ schemas/query         username and styling    |
+| ├─ services/counter      the only write          |
+| └─ badge/generator       pure svg and themes     |
+| migrations               d1 schema               |
+| scripts                  labels, docs, art       |
+|                                                  |
++--------------------------------------------------+
 ```
 
----
+### Releases
 
-## Contributing
+PRs are squash-merged, so the PR title is the commit that decides the release:
 
-1. Fork and clone the repo, then `mise install && mise run setup`
-2. Create a feature branch: `git switch -c feat/your-feature`
-3. Make changes and run `bun run check`
-4. Commit with a conventional message (`fix(badge): …`); the hk hook checks it
-5. Open a PR with a conventional title; it becomes the squash commit that drives the release
+```
++------------------ [ PIPELINE ] ------------------+
+|                                                  |
+| 1  Pull request                                  |
+|    title check, release label, quality gate      |
+| │                                                |
+| 2  Merge to main                                 |
+|    squash; the title decides the release         |
+| │                                                |
+| 3  Deploy                                        |
+|    d1 migrations, then wrangler deploy           |
+| │                                                |
+| 4  Release                                       |
+|    tag and GitHub Release with notes             |
+|                                                  |
++--------------------------------------------------+
+```
 
-> [!IMPORTANT]
-> See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for the full workflow and release rules.
+`feat` releases a minor version; `fix`, `perf`, `revert`, `security` and dependency updates a
+patch. See [CONTRIBUTING](.github/CONTRIBUTING.md) for the full workflow and [AGENTS.md](AGENTS.md)
+for the agent guides.
 
 ---
 
 <div align="center">
 
-<a href="https://github.com/tashfiqul-islam">
-  <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/>
-</a>
-<a href="https://x.com/_tashfiqulislam">
-  <img src="https://img.shields.io/badge/Twitter-000000?style=for-the-badge&logo=x&logoColor=white" alt="X"/>
-</a>
-
-**Built with care by [Tashfiqul Islam](https://github.com/tashfiqul-islam)**
-
-Licensed under MIT
+<sub>Built by <a href="https://github.com/tashfiqul-islam">Tashfiqul Islam</a> · <a href="https://x.com/_tashfiqulislam">@_tashfiqulislam</a> · MIT licensed</sub>
 
 </div>
