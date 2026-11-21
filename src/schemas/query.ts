@@ -54,7 +54,7 @@ export const querySchema = object(
     label_color: hexColor("label_color"),
     theme: optional(picklist(THEME_NAMES, `theme must be one of: ${THEME_NAMES.join(", ")}`)),
     // Views carried over from another counter: shown on the badge, never stored, so switching
-    // keeps a profile's history. Same name as komarev's GitHub Profile Views Counter.
+    // keeps a profile's history. Same name other GitHub profile view counters use.
     base: optional(
       pipe(
         string(BASE_ERROR),
