@@ -89,6 +89,24 @@ describe("readmeArt", () => {
   });
 });
 
+describe("README art", () => {
+  test("shows each pair by GitHub's theme setting, never the OS", async () => {
+    const readme = await Bun.file("README.md").text();
+    // GitHub hides links ending #gh-dark-mode-only / #gh-light-mode-only by its own theme; a
+    // <picture> with prefers-color-scheme follows the OS instead.
+    expect(readme).not.toContain("prefers-color-scheme");
+    for (const name of ["cover", "architecture"]) {
+      for (const mode of ["dark", "light"]) {
+        expect(readme).toMatch(
+          new RegExp(
+            `<a href="[^"]+#gh-${mode}-mode-only"><img src="assets/${name}-${mode}\\.svg"`,
+          ),
+        );
+      }
+    }
+  });
+});
+
 describe("writeReadmeArt", () => {
   test("writes each art file once through the given writer", async () => {
     const written: string[] = [];

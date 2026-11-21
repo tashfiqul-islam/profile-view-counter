@@ -42,8 +42,9 @@ theme or layout change.
 
 Renders the README cover and request path diagram as light and dark SVG pairs
 (`assets/cover-*.svg`, `assets/architecture-*.svg`) in the mdxcn figure style: dashed frame,
-corner marks, a `[ TITLE ]` label, monospace text, one accent per mode. The README picks the pair
-with `<picture>`, which follows the viewer's GitHub theme. The cover embeds real badges, and a test
+corner marks, a `[ TITLE ]` label, monospace text, one accent per mode. The README shows each pair as two
+links ending `#gh-dark-mode-only` and `#gh-light-mode-only`, which GitHub hides by the viewer's
+GitHub theme (a `<picture>` with `prefers-color-scheme` would follow the OS instead). The cover embeds real badges, and a test
 fails when any committed SVG drifts, so run `bun run readme:art` after a theme or layout change.
 
 ```sh

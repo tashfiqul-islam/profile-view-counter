@@ -1,9 +1,7 @@
 <div align="center">
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/cover-dark.svg" />
-  <img src="assets/cover-light.svg" alt="Profile View Counter: every view, counted. Five example badges in different themes." width="100%" />
-</picture>
+<a href="https://github.com/tashfiqul-islam/profile-view-counter#gh-dark-mode-only"><img src="assets/cover-dark.svg" alt="Profile View Counter: every view, counted. Five example badges in different themes." width="100%" /></a>
+<a href="https://github.com/tashfiqul-islam/profile-view-counter#gh-light-mode-only"><img src="assets/cover-light.svg" alt="Profile View Counter: every view, counted. Five example badges in different themes." width="100%" /></a>
 
 ### A view counter badge for your GitHub profile, crisp at any size, in any colour
 
@@ -60,10 +58,8 @@ changes the count.
 GitHub serves README images through its image proxy, camo. Each view fetches the badge from the
 Worker, which validates the query, counts the view in D1 and renders a fresh SVG.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/architecture-dark.svg" />
-  <img src="assets/architecture-light.svg" alt="Request path: your README, GitHub's image proxy, then the Worker validates, counts in D1 and renders the SVG." width="100%" />
-</picture>
+<a href="https://github.com/tashfiqul-islam/profile-view-counter#gh-dark-mode-only"><img src="assets/architecture-dark.svg" alt="Request path: your README, GitHub's image proxy, then the Worker validates, counts in D1 and renders the SVG." width="100%" /></a>
+<a href="https://github.com/tashfiqul-islam/profile-view-counter#gh-light-mode-only"><img src="assets/architecture-light.svg" alt="Request path: your README, GitHub's image proxy, then the Worker validates, counts in D1 and renders the SVG." width="100%" /></a>
 
 Inside the Worker, one request is four steps:
 
