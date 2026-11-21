@@ -28,7 +28,7 @@ JSON.
 | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
 | `index.ts`               | Hono app: middleware, `/`, `/health`, `/favicon.ico`, 404 and error handler                                                       |
 | `routes/view-counter.ts` | `GET /api/view-counter`: validate, count, render; `HEAD` without counting                                                         |
-| `schemas/query.ts`       | Valibot schema: `username` (GitHub-style, lowercased), `theme`, `color`, `label_color`                                            |
+| `schemas/query.ts`       | Valibot schema: `username` (GitHub-style, lowercased), `theme`, `color`, `label_color`, `base`                                    |
 | `services/counter.ts`    | `incrementViewCount()`: D1 `INSERT … ON CONFLICT DO UPDATE … RETURNING`                                                           |
 | `badge/generator.ts`     | Pure SVG: `generateModernBadge()`, `THEMES`, `resolvePalette()`, `readableText()`, `textWidth()`, `formatNumber()`, `escapeXml()` |
 | `test-setup.ts`          | Vitest setup: applies `migrations/` to each test file's isolated D1                                                               |

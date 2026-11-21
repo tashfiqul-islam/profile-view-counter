@@ -161,6 +161,40 @@ describe("Integration Tests (Hono + D1)", () => {
       expect(await viewsOf("bad-style")).toBeUndefined();
     });
 
+    it("adds base to the badge but stores only real views", async () => {
+      const first = await (await fetchApp("/api/view-counter?username=switcher&base=3000")).text();
+      const second = await (await fetchApp("/api/view-counter?username=switcher&base=3000")).text();
+
+      expect(first).toContain('aria-label="Profile visitors: 3K"');
+      expect(second).toContain(">3K</text>");
+      expect(await viewsOf("switcher")).toBe(2);
+      const exact = await (await fetchApp("/api/view-counter?username=switcher&base=997")).text();
+      expect(exact).toContain('aria-label="Profile visitors: 1K"');
+      expect(await viewsOf("switcher")).toBe(3);
+    });
+
+    it.each(["-1", "1.5", "1e3", "abc", "", "1000000001", "99999999999"])(
+      "rejects base=%s with 400 { error } and counts nothing",
+      async (base) => {
+        const res = await fetchApp(`/api/view-counter?username=bad-base&base=${base}`);
+
+        expect(res.status).toBe(400);
+        expect(await res.json()).toEqual({
+          error: "base must be a whole number from 0 to 1000000000",
+        });
+        expect(await viewsOf("bad-base")).toBeUndefined();
+      },
+    );
+
+    it("rejects a repeated base", async () => {
+      const res = await fetchApp("/api/view-counter?username=two-bases&base=1&base=2");
+
+      expect(res.status).toBe(400);
+      expect(await res.json()).toEqual({
+        error: "base must be a whole number from 0 to 1000000000",
+      });
+    });
+
     it("answers HEAD with the badge headers without counting a view", async () => {
       const res = await fetchApp("/api/view-counter?username=head-check", "HEAD");
 

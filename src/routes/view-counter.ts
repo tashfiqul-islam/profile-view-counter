@@ -22,7 +22,7 @@ const SVG_HEADERS = {
 
 /**
  * `GET /view-counter` (mounted under `/api`): counts one view per `GET` and returns the badge in the
- * requested theme or colours; `HEAD` gets the same headers without counting.
+ * requested theme or colours, plus any `base` carried over from another counter; `HEAD` gets the same headers without counting.
  */
 export const viewCounterRoute = new Hono<{ Bindings: Env }>();
 
@@ -36,9 +36,10 @@ viewCounterRoute.get(
     // HEAD comes from link checkers and crawlers, not readers: answer it without counting.
     if (c.req.method === "HEAD") return c.body(null, 200, SVG_HEADERS);
 
-    const { color, label_color: labelColor, theme, username } = c.req.valid("query");
-    const count = await incrementViewCount(c.env.DB, username);
-    const svg = generateModernBadge(count, { color, labelColor, theme });
+    const { base = 0, color, label_color: labelColor, theme, username } = c.req.valid("query");
+    const views = await incrementViewCount(c.env.DB, username);
+    // The badge shows views carried over from another counter; the database keeps only real ones.
+    const svg = generateModernBadge(views + base, { color, labelColor, theme });
     return c.body(svg, 200, SVG_HEADERS);
   },
 );

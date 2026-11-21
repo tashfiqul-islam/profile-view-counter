@@ -14,7 +14,7 @@ that fits any font. No sign-up, no API key: paste one line.
 [![Renovate](https://img.shields.io/badge/renovate-enabled-1f2328?style=flat-square&logo=renovatebot)](renovate.json)&nbsp;
 [![License](https://img.shields.io/badge/license-MIT-1f2328?style=flat-square)](LICENSE)
 
-**[What you get](#what-you-get) · [Get started](#get-started-in-three-steps) · [Themes](#themes-and-colours) · [How it works](#how-it-works) · [API](#api) · [Self-host](#self-host) · [Development](#development) · [Security](.github/SECURITY.md)**
+**[What you get](#what-you-get) · [Get started](#get-started-in-three-steps) · [Switching](#switching-from-another-counter) · [Themes](#themes-and-colours) · [How it works](#how-it-works) · [API](#api) · [Self-host](#self-host) · [Development](#development) · [Security](.github/SECURITY.md)**
 
 </div>
 
@@ -45,6 +45,7 @@ always current, and bad input fails loudly instead of drawing a wrong number.
 
 - **Every view**: `Cache-Control: no-store`, so GitHub's image proxy fetches each one
 - **Atomic**: one `INSERT … ON CONFLICT DO UPDATE … RETURNING`; concurrent views never race
+- **Keep your history**: `&base=` carries views over from any other counter
 - **One counter per person**: usernames are case-insensitive; `HEAD` requests count nothing
 
 </td>
@@ -127,6 +128,19 @@ always current, and bad input fails loudly instead of drawing a wrong number.
 > Add `&theme=aurora`, or your own colours with `&color=e11d48&label_color=0f172a`. All options
 > are under [Themes and colours](#themes-and-colours).
 
+## Switching from another counter
+
+Already have views on another counter? Add them as `base`, and the badge starts from your real
+number instead of zero:
+
+```markdown
+[![Profile Views](https://profile-view-counter.tashfiq61.workers.dev/api/view-counter?username=YOUR_USERNAME&base=3000)](https://github.com/tashfiqul-islam/profile-view-counter)
+```
+
+`base` is added to what the badge shows (0 to 1,000,000,000); new views count on top, and the
+stored count stays your real views here. Coming from komarev's GitHub Profile Views Counter? It
+uses the same `base` parameter, so change the domain and keep the rest.
+
 ## Themes and colours
 
 Add `&theme=` for a built-in look, or `&color=` / `&label_color=` for your own (6-digit hex, no
@@ -137,6 +151,7 @@ Add `&theme=` for a built-in look, or `&color=` / `&label_color=` for your own (
 | `theme`       | `graphite`, `aurora`, `mono`, `paper`, `contribution`, `adaptive` | `graphite` |
 | `color`       | count background, hex like `0969da`                               | theme's    |
 | `label_color` | label background, hex like `1f2328`                               | theme's    |
+| `base`        | views carried over from another counter, `0` to `1000000000`      | `0`        |
 
 ![Every badge theme and two custom-colour examples, on light and dark backgrounds](assets/badge-themes.svg)
 
@@ -206,6 +221,8 @@ never drift.
 |    theme        string  one of six looks         |
 |    color        hex     count background         |
 |    label_color  hex     label background         |
+|    base         number  views from a previous    |
+|                         counter, added on top    |
 |                                                  |
 | * required                                       |
 |                                                  |

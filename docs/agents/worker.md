@@ -16,6 +16,8 @@ D1 schema or a migration.
   `INSERT … ON CONFLICT DO UPDATE … RETURNING views`. Keep it a single statement.
 - **Styling** (`theme`, `color`, `label_color`) is optional, validated in `querySchema` (and the
   colours again in the renderer), and only reaches the badge; the counter key is the username alone.
+- **`base`** (0 to 1e9) carries views over from another counter: the route renders `views + base`
+  and stores nothing extra. Keep it out of the database so a URL edit can never change real counts.
 - **Validation** lives in a Valibot schema in `src/schemas/` and runs through `vValidator` at the
   route with the hook that returns `400 { error: <first issue message> }`.
 - **Errors** reach clients as `{ error: string }` (400, 404, 500); details go to
