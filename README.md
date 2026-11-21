@@ -52,7 +52,7 @@ always current, and bad input fails loudly instead of drawing a wrong number.
 
 ### 🎨 Badge design
 
-- **28 px pill**: sized 1:1 to its `viewBox`, with a slanted `/` edge between label and count
+- **28 px badge**: corners curved like the GitHub mark, a slanted `/` edge between label and count
 - **Always fits**: widths from font metrics, text pinned with `textLength`, centred in any font
 - **Readable numbers**: `Intl` compact notation (`999`, `32.7K`, `1.2M`), screen-reader name
 

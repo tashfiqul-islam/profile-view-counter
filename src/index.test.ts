@@ -131,7 +131,7 @@ describe("Integration Tests (Hono + D1)", () => {
       const svg = await res.text();
 
       expect(res.status).toBe(200);
-      expect(svg).toContain('rx="14" fill="#e11d48"');
+      expect(svg).toContain('rx="7" fill="#e11d48"');
       expect(svg).toContain('fill="#0f172a"');
       expect(svg).not.toContain("pvc-accent");
     });

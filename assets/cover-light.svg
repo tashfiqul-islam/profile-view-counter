@@ -17,7 +17,7 @@
 <text x="96" y="400" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="21" fill="#59636e">Crisp at any size, in any theme or colour.</text>
 <path d="M96 428h512" stroke="#d0d7de"/>
 <text x="96" y="468" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="34" font-weight="700" letter-spacing="-0.5" fill="#1f2328">28 px</text>
-<text x="96" y="492" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" letter-spacing="0.5" fill="#59636e">pill height</text>
+<text x="96" y="492" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" letter-spacing="0.5" fill="#59636e">badge height</text>
 <text x="272" y="468" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="34" font-weight="700" letter-spacing="-0.5" fill="#1f2328">6</text>
 <text x="272" y="492" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12" letter-spacing="0.5" fill="#59636e">themes + any hex</text>
 <text x="448" y="468" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="34" font-weight="700" letter-spacing="-0.5" fill="#1f2328">100 %</text>
@@ -31,10 +31,10 @@
       <stop offset="1" stop-color="#000000" stop-opacity="0.12"/>
     </linearGradient>
   </defs>
-  <rect width="203.9" height="28" rx="14" fill="#0969da"/>
-  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
-  <rect width="203.9" height="28" rx="14" fill="url(#pvc-sheen-light0)"/>
-  <rect x=".5" y=".5" width="202.9" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
+  <rect width="203.9" height="28" rx="7" fill="#0969da"/>
+  <path d="M7 0H151.3L145.3 28H7A7 7 0 0 1 0 21V7A7 7 0 0 1 7 0Z" fill="#1f2328"/>
+  <rect width="203.9" height="28" rx="7" fill="url(#pvc-sheen-light0)"/>
+  <rect x=".5" y=".5" width="202.9" height="27" rx="6.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
     <path aria-hidden="true" fill="#ffffff" transform="translate(11 7) scale(0.875)" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
     <text x="31" y="17.5" fill="#ffffff" font-size="10" font-weight="600" textLength="106.3" lengthAdjust="spacing">PROFILE VISITORS</text>
@@ -54,10 +54,10 @@
       <stop offset="1" stop-color="#a371f7"/>
     </linearGradient>
   </defs>
-  <rect width="198.2" height="28" rx="14" fill="url(#pvc-accent-light1)"/>
-  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#0d1117"/>
-  <rect width="198.2" height="28" rx="14" fill="url(#pvc-sheen-light1)"/>
-  <rect x=".5" y=".5" width="197.2" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
+  <rect width="198.2" height="28" rx="7" fill="url(#pvc-accent-light1)"/>
+  <path d="M7 0H151.3L145.3 28H7A7 7 0 0 1 0 21V7A7 7 0 0 1 7 0Z" fill="#0d1117"/>
+  <rect width="198.2" height="28" rx="7" fill="url(#pvc-sheen-light1)"/>
+  <rect x=".5" y=".5" width="197.2" height="27" rx="6.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
     <path aria-hidden="true" fill="#ffffff" transform="translate(11 7) scale(0.875)" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
     <text x="31" y="17.5" fill="#ffffff" font-size="10" font-weight="600" textLength="106.3" lengthAdjust="spacing">PROFILE VISITORS</text>
@@ -73,10 +73,10 @@
       <stop offset="1" stop-color="#000000" stop-opacity="0.12"/>
     </linearGradient>
   </defs>
-  <rect width="191.1" height="28" rx="14" fill="#24292f"/>
-  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#24292f"/>
-  <rect width="191.1" height="28" rx="14" fill="url(#pvc-sheen-light2)"/>
-  <rect x=".5" y=".5" width="190.1" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
+  <rect width="191.1" height="28" rx="7" fill="#24292f"/>
+  <path d="M7 0H151.3L145.3 28H7A7 7 0 0 1 0 21V7A7 7 0 0 1 7 0Z" fill="#24292f"/>
+  <rect width="191.1" height="28" rx="7" fill="url(#pvc-sheen-light2)"/>
+  <rect x=".5" y=".5" width="190.1" height="27" rx="6.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <path d="M146.8 21L149.8 7" stroke="#ffffff" stroke-opacity=".3" stroke-width="1.2" stroke-linecap="round"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
     <path aria-hidden="true" fill="#ffffff" transform="translate(11 7) scale(0.875)" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
@@ -93,10 +93,10 @@
       <stop offset="1" stop-color="#000000" stop-opacity="0.04"/>
     </linearGradient>
   </defs>
-  <rect width="184.3" height="28" rx="14" fill="#0969da"/>
-  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#ffffff"/>
-  <rect width="184.3" height="28" rx="14" fill="url(#pvc-sheen-light3)"/>
-  <rect x=".5" y=".5" width="183.3" height="27" rx="13.5" fill="none" stroke="#d0d7de" stroke-opacity="1"/>
+  <rect width="184.3" height="28" rx="7" fill="#0969da"/>
+  <path d="M7 0H151.3L145.3 28H7A7 7 0 0 1 0 21V7A7 7 0 0 1 7 0Z" fill="#ffffff"/>
+  <rect width="184.3" height="28" rx="7" fill="url(#pvc-sheen-light3)"/>
+  <rect x=".5" y=".5" width="183.3" height="27" rx="6.5" fill="none" stroke="#d0d7de" stroke-opacity="1"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
     <path aria-hidden="true" fill="#1f2328" transform="translate(11 7) scale(0.875)" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
     <text x="31" y="17.5" fill="#1f2328" font-size="10" font-weight="600" textLength="106.3" lengthAdjust="spacing">PROFILE VISITORS</text>
@@ -112,10 +112,10 @@
       <stop offset="1" stop-color="#000000" stop-opacity="0.12"/>
     </linearGradient>
   </defs>
-  <rect width="200.2" height="28" rx="14" fill="#1a7f37"/>
-  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#1f2328"/>
-  <rect width="200.2" height="28" rx="14" fill="url(#pvc-sheen-light4)"/>
-  <rect x=".5" y=".5" width="199.2" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
+  <rect width="200.2" height="28" rx="7" fill="#1a7f37"/>
+  <path d="M7 0H151.3L145.3 28H7A7 7 0 0 1 0 21V7A7 7 0 0 1 7 0Z" fill="#1f2328"/>
+  <rect width="200.2" height="28" rx="7" fill="url(#pvc-sheen-light4)"/>
+  <rect x=".5" y=".5" width="199.2" height="27" rx="6.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
     <path aria-hidden="true" fill="#ffffff" transform="translate(11 7) scale(0.875)" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
     <text x="31" y="17.5" fill="#ffffff" font-size="10" font-weight="600" textLength="106.3" lengthAdjust="spacing">PROFILE VISITORS</text>
@@ -131,10 +131,10 @@
       <stop offset="1" stop-color="#000000" stop-opacity="0.12"/>
     </linearGradient>
   </defs>
-  <rect width="196.8" height="28" rx="14" fill="#e11d48"/>
-  <path d="M14 0H151.3L145.3 28H14A14 14 0 0 1 14 0Z" fill="#0f172a"/>
-  <rect width="196.8" height="28" rx="14" fill="url(#pvc-sheen-light5)"/>
-  <rect x=".5" y=".5" width="195.8" height="27" rx="13.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
+  <rect width="196.8" height="28" rx="7" fill="#e11d48"/>
+  <path d="M7 0H151.3L145.3 28H7A7 7 0 0 1 0 21V7A7 7 0 0 1 7 0Z" fill="#0f172a"/>
+  <rect width="196.8" height="28" rx="7" fill="url(#pvc-sheen-light5)"/>
+  <rect x=".5" y=".5" width="195.8" height="27" rx="6.5" fill="none" stroke="#ffffff" stroke-opacity="0.12"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" text-rendering="geometricPrecision">
     <path aria-hidden="true" fill="#ffffff" transform="translate(11 7) scale(0.875)" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
     <text x="31" y="17.5" fill="#ffffff" font-size="10" font-weight="600" textLength="106.3" lengthAdjust="spacing">PROFILE VISITORS</text>

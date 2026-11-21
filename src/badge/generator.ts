@@ -116,7 +116,8 @@ const ADAPTIVE_CSS =
   ".pvc-edge{stroke:#d0d7de;stroke-opacity:1}}";
 
 const HEIGHT = 28;
-const RADIUS = HEIGHT / 2;
+// Corners share the GitHub mark's curve: radius = mark radius, so the outline echoes the icon.
+const RADIUS = 7;
 const PAD = 11;
 const ICON = 14;
 const ICON_GAP = 6;
@@ -272,7 +273,7 @@ function parseHex(value: string | undefined, name: string): string | undefined {
 const baseline = (size: number): number => round(HEIGHT / 2 + size * 0.35);
 
 /**
- * Renders the badge: a 28 px pill with the GitHub mark and label on the left and the formatted
+ * Renders the badge: a 28 px rounded bar, corners curved like the GitHub mark, with the GitHub mark and label on the left and the formatted
  * count on the right. Width grows with the count; text never overflows its segment.
  *
  * @param count - View count to show.
@@ -331,7 +332,7 @@ export function generateModernBadge(count: number, options: BadgeOptions = {}): 
 ${defs}
   </defs>
   <rect width="${width}" height="${HEIGHT}" rx="${RADIUS}" fill="${countFill}"/>
-  <path${labelClass} d="M${RADIUS} 0H${edgeTop}L${edgeBottom} ${HEIGHT}H${RADIUS}A${RADIUS} ${RADIUS} 0 0 1 ${RADIUS} 0Z" fill="${palette.label}"/>
+  <path${labelClass} d="M${RADIUS} 0H${edgeTop}L${edgeBottom} ${HEIGHT}H${RADIUS}A${RADIUS} ${RADIUS} 0 0 1 0 ${HEIGHT - RADIUS}V${RADIUS}A${RADIUS} ${RADIUS} 0 0 1 ${RADIUS} 0Z" fill="${palette.label}"/>
   <rect width="${width}" height="${HEIGHT}" rx="${RADIUS}" fill="url(#pvc-sheen)"/>
   <rect x=".5" y=".5" width="${round(width - 1)}" height="${HEIGHT - 1}" rx="${RADIUS - 0.5}" fill="none"${edgeClass} stroke="${edgeColor}" stroke-opacity="${edgeOpacity}"/>${divider}
   <g font-family="${FONT_STACK}" text-rendering="geometricPrecision">

@@ -16,8 +16,11 @@ format.
   `scripts/badge-gallery.ts`; run `bun run badge:gallery` and `bun run readme:art`; update the
   theme lists in `README.md`, `docs/API.md` and the expected messages in `src/index.test.ts` and
   `src/schemas/query.test.ts` (they are independent copies on purpose).
-- **Size**: a 28 px pill (the shields `for-the-badge` height), `width`/`height` equal to the
-  `viewBox`, radius 14. It scales as a vector; 2× pixel sizing is unnecessary.
+- **Size**: 28 px tall (the shields `for-the-badge` height), `width`/`height` equal to the
+  `viewBox`. It scales as a vector; 2× pixel sizing is unnecessary.
+- **Shape**: corner radius 7, the radius of the 14 px GitHub mark, so the outline echoes the icon.
+  The label/count edge leans like `/` (`SLANT`, 6 px over the height), centred on the segment
+  boundary so widths and centring are unchanged.
 - **Text fit**: layout widths come from `textWidth()` (Arial Bold advances plus tracking), and each
   `<text>` carries `textLength` with `lengthAdjust="spacing"`, so whatever font the viewer has,
   text fills exactly its slot and stays centred. When you change a font size, tracking, label or
